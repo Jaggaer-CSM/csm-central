@@ -1,0 +1,950 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI-Powered CSM Agent Lifecycle</title>
+  <style>
+    :root {
+      --navy: #16356b;
+      --navy-deep: #0d2550;
+      --bg: #f5f8ff;
+      --panel: #ffffff;
+      --text: #19304f;
+      --muted: #61708f;
+      --line: #d9e2f1;
+      --shadow: 0 18px 40px rgba(16, 42, 86, 0.12);
+      --purple: #6f46d9;
+      --blue: #2474e0;
+      --green: #1d8d63;
+      --orange: #ea8418;
+      --teal: #0f8aa8;
+      --soft-purple: #f3edff;
+      --soft-blue: #edf5ff;
+      --soft-green: #ecfaf4;
+      --soft-orange: #fff3e8;
+      --soft-teal: #ebfafd;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: "Segoe UI", "Aptos", "Trebuchet MS", sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at top left, rgba(111, 70, 217, 0.08), transparent 24%),
+        radial-gradient(circle at top right, rgba(36, 116, 224, 0.10), transparent 28%),
+        linear-gradient(180deg, #fbfcff 0%, #eef4ff 100%);
+    }
+
+    .page {
+      max-width: 1500px;
+      margin: 0 auto;
+      padding: 28px 22px 40px;
+    }
+
+    .hero h1 {
+      margin: 0;
+      font-size: clamp(2.3rem, 5vw, 4rem);
+      line-height: 1;
+      letter-spacing: -0.03em;
+      color: var(--navy);
+    }
+
+    .hero p {
+      margin: 10px 0 0;
+      font-size: 1.1rem;
+      color: var(--navy);
+      max-width: 1100px;
+      font-weight: 600;
+    }
+
+    .legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin: 22px auto 24px;
+      width: fit-content;
+      padding: 14px 20px;
+      background: rgba(255, 255, 255, 0.82);
+      border: 1px solid rgba(128, 149, 191, 0.28);
+      border-radius: 18px;
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(6px);
+    }
+
+    .legend-item {
+      display: inline-flex;
+      align-items: center;
+      gap: 9px;
+      font-weight: 700;
+      color: var(--navy);
+      white-space: nowrap;
+    }
+
+    .legend-icon,
+    .legend-line {
+      flex: 0 0 auto;
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: 250px minmax(0, 1fr);
+      gap: 22px;
+      align-items: start;
+    }
+
+    .outcomes,
+    .reports {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 24px;
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+
+    .panel-head {
+      padding: 16px 18px;
+      background: linear-gradient(90deg, var(--navy) 0%, var(--navy-deep) 100%);
+      color: #fff;
+      font-size: 1.05rem;
+      font-weight: 800;
+      letter-spacing: 0.02em;
+      text-transform: uppercase;
+    }
+
+    .outcomes .body,
+    .reports .body {
+      padding: 16px 18px 18px;
+    }
+
+    .intro-copy {
+      margin: 0 0 14px;
+      color: var(--text);
+      font-size: 1rem;
+      line-height: 1.5;
+    }
+
+    .outcome {
+      display: grid;
+      grid-template-columns: 52px 1fr;
+      gap: 14px;
+      padding: 16px 0;
+      border-top: 1px solid var(--line);
+    }
+
+    .outcome:first-of-type {
+      border-top: 0;
+      padding-top: 4px;
+    }
+
+    .outcome-icon {
+      width: 52px;
+      height: 52px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      color: #fff;
+      font-size: 1.45rem;
+      font-weight: 800;
+    }
+
+    .outcome h3,
+    .reports h3 {
+      margin: 0 0 4px;
+      font-size: 1.1rem;
+      color: var(--navy);
+    }
+
+    .outcome p,
+    .reports li {
+      margin: 0;
+      color: var(--text);
+      line-height: 1.4;
+    }
+
+    .main {
+      min-width: 0;
+    }
+
+    .lifecycle {
+      background: rgba(255, 255, 255, 0.8);
+      border: 1px solid var(--line);
+      border-radius: 28px;
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+
+    .lifecycle-head {
+      padding: 14px 20px;
+      background: linear-gradient(90deg, var(--navy) 0%, var(--navy-deep) 100%);
+      color: #fff;
+      text-align: center;
+      font-weight: 800;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(210px, 1fr));
+      gap: 16px;
+      padding: 18px;
+      align-items: stretch;
+      position: relative;
+    }
+
+    .agent-card {
+      position: relative;
+      border-radius: 24px;
+      border: 2px solid var(--accent);
+      background: var(--soft);
+      box-shadow: 0 16px 28px rgba(20, 42, 82, 0.08);
+      transition: transform 160ms ease, box-shadow 160ms ease;
+      cursor: pointer;
+      overflow: hidden;
+      min-height: 470px;
+    }
+
+    .agent-card:hover,
+    .agent-card:focus-visible {
+      transform: translateY(-4px);
+      box-shadow: 0 22px 36px rgba(20, 42, 82, 0.14);
+      outline: none;
+    }
+
+    .agent-card.active {
+      box-shadow: 0 0 0 4px rgba(17, 39, 80, 0.14), 0 22px 36px rgba(20, 42, 82, 0.18);
+    }
+
+    .agent-number {
+      position: absolute;
+      top: 10px;
+      right: 16px;
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      background: var(--accent);
+      color: #fff;
+      display: grid;
+      place-items: center;
+      font-weight: 800;
+      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.14);
+    }
+
+    .card-head {
+      padding: 24px 20px 18px;
+      color: #fff;
+      background: linear-gradient(180deg, color-mix(in srgb, var(--accent) 94%, #fff 6%) 0%, var(--accent) 100%);
+    }
+
+    .stage-tag {
+      display: inline-flex;
+      padding: 6px 10px;
+      border-radius: 999px;
+      font-size: 0.77rem;
+      font-weight: 800;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      background: rgba(255, 255, 255, 0.18);
+      backdrop-filter: blur(4px);
+    }
+
+    .card-head h2 {
+      margin: 14px 0 6px;
+      font-size: 1.4rem;
+      line-height: 1.1;
+    }
+
+    .card-head p {
+      margin: 0;
+      line-height: 1.45;
+      color: rgba(255, 255, 255, 0.95);
+    }
+
+    .card-body {
+      padding: 18px 20px 16px;
+      display: grid;
+      gap: 14px;
+    }
+
+    .icon-wrap {
+      width: 68px;
+      height: 68px;
+      border-radius: 20px;
+      display: grid;
+      place-items: center;
+      background: #fff;
+      color: var(--accent);
+      font-size: 1.9rem;
+      font-weight: 900;
+      box-shadow: inset 0 0 0 1px rgba(18, 44, 89, 0.08);
+    }
+
+    .agent-card h3 {
+      margin: 0 0 8px;
+      font-size: 1rem;
+      color: var(--navy);
+    }
+
+    .agent-card ul {
+      margin: 0;
+      padding-left: 18px;
+      color: var(--text);
+      line-height: 1.45;
+    }
+
+    .card-foot {
+      margin-top: auto;
+      padding: 14px 20px 18px;
+    }
+
+    .impact-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      border-radius: 16px;
+      padding: 10px 12px;
+      background: rgba(255, 255, 255, 0.7);
+      border: 1px solid rgba(17, 44, 92, 0.08);
+      font-weight: 700;
+      color: var(--navy);
+      line-height: 1.3;
+    }
+
+    .flow-row {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(210px, 1fr));
+      gap: 16px;
+      padding: 0 18px 18px;
+      margin-top: -2px;
+    }
+
+    .flow-row div {
+      display: flex;
+      justify-content: center;
+      color: #5370ac;
+      font-size: 2rem;
+      font-weight: 800;
+    }
+
+    .feedback {
+      position: relative;
+      margin: 2px 18px 18px;
+      padding: 18px;
+      border-radius: 26px;
+      background: linear-gradient(180deg, rgba(243, 239, 255, 0.9), rgba(236, 244, 255, 0.9));
+      border: 1px solid #cdcffa;
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.8);
+    }
+
+    .feedback-title {
+      width: fit-content;
+      margin: -34px auto 14px;
+      padding: 12px 26px;
+      border-radius: 999px;
+      color: #fff;
+      background: linear-gradient(90deg, #5b38c8 0%, #2348b9 100%);
+      font-weight: 800;
+      letter-spacing: 0.02em;
+      text-transform: uppercase;
+      box-shadow: 0 10px 20px rgba(58, 69, 144, 0.18);
+    }
+
+    .feedback p {
+      margin: 0 0 16px;
+      text-align: center;
+      color: var(--text);
+      line-height: 1.45;
+    }
+
+    .feedback-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(180px, 1fr));
+      gap: 14px;
+    }
+
+    .feedback-item {
+      padding: 16px;
+      border-radius: 18px;
+      background: rgba(255, 255, 255, 0.72);
+      border: 1px solid rgba(120, 134, 209, 0.18);
+    }
+
+    .feedback-item h3 {
+      margin: 0 0 8px;
+      color: var(--navy);
+      font-size: 1rem;
+    }
+
+    .feedback-item p {
+      margin: 0;
+      text-align: left;
+      line-height: 1.45;
+    }
+
+    .lower {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 290px;
+      gap: 18px;
+      align-items: start;
+      margin-top: 18px;
+    }
+
+    .reports ul {
+      margin: 0;
+      padding-left: 18px;
+      display: grid;
+      gap: 10px;
+    }
+
+    .details {
+      position: sticky;
+      top: 20px;
+      align-self: start;
+      background: rgba(255, 255, 255, 0.94);
+      border: 1px solid var(--line);
+      border-radius: 26px;
+      box-shadow: var(--shadow);
+      overflow: hidden;
+      min-height: 620px;
+    }
+
+    .details-head {
+      padding: 20px 22px 18px;
+      color: #fff;
+      background: linear-gradient(135deg, var(--details-accent, var(--navy)) 0%, color-mix(in srgb, var(--details-accent, var(--navy)) 68%, #081d40 32%) 100%);
+    }
+
+    .details-stage {
+      font-size: 0.8rem;
+      font-weight: 800;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      opacity: 0.9;
+    }
+
+    .details-head h2 {
+      margin: 10px 0 6px;
+      font-size: 1.8rem;
+      line-height: 1.05;
+    }
+
+    .details-head p {
+      margin: 0;
+      line-height: 1.45;
+      color: rgba(255, 255, 255, 0.96);
+    }
+
+    .details-body {
+      padding: 18px 22px 24px;
+      display: grid;
+      gap: 16px;
+    }
+
+    .detail-block {
+      padding: 16px 16px 14px;
+      border-radius: 18px;
+      background: #f8fbff;
+      border: 1px solid #dce6f5;
+    }
+
+    .detail-block h3 {
+      margin: 0 0 8px;
+      font-size: 1rem;
+      color: var(--navy);
+    }
+
+    .detail-block ul {
+      margin: 0;
+      padding-left: 18px;
+      line-height: 1.5;
+    }
+
+    .chip-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .chip {
+      padding: 8px 10px;
+      border-radius: 999px;
+      background: #eef4ff;
+      border: 1px solid #d7e2f7;
+      color: var(--navy);
+      font-size: 0.92rem;
+      font-weight: 700;
+    }
+
+    .details-note {
+      font-size: 0.94rem;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    @media (max-width: 1360px) {
+      .layout {
+        grid-template-columns: 1fr;
+      }
+
+      .lower {
+        grid-template-columns: 1fr;
+      }
+
+      .details {
+        position: static;
+        min-height: unset;
+      }
+    }
+
+    @media (max-width: 1120px) {
+      .cards,
+      .flow-row {
+        grid-template-columns: repeat(2, minmax(240px, 1fr));
+      }
+
+      .feedback-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 720px) {
+      .page {
+        padding: 20px 14px 30px;
+      }
+
+      .cards,
+      .flow-row {
+        grid-template-columns: 1fr;
+      }
+
+      .agent-card {
+        min-height: unset;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <section class="hero">
+      <h1>AI-Powered CSM Agent Lifecycle</h1>
+      <p>Multiple AI agents working together to streamline onboarding, strengthen adoption, support ongoing customer meetings, surface risk early, and improve renewal readiness in JAGGAER.</p>
+    </section>
+
+    <section class="legend" aria-label="Legend">
+      <div class="legend-item">
+        <svg class="legend-icon" width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <circle cx="12" cy="12" r="11" fill="#6f46d9"></circle>
+          <path d="M8 13.5c1.3-1.1 2.1-1.8 3.1-3.3 1 1.8 1.7 2.5 4.9 3.9-2.3.5-3.4 1.6-4.6 4.1-.8-2.2-1.7-3.2-3.4-4.7Z" fill="white"></path>
+        </svg>
+        AI Agent
+      </div>
+      <div class="legend-item">
+        <svg class="legend-icon" width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <circle cx="12" cy="8" r="4" fill="#16356b"></circle>
+          <path d="M5 20c0-3.7 3.1-6 7-6s7 2.3 7 6" fill="#16356b"></path>
+        </svg>
+        Human CSM
+      </div>
+      <div class="legend-item">
+        <svg class="legend-icon" width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <rect x="5" y="5" width="14" height="14" rx="3" transform="rotate(45 12 12)" fill="#6f46d9"></rect>
+        </svg>
+        Decision Point
+      </div>
+      <div class="legend-item">
+        <svg class="legend-line" width="44" height="16" viewBox="0 0 44 16" fill="none" aria-hidden="true">
+          <path d="M2 8h34" stroke="#5b38c8" stroke-width="3" stroke-linecap="round"></path>
+          <path d="M29 3l8 5-8 5" fill="none" stroke="#5b38c8" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"></path>
+        </svg>
+        Flow
+      </div>
+      <div class="legend-item">
+        <svg class="legend-line" width="44" height="16" viewBox="0 0 44 16" fill="none" aria-hidden="true">
+          <path d="M2 8h34" stroke="#5b38c8" stroke-width="3" stroke-linecap="round" stroke-dasharray="5 5"></path>
+          <path d="M29 3l8 5-8 5" fill="none" stroke="#5b38c8" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"></path>
+        </svg>
+        Feedback Loop
+      </div>
+    </section>
+
+    <section class="layout">
+      <aside class="outcomes">
+        <div class="panel-head">System Outcomes</div>
+        <div class="body">
+          <p class="intro-copy">A practical, self-improving CSM support model focused on onboarding, adoption, value realization, and renewal confidence.</p>
+
+          <div class="outcome">
+            <div class="outcome-icon" style="background:#6f46d9;">↗</div>
+            <div>
+              <h3>Stronger Adoption</h3>
+              <p>Consistent follow-up, better meeting prep, and targeted enablement improve ongoing usage and stakeholder engagement.</p>
+            </div>
+          </div>
+
+          <div class="outcome">
+            <div class="outcome-icon" style="background:#1d8d63;">★</div>
+            <div>
+              <h3>More Success Stories</h3>
+              <p>Value moments, outcomes, and customer quotes are captured earlier and turned into reusable stories and references.</p>
+            </div>
+          </div>
+
+          <div class="outcome">
+            <div class="outcome-icon" style="background:#2474e0;">!</div>
+            <div>
+              <h3>Earlier Risk Detection</h3>
+              <p>Signals from meetings, support, adoption, and executive engagement surface issues before they become renewal problems.</p>
+            </div>
+          </div>
+
+          <div class="outcome">
+            <div class="outcome-icon" style="background:#ea8418;">$</div>
+            <div>
+              <h3>Better Renewal Readiness</h3>
+              <p>QBRs, value narratives, and expansion opportunities are prepared with cleaner evidence and less manual effort.</p>
+            </div>
+          </div>
+        </div>
+      </aside>
+
+      <div class="main">
+        <section class="lifecycle">
+          <div class="lifecycle-head">The Agent Lifecycle</div>
+
+          <div class="cards">
+            <button class="agent-card active" type="button" data-agent="handoff" style="--accent: var(--purple); --soft: var(--soft-purple);">
+              <div class="agent-number">1</div>
+              <div class="card-head">
+                <span class="stage-tag">Implementation</span>
+                <h2>Handoff Agent</h2>
+                <p>Builds a clean post-implementation brief so the CSM starts with complete context, clear goals, and visible risks.</p>
+              </div>
+              <div class="card-body">
+                <div class="icon-wrap">⇄</div>
+                <div>
+                  <h3>Key Actions</h3>
+                  <ul>
+                    <li>Prepares the first CSM intro call brief.</li>
+                    <li>Checks KPI alignment, stakeholders, and open actions.</li>
+                    <li>Confirms help-resource and onboarding readiness.</li>
+                    <li>Flags gaps before the move into Onboarding.</li>
+                  </ul>
+                </div>
+              </div>
+              <div class="card-foot">
+                <div class="impact-pill">Creates the structured account record every later agent depends on.</div>
+              </div>
+            </button>
+
+            <button class="agent-card" type="button" data-agent="adoption" style="--accent: var(--blue); --soft: var(--soft-blue);">
+              <div class="agent-number">2</div>
+              <div class="card-head">
+                <span class="stage-tag">Onboarding + Sustain Growth</span>
+                <h2>Adoption Agent</h2>
+                <p>Supports ongoing meetings, success-plan execution, and success-story creation so value realization stays visible.</p>
+              </div>
+              <div class="card-body">
+                <div class="icon-wrap">◎</div>
+                <div>
+                  <h3>Key Actions</h3>
+                  <ul>
+                    <li>Builds meeting briefs, agendas, and follow-up notes.</li>
+                    <li>Tracks success-plan milestones and adoption by module.</li>
+                    <li>Suggests enablement actions and release talking points.</li>
+                    <li>Drafts success stories from customer outcomes and quotes.</li>
+                  </ul>
+                </div>
+              </div>
+              <div class="card-foot">
+                <div class="impact-pill">Best first agent if your goal is stronger ongoing engagement and reusable customer stories.</div>
+              </div>
+            </button>
+
+            <button class="agent-card" type="button" data-agent="health" style="--accent: var(--green); --soft: var(--soft-green);">
+              <div class="agent-number">3</div>
+              <div class="card-head">
+                <span class="stage-tag">Sustain Growth</span>
+                <h2>Health and Risk Agent</h2>
+                <p>Monitors account health across adoption, support, stakeholder engagement, and escalation signals.</p>
+              </div>
+              <div class="card-body">
+                <div class="icon-wrap">✓</div>
+                <div>
+                  <h3>Key Actions</h3>
+                  <ul>
+                    <li>Scores accounts red, amber, or green.</li>
+                    <li>Detects stalled touchpoints and executive disengagement.</li>
+                    <li>Recommends recovery plays and escalation paths.</li>
+                    <li>Triggers review when the success plan is drifting.</li>
+                  </ul>
+                </div>
+              </div>
+              <div class="card-foot">
+                <div class="impact-pill">Keeps the CSM team proactive instead of discovering risk right before renewal.</div>
+              </div>
+            </button>
+
+            <button class="agent-card" type="button" data-agent="renewal" style="--accent: var(--orange); --soft: var(--soft-orange);">
+              <div class="agent-number">4</div>
+              <div class="card-head">
+                <span class="stage-tag">Renewal</span>
+                <h2>Value and Renewal Agent</h2>
+                <p>Turns account progress into QBR-ready value narratives, renewal readiness signals, and expansion ideas.</p>
+              </div>
+              <div class="card-body">
+                <div class="icon-wrap">◌</div>
+                <div>
+                  <h3>Key Actions</h3>
+                  <ul>
+                    <li>Builds QBR drafts and renewal assessment packs.</li>
+                    <li>Summarizes value delivered versus goals and KPIs.</li>
+                    <li>Identifies expansion and reference candidates.</li>
+                    <li>Highlights risk 90-120 days before renewal.</li>
+                  </ul>
+                </div>
+              </div>
+              <div class="card-foot">
+                <div class="impact-pill">Gives leadership a cleaner commercial story at the right moment.</div>
+              </div>
+            </button>
+          </div>
+
+          <div class="flow-row" aria-hidden="true">
+            <div>→</div>
+            <div>→</div>
+            <div>→</div>
+            <div></div>
+          </div>
+
+          <section class="feedback">
+            <div class="feedback-title">Closed-Loop Learning &amp; Continuous Improvement</div>
+            <p>Insights from meetings, adoption gaps, success stories, QBRs, and renewal outcomes continuously improve earlier stages of the lifecycle.</p>
+            <div class="feedback-grid">
+              <article class="feedback-item">
+                <h3>Improve Meeting Quality</h3>
+                <p>Recurring objections, stakeholder questions, and enablement gaps improve agenda templates and talk tracks for future accounts.</p>
+              </article>
+              <article class="feedback-item">
+                <h3>Strengthen Success Stories</h3>
+                <p>Captured outcomes and customer quotes turn into references, proof points, and repeatable expansion narratives.</p>
+              </article>
+              <article class="feedback-item">
+                <h3>Tune Risk Logic</h3>
+                <p>Renewal results, escalations, and adoption patterns improve the health model and next-best-action recommendations.</p>
+              </article>
+            </div>
+          </section>
+        </section>
+
+        <section class="lower">
+          <aside class="details" id="details-panel" aria-live="polite">
+            <div class="details-head" id="details-head">
+              <div class="details-stage" id="details-stage"></div>
+              <h2 id="details-title"></h2>
+              <p id="details-summary"></p>
+            </div>
+            <div class="details-body">
+              <div class="detail-block">
+                <h3>Primary Responsibilities</h3>
+                <ul id="details-responsibilities"></ul>
+              </div>
+
+              <div class="detail-block">
+                <h3>Data Fields Needed</h3>
+                <div class="chip-row" id="details-fields"></div>
+              </div>
+
+              <div class="detail-block">
+                <h3>Main Outputs</h3>
+                <ul id="details-outputs"></ul>
+              </div>
+
+              <div class="detail-block">
+                <h3>Why It Matters</h3>
+                <p class="details-note" id="details-value"></p>
+              </div>
+            </div>
+          </aside>
+
+          <aside class="reports">
+            <div class="panel-head">Weekly &amp; Monthly Outputs</div>
+            <div class="body">
+              <ul>
+                <li>Meeting brief and follow-up summary pack</li>
+                <li>Success-plan milestone tracker</li>
+                <li>Adoption movement and enablement recommendations</li>
+                <li>Health-risk watchlist and escalation queue</li>
+                <li>Success-story and customer-reference pipeline</li>
+                <li>QBR and renewal readiness summary</li>
+              </ul>
+            </div>
+          </aside>
+        </section>
+      </div>
+    </section>
+  </div>
+
+  <script>
+    const agentDetails = {
+      handoff: {
+        accent: "#6f46d9",
+        stage: "Implementation",
+        title: "Handoff Agent",
+        summary: "Ensures the CSM starts with the right account picture, the right stakeholders, and the right onboarding prerequisites.",
+        responsibilities: [
+          "Create the first CSM intro call brief from implementation notes, open actions, and account goals.",
+          "Check whether steerco participation, executive attention, or special escalation handling is needed.",
+          "Confirm modules, integrations, training status, and help-resource enablement are complete enough for onboarding.",
+          "Produce a clean handoff summary with missing-data flags and ownership."
+        ],
+        fields: [
+          "account_id", "account_name", "go_live_date", "implementation_status", "modules_deployed",
+          "integrations_completed", "open_risks", "open_actions", "executive_sponsor", "business_owner",
+          "procurement_lead", "goal_kpi_alignment", "training_completed", "help_resources_status"
+        ],
+        outputs: [
+          "CSM intro call brief",
+          "Onboarding readiness score",
+          "Missing-data checklist",
+          "First 30-day action plan"
+        ],
+        value: "This removes the handoff gap between implementation and customer success. Without it, the later agents tend to produce shallow or unreliable guidance because the base account record is incomplete."
+      },
+      adoption: {
+        accent: "#2474e0",
+        stage: "Onboarding + Sustain Growth",
+        title: "Adoption Agent",
+        summary: "Supports ongoing meetings and turns customer progress into measurable adoption plans and compelling success stories.",
+        responsibilities: [
+          "Prepare agendas, talking points, stakeholder briefs, and follow-up summaries for ongoing customer meetings.",
+          "Track success-plan milestones, value-dashboard setup, and adoption movement by module, role, and business unit.",
+          "Recommend enablement actions, release talking points, and next-best actions for the CSM.",
+          "Identify value moments, customer quotes, and measurable outcomes that can become draft success stories or references."
+        ],
+        fields: [
+          "success_plan", "customer_goals", "agreed_kpis", "baseline_kpis", "target_kpis",
+          "milestone_status", "meeting_dates", "meeting_notes", "stakeholder_sentiment", "active_users",
+          "feature_adoption", "workflow_completion", "supplier_onboarding_progress", "release_impact_flags",
+          "value_dashboard_status", "customer_quotes", "outcomes_evidence"
+        ],
+        outputs: [
+          "Meeting brief and agenda",
+          "Follow-up notes and action summary",
+          "Adoption score and milestone tracker",
+          "Draft success story or reference brief"
+        ],
+        value: "This is the strongest first agent for your stated goal. It directly supports regular touchpoints and creates reusable customer-success narratives instead of leaving those tasks as manual afterthoughts."
+      },
+      health: {
+        accent: "#1d8d63",
+        stage: "Sustain Growth",
+        title: "Health and Risk Agent",
+        summary: "Creates an early-warning system across product usage, support activity, engagement quality, and operational signals.",
+        responsibilities: [
+          "Score each account using adoption, engagement, support, and technical health signals.",
+          "Detect stalled touchpoints, low executive engagement, unresolved critical tickets, or declining usage trends.",
+          "Recommend the next-best action, including standard recovery plays and escalation paths.",
+          "Flag when the success plan needs review because actual behavior no longer matches the target path."
+        ],
+        fields: [
+          "health_score", "login_trends", "active_users_by_role", "ticket_count", "severity_mix",
+          "critical_open_tickets", "escalation_count", "time_to_resolution", "csat", "exec_engagement",
+          "last_meeting_date", "stakeholder_sentiment", "success_plan_status", "renewal_date"
+        ],
+        outputs: [
+          "Red-amber-green account score",
+          "Risk reason summary",
+          "Escalation recommendation",
+          "Recovery play suggestion"
+        ],
+        value: "This gives CSM leadership a proactive portfolio view. It is especially helpful once regular customer meetings are already running and you want to prioritize effort intelligently."
+      },
+      renewal: {
+        accent: "#ea8418",
+        stage: "Renewal",
+        title: "Value and Renewal Agent",
+        summary: "Packages the account story for QBRs, renewals, and expansion planning using measured value rather than anecdotal updates.",
+        responsibilities: [
+          "Pull outcomes, KPI movement, milestone progress, and business-value evidence into a QBR-ready narrative.",
+          "Assess renewal readiness and flag risk 90 to 120 days before contract end.",
+          "Spot reference readiness and identify expansion themes based on adoption and stakeholder traction.",
+          "Draft executive-level renewal and value summaries for the CSM and account team."
+        ],
+        fields: [
+          "contract_end_date", "renewal_date", "arr", "renewal_probability", "qbr_date",
+          "savings_target", "savings_realized", "efficiency_gain", "cycle_time_improvement",
+          "value_narrative", "expansion_opportunities", "reference_readiness", "executive_sponsor",
+          "outcomes_evidence"
+        ],
+        outputs: [
+          "QBR draft",
+          "Renewal readiness score",
+          "Expansion opportunity summary",
+          "Executive value narrative"
+        ],
+        value: "This becomes much more powerful after the earlier agents are in place because it depends on reliable handoff, adoption, and health data to tell a convincing commercial story."
+      }
+    };
+
+    const cards = Array.from(document.querySelectorAll(".agent-card"));
+    const detailsPanel = {
+      head: document.getElementById("details-head"),
+      stage: document.getElementById("details-stage"),
+      title: document.getElementById("details-title"),
+      summary: document.getElementById("details-summary"),
+      responsibilities: document.getElementById("details-responsibilities"),
+      fields: document.getElementById("details-fields"),
+      outputs: document.getElementById("details-outputs"),
+      value: document.getElementById("details-value")
+    };
+
+    function renderList(target, items) {
+      target.innerHTML = "";
+      items.forEach((item) => {
+        const li = document.createElement("li");
+        li.textContent = item;
+        target.appendChild(li);
+      });
+    }
+
+    function renderChips(target, items) {
+      target.innerHTML = "";
+      items.forEach((item) => {
+        const span = document.createElement("span");
+        span.className = "chip";
+        span.textContent = item;
+        target.appendChild(span);
+      });
+    }
+
+    function selectAgent(agentKey) {
+      const data = agentDetails[agentKey];
+      if (!data) return;
+
+      cards.forEach((card) => {
+        card.classList.toggle("active", card.dataset.agent === agentKey);
+      });
+
+      detailsPanel.head.style.setProperty("--details-accent", data.accent);
+      detailsPanel.stage.textContent = data.stage;
+      detailsPanel.title.textContent = data.title;
+      detailsPanel.summary.textContent = data.summary;
+      renderList(detailsPanel.responsibilities, data.responsibilities);
+      renderChips(detailsPanel.fields, data.fields);
+      renderList(detailsPanel.outputs, data.outputs);
+      detailsPanel.value.textContent = data.value;
+    }
+
+    cards.forEach((card) => {
+      card.addEventListener("click", () => selectAgent(card.dataset.agent));
+    });
+
+    selectAgent("adoption");
+  </script>
+</body>
+</html>
