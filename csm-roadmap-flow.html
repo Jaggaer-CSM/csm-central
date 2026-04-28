@@ -1,0 +1,2713 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI-Powered Customer Success Lifecycle</title>
+  <style>
+    :root {
+      --paper: #fbfaf7;
+      --ink: #1f2933;
+      --muted: #64707d;
+      --line: #222831;
+      --dash: #475569;
+      --stage-one-light: #dff3df;
+      --stage-one-dark: #3f7f4c;
+      --stage-two-light: #dceeff;
+      --stage-two-dark: #2f6fa5;
+      --stage-three-light: #eadfff;
+      --stage-three-dark: #6b54b8;
+      --stage-four-light: #fde3ed;
+      --stage-four-dark: #b65478;
+      --manager-light: #eef1f5;
+      --manager-dark: #5c6876;
+      --legend-light: #f3f5f7;
+      --legend-dark: #59636f;
+      --panel: #ffffff;
+      --shadow: 0 22px 50px rgba(31, 41, 51, 0.12);
+      --radius: 8px;
+      --font: "Aptos", "Segoe UI", Arial, sans-serif;
+      --sketch-font: "Segoe Print", "Bradley Hand", "Comic Sans MS", cursive;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      color: var(--ink);
+      background:
+        linear-gradient(rgba(31, 41, 51, 0.035) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(31, 41, 51, 0.035) 1px, transparent 1px),
+        var(--paper);
+      background-size: 28px 28px;
+      font-family: var(--font);
+    }
+
+    button {
+      font: inherit;
+    }
+
+    .page {
+      width: min(1780px, 100%);
+      margin: 0 auto;
+      padding: 12px 18px;
+    }
+
+    .topbar {
+      display: grid;
+      grid-template-columns: minmax(300px, 1fr) auto;
+      gap: 12px;
+      align-items: end;
+      margin-bottom: 8px;
+    }
+
+    .title-block {
+      min-width: 0;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 10px;
+      border: 1.5px solid var(--dash);
+      border-radius: 999px;
+      color: var(--ink);
+      background: rgba(255, 255, 255, 0.72);
+      font-size: 0.75rem;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .source-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .source-link {
+      display: inline-flex;
+      align-items: center;
+      min-height: 31px;
+      padding: 6px 10px;
+      border: 1.5px solid rgba(71, 85, 105, 0.72);
+      border-radius: 999px;
+      color: var(--ink);
+      background: rgba(255, 255, 255, 0.72);
+      font-size: 0.75rem;
+      font-weight: 850;
+      letter-spacing: 0.03em;
+      text-decoration: none;
+      text-transform: uppercase;
+    }
+
+    .source-link:hover,
+    .source-link:focus-visible {
+      border-color: var(--line);
+      box-shadow: 3px 3px 0 rgba(31, 41, 51, 0.09);
+      outline: none;
+    }
+
+    h1 {
+      margin: 8px 0 4px;
+      font-size: clamp(1.75rem, 3.2vw, 3.35rem);
+      line-height: 0.96;
+      letter-spacing: 0;
+    }
+
+    .lede {
+      max-width: 760px;
+      margin: 0;
+      color: var(--muted);
+      font-size: 0.95rem;
+      line-height: 1.28;
+    }
+
+    .quick-stats {
+      display: grid;
+      grid-template-columns: minmax(140px, 1fr);
+      gap: 8px;
+      min-width: 170px;
+    }
+
+    .stat {
+      padding: 9px 11px;
+      border: 1.5px solid var(--line);
+      border-radius: var(--radius);
+      background: rgba(255, 255, 255, 0.82);
+      box-shadow: 5px 5px 0 rgba(31, 41, 51, 0.08);
+    }
+
+    .stat strong {
+      display: block;
+      font-size: 1.25rem;
+      line-height: 1;
+    }
+
+    .stat span {
+      display: block;
+      margin-top: 4px;
+      color: var(--muted);
+      font-size: 0.78rem;
+      font-weight: 800;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    .stat-cost {
+      background: #fff3e3;
+      border-color: #c98931;
+    }
+
+    .stat-cost strong {
+      color: #8a5017;
+    }
+
+    .stat-gain {
+      background: #e8f5ed;
+      border-color: #2f8f55;
+    }
+
+    .stat-gain strong {
+      color: #17684c;
+    }
+
+    .view-switch {
+      display: inline-flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 8px;
+      padding: 5px;
+      border: 1.5px solid rgba(31, 41, 51, 0.72);
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.76);
+      box-shadow: 5px 5px 0 rgba(31, 41, 51, 0.06);
+    }
+
+    .view-tab {
+      min-height: 40px;
+      padding: 7px 12px;
+      border: 1.5px solid transparent;
+      border-radius: 999px;
+      color: var(--muted);
+      background: transparent;
+      cursor: pointer;
+      font-size: 0.9rem;
+      font-weight: 900;
+    }
+
+    .view-tab:hover,
+    .view-tab:focus-visible {
+      color: var(--ink);
+      border-color: rgba(71, 85, 105, 0.42);
+      outline: none;
+    }
+
+    .view-tab.is-active {
+      color: var(--ink);
+      border-color: var(--line);
+      background: var(--manager-light);
+      box-shadow: 3px 3px 0 rgba(31, 41, 51, 0.1);
+    }
+
+    .view-panel[hidden] {
+      display: none;
+    }
+
+    .legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+      margin-bottom: 16px;
+      padding: 8px 12px;
+      border: 1.5px solid rgba(31, 41, 51, 0.72);
+      border-radius: var(--radius);
+      background: rgba(255, 255, 255, 0.72);
+    }
+
+    .legend-label {
+      color: var(--muted);
+      font-size: 0.76rem;
+      font-weight: 900;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .legend-item {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      color: var(--ink);
+      font-size: 0.8rem;
+      font-weight: 750;
+    }
+
+    .legend-shape {
+      position: relative;
+      display: inline-grid;
+      place-items: center;
+      width: 28px;
+      height: 28px;
+      border: 1.5px solid var(--legend-dark);
+      color: var(--legend-dark);
+      background: var(--legend-light);
+      flex: 0 0 auto;
+    }
+
+    .legend-shape.tool {
+      border-radius: 6px;
+    }
+
+    .legend-shape.agent {
+      border-radius: 999px;
+    }
+
+    .legend-shape.gpt {
+      border: 0;
+      background: var(--legend-dark);
+      clip-path: polygon(25% 0, 75% 0, 100% 50%, 75% 100%, 25% 100%, 0 50%);
+    }
+
+    .legend-shape.matik {
+      border: 0;
+      background: var(--legend-dark);
+      clip-path: polygon(50% 0, 100% 50%, 50% 100%, 0 50%);
+    }
+
+    .legend-shape.gpt::before,
+    .legend-shape.matik::before {
+      content: "";
+      position: absolute;
+      inset: 2px;
+      background: var(--legend-light);
+    }
+
+    .legend-shape.gpt::before {
+      clip-path: polygon(25% 0, 75% 0, 100% 50%, 75% 100%, 25% 100%, 0 50%);
+    }
+
+    .legend-shape.matik::before {
+      clip-path: polygon(50% 0, 100% 50%, 50% 100%, 0 50%);
+    }
+
+    .legend-shape.orchestrator {
+      border-radius: 4px;
+      box-shadow: 4px 4px 0 rgba(31, 41, 51, 0.16);
+    }
+
+    .legend-shape.overview {
+      border-radius: 8px;
+      box-shadow: 4px 4px 0 rgba(31, 41, 51, 0.16);
+    }
+
+    .legend-shape.supporting {
+      border-radius: 8px;
+      background: var(--manager-light);
+    }
+
+    .legend-shape.feeds-up {
+      border: 0;
+      background: transparent;
+      color: var(--legend-dark);
+      font-size: 1.1rem;
+      font-weight: 950;
+    }
+
+    .legend-shape svg {
+      position: relative;
+      z-index: 1;
+      width: 17px;
+      height: 17px;
+      stroke: currentColor;
+      stroke-width: 2.2;
+      fill: none;
+    }
+
+    .legend-prototype {
+      display: inline-flex;
+      align-items: center;
+      min-height: 19px;
+      padding: 2px 6px;
+      border: 1.5px solid var(--line);
+      border-radius: 999px;
+      background: #fff;
+      font-size: 0.62rem;
+      font-weight: 950;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+
+    .canvas-wrap {
+      position: relative;
+      overflow-x: auto;
+      padding: 6px 4px 10px;
+    }
+
+    .canvas {
+      position: relative;
+      overflow: hidden;
+      min-width: 1280px;
+      padding: 14px 14px 16px;
+      border: 2px solid rgba(71, 85, 105, 0.42);
+      border-radius: 26px;
+      background: rgba(255, 255, 255, 0.68);
+      box-shadow: var(--shadow);
+    }
+
+    .agent-links {
+      position: absolute;
+      inset: 0;
+      z-index: 0;
+      overflow: hidden;
+      pointer-events: none;
+    }
+
+    .agent-links path {
+      fill: none;
+      stroke: rgba(92, 104, 118, 0.46);
+      stroke-width: 1.35;
+      stroke-dasharray: 1 8;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .elevator-layer {
+      --stage-light: var(--manager-light);
+      --stage-dark: var(--manager-dark);
+      position: relative;
+      z-index: 2;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(320px, 520px) minmax(0, 1fr);
+      align-items: center;
+      gap: 12px;
+      margin: 0 0 12px;
+    }
+
+    .elevator-layer::before,
+    .elevator-layer::after {
+      content: "";
+      height: 2px;
+      border-top: 2px dotted rgba(92, 104, 118, 0.5);
+    }
+
+    .elevator-layer .tool-button {
+      border-color: var(--manager-dark);
+      box-shadow: 4px 4px 0 rgba(31, 41, 51, 0.08);
+    }
+
+    .flow-grid {
+      position: relative;
+      display: grid;
+      grid-template-columns: repeat(4, minmax(280px, 1fr));
+      gap: 18px;
+      z-index: 2;
+    }
+
+    .stage {
+      --stage-light: var(--manager-light);
+      --stage-dark: var(--manager-dark);
+      position: relative;
+      display: grid;
+      grid-template-rows: auto 1fr;
+      gap: 9px;
+      min-width: 0;
+    }
+
+    .stage[data-stage="1"] {
+      --stage-light: var(--stage-one-light);
+      --stage-dark: var(--stage-one-dark);
+    }
+
+    .stage[data-stage="2"] {
+      --stage-light: var(--stage-two-light);
+      --stage-dark: var(--stage-two-dark);
+    }
+
+    .stage[data-stage="3"] {
+      --stage-light: var(--stage-three-light);
+      --stage-dark: var(--stage-three-dark);
+    }
+
+    .stage[data-stage="4"] {
+      --stage-light: var(--stage-four-light);
+      --stage-dark: var(--stage-four-dark);
+    }
+
+    .stage:not(:last-child)::after {
+      content: "";
+      position: absolute;
+      top: 31px;
+      right: -16px;
+      width: 13px;
+      height: 3px;
+      border-radius: 999px;
+      background: var(--stage-dark);
+      z-index: 3;
+    }
+
+    .stage:not(:last-child)::before {
+      content: "";
+      position: absolute;
+      top: 26px;
+      right: -20px;
+      width: 0;
+      height: 0;
+      border-top: 7px solid transparent;
+      border-bottom: 7px solid transparent;
+      border-left: 10px solid var(--stage-dark);
+      z-index: 3;
+    }
+
+    .stage-head {
+      position: relative;
+      display: grid;
+      grid-template-columns: auto 1fr;
+      gap: 12px;
+      align-items: center;
+      min-height: 62px;
+      padding: 10px 12px;
+      border: 2.5px solid var(--stage-dark);
+      border-radius: var(--radius);
+      color: #111827;
+      background: var(--stage-light);
+      box-shadow: 5px 6px 0 rgba(31, 41, 51, 0.09);
+    }
+
+    .stage-number {
+      display: grid;
+      place-items: center;
+      width: 42px;
+      height: 36px;
+      width: 36px;
+      border: 2px solid var(--stage-dark);
+      border-radius: 999px;
+      background: #fff;
+      color: var(--stage-dark);
+      font-size: 1.08rem;
+      font-weight: 950;
+    }
+
+    .stage-title {
+      min-width: 0;
+    }
+
+    .stage-title h2 {
+      margin: 0;
+      font-size: 1.12rem;
+      line-height: 1.05;
+      letter-spacing: 0;
+    }
+
+    .stage-title p {
+      margin: 3px 0 0;
+      color: rgba(17, 24, 39, 0.72);
+      font-size: 0.73rem;
+      line-height: 1.22;
+      font-weight: 700;
+    }
+
+    .action-stack {
+      display: grid;
+      align-content: start;
+      gap: 6px;
+    }
+
+    .tool-cluster {
+      display: grid;
+      gap: 4px;
+      padding: 4px 5px;
+      border: 1.3px solid rgba(31, 41, 51, 0.2);
+      border-left-color: var(--stage-dark);
+      border-left-width: 4px;
+      border-radius: var(--radius);
+      background: rgba(255, 255, 255, 0.46);
+    }
+
+    .tool-cluster-label {
+      display: inline-flex;
+      width: max-content;
+      max-width: 100%;
+      margin: 0 0 1px;
+      padding: 2px 6px;
+      border: 1px solid rgba(31, 41, 51, 0.24);
+      border-radius: 999px;
+      color: var(--stage-dark);
+      background: rgba(255, 255, 255, 0.78);
+      font-size: 0.56rem;
+      font-weight: 950;
+      letter-spacing: 0.05em;
+      line-height: 1.05;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+
+    .tool-cluster .tool-button {
+      box-shadow: none;
+    }
+
+    .tool-cluster .tool-button:hover,
+    .tool-cluster .tool-button:focus-visible {
+      box-shadow: 3px 3px 0 rgba(31, 41, 51, 0.1);
+    }
+    }
+
+    .action-card {
+      position: relative;
+      display: grid;
+      gap: 6px;
+      min-height: 92px;
+      padding: 9px;
+      border: 2px solid var(--stage-dark);
+      border-radius: var(--radius);
+      background: var(--stage-light);
+      box-shadow: 4px 4px 0 rgba(31, 41, 51, 0.06);
+    }
+
+    .action-card.internal {
+      background: var(--stage-light);
+    }
+
+    .action-card.customer {
+      background: var(--stage-light);
+    }
+
+    .action-card.solo {
+      border-radius: var(--radius);
+      background: var(--stage-light);
+    }
+
+    .action-topline {
+      display: grid;
+      grid-template-columns: auto 1fr;
+      gap: 8px;
+      align-items: start;
+    }
+
+    .action-number {
+      display: inline-grid;
+      place-items: center;
+      min-width: 38px;
+      height: 25px;
+      padding: 0 7px;
+      border: 1.5px solid var(--stage-dark);
+      border-radius: 999px;
+      background: #fff;
+      color: var(--stage-dark);
+      font-size: 0.68rem;
+      font-weight: 900;
+    }
+
+    .action-title {
+      margin: 0;
+      font-size: 0.86rem;
+      line-height: 1.14;
+      font-weight: 900;
+    }
+
+    .action-note {
+      margin: 0;
+      color: var(--muted);
+      overflow: hidden;
+      font-size: 0.62rem;
+      line-height: 1.15;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .tool-row {
+      display: grid;
+      gap: 5px;
+    }
+
+    .tool-button {
+      position: relative;
+      display: grid;
+      grid-template-columns: auto 1fr auto;
+      gap: 7px;
+      align-items: center;
+      width: 100%;
+      min-height: 34px;
+      padding: 5px 7px;
+      border: 1.5px solid rgba(31, 41, 51, 0.78);
+      border-radius: var(--radius);
+      color: var(--ink);
+      background: #fff;
+      cursor: pointer;
+      text-align: left;
+      transition: transform 140ms ease, box-shadow 140ms ease, border-color 140ms ease;
+    }
+
+    .tool-button:hover,
+    .tool-button:focus-visible {
+      transform: translate(-1px, -1px);
+      border-color: var(--stage-dark);
+      box-shadow: 4px 4px 0 rgba(31, 41, 51, 0.12);
+      outline: none;
+    }
+
+    .tool-icon {
+      position: relative;
+      display: grid;
+      place-items: center;
+      width: 28px;
+      height: 24px;
+      width: 24px;
+      border: 1.5px solid var(--stage-dark);
+      border-radius: 6px;
+      color: var(--stage-dark);
+      background: var(--stage-light);
+    }
+
+    .tool-button[data-kind="agent"] .tool-icon {
+      border-radius: 999px;
+    }
+
+    .tool-button[data-kind="gpt"] .tool-icon {
+      border: 0;
+      border-radius: 0;
+      background: var(--stage-dark);
+      clip-path: polygon(25% 0, 75% 0, 100% 50%, 75% 100%, 25% 100%, 0 50%);
+    }
+
+    .tool-button[data-kind="matik"] .tool-icon {
+      border: 0;
+      border-radius: 0;
+      background: var(--stage-dark);
+      clip-path: polygon(50% 0, 100% 50%, 50% 100%, 0 50%);
+    }
+
+    .tool-button[data-kind="gpt"] .tool-icon::before,
+    .tool-button[data-kind="matik"] .tool-icon::before {
+      content: "";
+      position: absolute;
+      inset: 2px;
+      background: var(--stage-light);
+    }
+
+    .tool-button[data-kind="gpt"] .tool-icon::before {
+      clip-path: polygon(25% 0, 75% 0, 100% 50%, 75% 100%, 25% 100%, 0 50%);
+    }
+
+    .tool-button[data-kind="matik"] .tool-icon::before {
+      clip-path: polygon(50% 0, 100% 50%, 50% 100%, 0 50%);
+    }
+
+    .tool-button[data-kind="orchestrator"] .tool-icon {
+      border-radius: 5px;
+      box-shadow: 3px 3px 0 rgba(31, 41, 51, 0.16);
+    }
+
+    .tool-button[data-kind="manager"] .tool-icon {
+      width: 34px;
+      border-radius: 999px;
+    }
+
+    .tool-icon svg {
+      position: relative;
+      z-index: 1;
+      width: 14px;
+      height: 14px;
+      stroke-width: 2.2;
+    }
+
+    .tool-copy {
+      min-width: 0;
+    }
+
+    .tool-copy strong {
+      display: block;
+      overflow: hidden;
+      color: var(--ink);
+      font-size: 0.7rem;
+      line-height: 1.12;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .tool-copy span {
+      display: block;
+      margin-top: 2px;
+      color: var(--muted);
+      font-size: 0.58rem;
+      font-weight: 800;
+      letter-spacing: 0.03em;
+      text-transform: uppercase;
+    }
+
+    .tool-side {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .prototype-badge {
+      display: inline-flex;
+      align-items: center;
+      min-height: 20px;
+      padding: 2px 5px;
+      border: 1.5px solid var(--stage-dark);
+      border-radius: 999px;
+      color: var(--stage-dark);
+      background: #fff;
+      font-size: 0.56rem;
+      font-weight: 950;
+      letter-spacing: 0.05em;
+      line-height: 1;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+
+    .priority-dot {
+      width: 10px;
+      height: 10px;
+      border: 1.5px solid var(--stage-dark);
+      border-radius: 999px;
+      background: var(--stage-dark);
+    }
+
+    .priority-dot.high {
+      background: var(--stage-dark);
+    }
+
+    .priority-dot.medium {
+      background: var(--stage-dark);
+    }
+
+    .priority-dot.low {
+      background: var(--stage-dark);
+    }
+
+    .manager-view {
+      overflow-x: auto;
+      padding: 6px 4px 10px;
+    }
+
+    .manager-canvas {
+      position: relative;
+      overflow: hidden;
+      min-width: 1280px;
+      padding: 14px 14px 16px;
+      border: 2px solid rgba(71, 85, 105, 0.42);
+      border-radius: 26px;
+      background: rgba(255, 255, 255, 0.68);
+      box-shadow: var(--shadow);
+    }
+
+    .manager-links path {
+      stroke: rgba(92, 104, 118, 0.4);
+    }
+
+    .manager-overview-layer {
+      --stage-light: var(--manager-light);
+      --stage-dark: var(--manager-dark);
+      margin-bottom: 12px;
+    }
+
+    .manager-grid {
+      position: relative;
+      z-index: 2;
+      display: grid;
+      grid-template-columns: repeat(3, minmax(280px, 1fr));
+      gap: 18px;
+    }
+
+    .manager-grid .stage::before,
+    .manager-grid .stage::after {
+      display: none;
+    }
+
+    .manager-grid .stage {
+      --stage-light: var(--manager-light);
+      --stage-dark: var(--manager-dark);
+    }
+
+    .manager-grid .stage-number {
+      width: auto;
+      min-width: 44px;
+      padding: 0 8px;
+    }
+
+    .manager-intro {
+      display: grid;
+      grid-template-columns: minmax(240px, 1fr) auto;
+      gap: 16px;
+      align-items: end;
+      padding: 18px;
+      border: 2px solid var(--line);
+      border-radius: 18px;
+      background: #fff;
+      box-shadow: 6px 7px 0 rgba(31, 41, 51, 0.08);
+    }
+
+    .manager-intro h2 {
+      margin: 0;
+      font-size: clamp(1.6rem, 2.5vw, 2.5rem);
+      line-height: 1.02;
+      letter-spacing: 0;
+    }
+
+    .manager-intro p {
+      max-width: 780px;
+      margin: 8px 0 0;
+      color: var(--muted);
+      font-size: 1rem;
+      line-height: 1.4;
+    }
+
+    .manager-count {
+      display: grid;
+      place-items: center;
+      width: 94px;
+      height: 94px;
+      border: 2px solid var(--line);
+      border-radius: 999px;
+      background: var(--manager-light);
+      box-shadow: 4px 4px 0 rgba(31, 41, 51, 0.08);
+      text-align: center;
+      font-weight: 950;
+    }
+
+    .manager-count strong {
+      display: block;
+      font-size: 2rem;
+      line-height: 1;
+    }
+
+    .manager-count span {
+      display: block;
+      margin-top: 4px;
+      font-size: 0.72rem;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+
+    .manager-card {
+      --stage-light: var(--manager-light);
+      --stage-dark: var(--manager-dark);
+      display: grid;
+      align-content: start;
+      gap: 13px;
+      min-height: 250px;
+      padding: 16px;
+      border: 2px solid var(--line);
+      border-radius: 18px;
+      background: var(--manager-light);
+      box-shadow: 5px 6px 0 rgba(31, 41, 51, 0.07);
+    }
+
+    .manager-card.overview {
+      width: min(680px, 100%);
+      justify-self: center;
+      min-height: 230px;
+      background: var(--manager-light);
+    }
+
+    .manager-feeder-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 16px;
+    }
+
+    .manager-card.feed-one {
+      background: var(--manager-light);
+    }
+
+    .manager-card.feed-two {
+      background: var(--manager-light);
+    }
+
+    .manager-card.feed-three {
+      background: var(--manager-light);
+    }
+
+    .manager-feed-arrow {
+      display: grid;
+      justify-items: center;
+      gap: 8px;
+      color: var(--manager-dark);
+      font-weight: 900;
+      text-align: center;
+    }
+
+    .manager-feed-arrow span {
+      display: grid;
+      place-items: center;
+      width: 34px;
+      height: 34px;
+      border: 2px solid var(--manager-dark);
+      border-radius: 999px;
+      background: #fff;
+      font-size: 1.2rem;
+      line-height: 1;
+    }
+
+    .manager-feed-arrow p {
+      margin: 0;
+      max-width: 760px;
+      color: var(--muted);
+      font-size: 0.9rem;
+      line-height: 1.35;
+    }
+
+    .manager-card-head {
+      display: grid;
+      grid-template-columns: auto 1fr;
+      gap: 10px;
+      align-items: start;
+    }
+
+    .manager-ordinal {
+      display: grid;
+      place-items: center;
+      min-width: 44px;
+      height: 32px;
+      padding: 0 8px;
+      border: 1.5px solid var(--line);
+      border-radius: 999px;
+      background: #fff;
+      color: var(--manager-dark);
+      font-size: 0.83rem;
+      font-weight: 950;
+    }
+
+    .manager-card h3 {
+      margin: 0;
+      font-size: 1.1rem;
+      line-height: 1.14;
+      letter-spacing: 0;
+    }
+
+    .manager-card p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 0.9rem;
+      line-height: 1.38;
+    }
+
+    .manager-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 7px;
+    }
+
+    .manager-meta span {
+      padding: 5px 7px;
+      border: 1.2px solid rgba(31, 41, 51, 0.45);
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.72);
+      color: var(--manager-dark);
+      font-size: 0.7rem;
+      font-weight: 850;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    .roi-view {
+      display: grid;
+      gap: 12px;
+      padding: 6px 4px 10px;
+    }
+
+    .roi-view[hidden] {
+      display: none;
+    }
+
+    .roi-hero,
+    .roi-table-card {
+      border: 2px solid rgba(71, 85, 105, 0.42);
+      border-radius: 18px;
+      background: rgba(255, 255, 255, 0.76);
+      box-shadow: var(--shadow);
+    }
+
+    .roi-hero {
+      display: grid;
+      grid-template-columns: minmax(280px, 1fr) minmax(260px, 420px);
+      gap: 16px;
+      align-items: start;
+      padding: 16px;
+    }
+
+    .roi-hero h2,
+    .roi-table-card h2 {
+      margin: 0;
+      font-size: clamp(1.25rem, 2vw, 1.75rem);
+      line-height: 1.04;
+      letter-spacing: 0;
+    }
+
+    .roi-hero p,
+    .roi-table-card p {
+      margin: 6px 0 0;
+      color: var(--muted);
+      font-size: 0.9rem;
+      line-height: 1.36;
+    }
+
+    .roi-assumptions {
+      display: grid;
+      gap: 7px;
+    }
+
+    .roi-assumption {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 8px 10px;
+      border: 1.3px solid rgba(31, 41, 51, 0.28);
+      border-radius: var(--radius);
+      background: #fbfaf7;
+      font-size: 0.78rem;
+      font-weight: 800;
+    }
+
+    .roi-assumption span {
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      font-size: 0.66rem;
+    }
+
+    .roi-summary-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(180px, 1fr));
+      gap: 10px;
+    }
+
+    .roi-card {
+      padding: 13px;
+      border: 1.5px solid var(--line);
+      border-radius: var(--radius);
+      background: #fff;
+      box-shadow: 5px 5px 0 rgba(31, 41, 51, 0.08);
+    }
+
+    .roi-card strong {
+      display: block;
+      font-size: 1.55rem;
+      line-height: 1;
+    }
+
+    .roi-card span {
+      display: block;
+      margin-top: 6px;
+      color: var(--muted);
+      font-size: 0.72rem;
+      font-weight: 900;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+
+    .roi-card.cost {
+      border-color: #c98931;
+      background: #fff3e3;
+    }
+
+    .roi-card.cost strong {
+      color: #8a5017;
+    }
+
+    .roi-card.gain {
+      border-color: #2f8f55;
+      background: #e8f5ed;
+    }
+
+    .roi-card.gain strong {
+      color: #17684c;
+    }
+
+    .roi-table-card {
+      padding: 14px;
+    }
+
+    .roi-table-wrap {
+      overflow-x: auto;
+      margin-top: 12px;
+      border: 1.5px solid rgba(31, 41, 51, 0.28);
+      border-radius: var(--radius);
+      background: #fff;
+    }
+
+    .roi-table {
+      width: 100%;
+      min-width: 1280px;
+      border-collapse: collapse;
+      font-size: 0.76rem;
+    }
+
+    .roi-table th,
+    .roi-table td {
+      padding: 8px 9px;
+      border-bottom: 1px solid rgba(31, 41, 51, 0.12);
+      text-align: left;
+      vertical-align: top;
+    }
+
+    .roi-table th {
+      background: var(--manager-light);
+      color: var(--ink);
+      font-size: 0.64rem;
+      font-weight: 950;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+
+    .roi-table td.num,
+    .roi-table th.num {
+      text-align: right;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .roi-table tfoot td {
+      border-top: 2px solid var(--line);
+      border-bottom: 0;
+      background: #fbfaf7;
+      font-weight: 950;
+    }
+
+    .roi-table .tool-name {
+      min-width: 220px;
+      font-weight: 850;
+    }
+
+    .detail-backdrop {
+      position: fixed;
+      inset: 0;
+      z-index: 30;
+      display: none;
+      background: rgba(17, 24, 39, 0.28);
+    }
+
+    .detail-panel {
+      --stage-light: var(--manager-light);
+      --stage-dark: var(--manager-dark);
+      position: fixed;
+      top: 12px;
+      right: 12px;
+      bottom: 12px;
+      z-index: 40;
+      display: grid;
+      grid-template-rows: auto minmax(0, 1fr);
+      width: min(980px, calc(100vw - 24px));
+      overflow: hidden;
+      border: 2px solid var(--stage-dark);
+      border-radius: 18px;
+      background: #fff;
+      box-shadow: 14px 18px 0 rgba(31, 41, 51, 0.16);
+      transform: translateX(calc(100% + 40px));
+      transition: transform 180ms ease;
+    }
+
+    .detail-panel[data-stage="1"] {
+      --stage-light: var(--stage-one-light);
+      --stage-dark: var(--stage-one-dark);
+    }
+
+    .detail-panel[data-stage="2"] {
+      --stage-light: var(--stage-two-light);
+      --stage-dark: var(--stage-two-dark);
+    }
+
+    .detail-panel[data-stage="3"] {
+      --stage-light: var(--stage-three-light);
+      --stage-dark: var(--stage-three-dark);
+    }
+
+    .detail-panel[data-stage="4"] {
+      --stage-light: var(--stage-four-light);
+      --stage-dark: var(--stage-four-dark);
+    }
+
+    body.detail-open .detail-backdrop {
+      display: block;
+    }
+
+    body.detail-open .detail-panel {
+      transform: translateX(0);
+    }
+
+    .detail-head {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 12px;
+      align-items: start;
+      padding: 12px 14px 10px;
+      border-bottom: 1.5px solid rgba(31, 41, 51, 0.2);
+      background: var(--stage-light);
+    }
+
+    .detail-kicker {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-bottom: 8px;
+    }
+
+    .detail-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 7px;
+      border: 1.3px solid var(--stage-dark);
+      border-radius: 999px;
+      color: var(--stage-dark);
+      background: #fff;
+      font-size: 0.68rem;
+      font-weight: 850;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .detail-head h2 {
+      margin: 0;
+      font-size: clamp(1.1rem, 2vw, 1.55rem);
+      line-height: 1.06;
+      letter-spacing: 0;
+    }
+
+    .detail-stage {
+      margin: 5px 0 0;
+      color: var(--muted);
+      font-size: 0.82rem;
+      line-height: 1.25;
+      font-weight: 750;
+    }
+
+    .close-button {
+      display: inline-grid;
+      grid-template-columns: auto auto;
+      gap: 8px;
+      align-items: center;
+      min-height: 34px;
+      padding: 7px 10px;
+      border: 1.5px solid var(--stage-dark);
+      border-radius: var(--radius);
+      color: var(--ink);
+      background: #fff;
+      cursor: pointer;
+      font-size: 0.78rem;
+      font-weight: 850;
+    }
+
+    .close-button:hover,
+    .close-button:focus-visible {
+      border-color: var(--stage-dark);
+      box-shadow: 3px 3px 0 rgba(31, 41, 51, 0.12);
+      outline: none;
+    }
+
+    .close-button svg {
+      width: 16px;
+      height: 16px;
+    }
+
+    .detail-body {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+      gap: 9px;
+      align-content: start;
+      overflow: hidden;
+      padding: 12px;
+    }
+
+    .detail-section {
+      min-width: 0;
+      padding: 9px;
+      border: 1px solid rgba(31, 41, 51, 0.16);
+      border-radius: var(--radius);
+      background: #fff;
+    }
+
+    .detail-section:first-child {
+      padding-top: 9px;
+    }
+
+    .detail-section:last-child {
+      border-bottom: 1px solid rgba(31, 41, 51, 0.16);
+    }
+
+    .detail-section h3 {
+      margin: 0 0 5px;
+      color: var(--stage-dark);
+      font-size: 0.7rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .detail-section p {
+      margin: 0;
+      color: var(--ink);
+      font-size: 0.8rem;
+      line-height: 1.28;
+    }
+
+    .detail-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 6px;
+    }
+
+    .detail-metric {
+      padding: 7px;
+      border: 1.3px solid rgba(31, 41, 51, 0.28);
+      border-radius: var(--radius);
+      background: #fbfaf7;
+    }
+
+    .detail-metric span {
+      display: block;
+      color: var(--muted);
+      font-size: 0.6rem;
+      font-weight: 850;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+
+    .detail-metric strong {
+      display: block;
+      margin-top: 3px;
+      font-size: 0.76rem;
+      line-height: 1.16;
+    }
+
+    .detail-list {
+      display: grid;
+      gap: 5px;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .detail-list li {
+      position: relative;
+      padding-left: 14px;
+      color: var(--ink);
+      font-size: 0.78rem;
+      line-height: 1.24;
+    }
+
+    .detail-list li::before {
+      content: "";
+      position: absolute;
+      left: 0;
+      top: 0.5em;
+      width: 6px;
+      height: 6px;
+      border: 1.2px solid var(--stage-dark);
+      border-radius: 999px;
+      background: var(--stage-dark);
+    }
+
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+    }
+
+    @media (max-width: 1240px) {
+      .topbar {
+        grid-template-columns: 1fr;
+        align-items: start;
+      }
+
+      .quick-stats {
+        min-width: 0;
+        width: min(100%, 180px);
+      }
+
+      .manager-feeder-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .roi-hero,
+      .roi-summary-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 760px) {
+      .page {
+        padding: 16px;
+      }
+
+      .quick-stats {
+        grid-template-columns: 1fr;
+      }
+
+      .canvas,
+      .manager-canvas {
+        min-width: 0;
+      }
+
+      .flow-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .agent-links,
+      .elevator-layer::before,
+      .elevator-layer::after {
+        display: none;
+      }
+
+      .elevator-layer {
+        grid-template-columns: 1fr;
+      }
+
+      .view-switch {
+        width: 100%;
+        border-radius: 18px;
+      }
+
+      .view-tab {
+        flex: 1 1 160px;
+      }
+
+      .stage::before,
+      .stage::after {
+        display: none;
+      }
+
+      .manager-intro {
+        grid-template-columns: 1fr;
+      }
+
+      .manager-grid,
+      .manager-feeder-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .detail-panel {
+        inset: 10px;
+        width: auto;
+      }
+
+      .detail-head {
+        grid-template-columns: 1fr;
+      }
+
+      .detail-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <svg class="sr-only" aria-hidden="true" focusable="false">
+    <symbol id="icon-agent" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M12 3l1.6 4.2L18 9l-4.4 1.8L12 15l-1.6-4.2L6 9l4.4-1.8L12 3z"></path>
+      <path d="M19 14l.9 2.1L22 17l-2.1.9L19 20l-.9-2.1L16 17l2.1-.9L19 14z"></path>
+      <path d="M5 13l.7 1.6L7 15l-1.3.4L5 17l-.7-1.6L3 15l1.3-.4L5 13z"></path>
+    </symbol>
+    <symbol id="icon-tool" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+      <rect x="4" y="5" width="16" height="14" rx="2"></rect>
+      <path d="M8 9h8"></path>
+      <path d="M8 13h5"></path>
+      <path d="M6 17h12"></path>
+    </symbol>
+    <symbol id="icon-gpt" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M5 6.5h9a3 3 0 0 1 3 3v2.5a3 3 0 0 1-3 3H9l-4 3v-3.5a3 3 0 0 1-2-2.8V9.5a3 3 0 0 1 2-3z"></path>
+      <path d="M18 4l.7 1.7L20.5 6l-1.8.7L18 8.5l-.7-1.8L15.5 6l1.8-.3L18 4z"></path>
+      <path d="M7.5 10h5"></path>
+      <path d="M7.5 12.5h3"></path>
+    </symbol>
+    <symbol id="icon-deck" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+      <rect x="4" y="5" width="16" height="12" rx="2"></rect>
+      <path d="M8 21h8"></path>
+      <path d="M12 17v4"></path>
+      <path d="M8 13l3-3 2 2 3-4"></path>
+    </symbol>
+    <symbol id="icon-layer" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M12 3l9 5-9 5-9-5 9-5z"></path>
+      <path d="M3 12l9 5 9-5"></path>
+      <path d="M3 16l9 5 9-5"></path>
+    </symbol>
+    <symbol id="icon-back" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M19 12H5"></path>
+      <path d="M12 19l-7-7 7-7"></path>
+    </symbol>
+  </svg>
+
+  <div class="page">
+    <header class="topbar">
+      <div class="title-block">
+        <div class="source-row">
+          <span class="eyebrow">JAGGAER CSM / 2026</span>
+          <a class="source-link" href="AI%20roadmap%20copied%20to%20wsl2.xlsx">Excel Source</a>
+        </div>
+        <h1>AI-Powered Customer Success Lifecycle</h1>
+        <p class="lede">AI powered tools guiding CSMs from handoff to renewal readiness.</p>
+      </div>
+      <div class="quick-stats" aria-label="Roadmap summary">
+        <div class="stat"><strong>22</strong><span>Mapped Processes</span></div>
+      </div>
+    </header>
+
+    <nav class="view-switch" role="tablist" aria-label="Roadmap views">
+      <button class="view-tab is-active" id="tab-lifecycleView" type="button" role="tab" aria-selected="true" aria-controls="lifecycleView" data-tab-target="lifecycleView">CSM Lifecycle</button>
+      <button class="view-tab" id="tab-managerView" type="button" role="tab" aria-selected="false" aria-controls="managerView" data-tab-target="managerView">Manager Tools</button>
+      <button class="view-tab" id="tab-roiView" type="button" role="tab" aria-selected="false" aria-controls="roiView" data-tab-target="roiView">ROI</button>
+    </nav>
+
+    <main class="view-panel canvas-wrap" id="lifecycleView" role="tabpanel" aria-labelledby="tab-lifecycleView">
+      <section class="legend" aria-label="Lifecycle type legend">
+        <span class="legend-label">Type Legend</span>
+        <span class="legend-item"><span class="legend-shape tool"><svg aria-hidden="true"><use href="#icon-tool"></use></svg></span>Tool with server</span>
+        <span class="legend-item"><span class="legend-shape agent"><svg aria-hidden="true"><use href="#icon-agent"></use></svg></span>Agent</span>
+        <span class="legend-item"><span class="legend-shape gpt"><svg aria-hidden="true"><use href="#icon-gpt"></use></svg></span>Custom GPT</span>
+        <span class="legend-item"><span class="legend-shape matik"><svg aria-hidden="true"><use href="#icon-deck"></use></svg></span>Matik</span>
+        <span class="legend-item"><span class="legend-shape orchestrator"><svg aria-hidden="true"><use href="#icon-layer"></use></svg></span>Orchestrating layer</span>
+        <span class="legend-item"><span class="legend-prototype">Prototype</span> Prototype status</span>
+      </section>
+      <section class="canvas" aria-label="CSM roadmap flow chart">
+        <div class="elevator-layer" id="elevatorLayer"></div>
+        <div class="flow-grid" id="flowGrid"></div>
+      </section>
+    </main>
+
+    <section class="view-panel manager-view" id="managerView" role="tabpanel" aria-labelledby="tab-managerView" hidden>
+      <section class="legend" aria-label="Manager tools legend">
+        <span class="legend-label">Manager Legend</span>
+        <span class="legend-item"><span class="legend-shape overview"><svg aria-hidden="true"><use href="#icon-layer"></use></svg></span>Manager overview</span>
+        <span class="legend-item"><span class="legend-shape supporting"><svg aria-hidden="true"><use href="#icon-tool"></use></svg></span>Supporting manager tool</span>
+        <span class="legend-item"><span class="legend-shape feeds-up">↑</span>Feeds the overview</span>
+        <span class="legend-item"><span class="legend-prototype">Prototype</span> Prototype status</span>
+      </section>
+      <div class="manager-canvas" aria-label="Manager tools">
+        <div class="elevator-layer manager-overview-layer" id="managerOverviewLayer"></div>
+        <div class="manager-grid" id="managerGrid"></div>
+      </div>
+    </section>
+
+    <section class="view-panel roi-view" id="roiView" role="tabpanel" aria-labelledby="tab-roiView" hidden>
+      <section class="roi-hero" aria-label="ROI summary">
+        <div>
+          <h2>ROI Estimate</h2>
+          <p>Build effort, maintenance load, and estimated CSM capacity gain from the FTE Calculations tab in the Excel source.</p>
+        </div>
+        <div class="roi-assumptions" aria-label="ROI assumptions">
+          <div class="roi-assumption"><span>Build FTE</span><strong>1,600 hrs / year</strong></div>
+          <div class="roi-assumption"><span>Savings FTE</span><strong>1,800 hrs / year</strong></div>
+          <div class="roi-assumption"><span>Team Size</span><strong>30 CSMs</strong></div>
+        </div>
+      </section>
+      <section class="roi-summary-grid" id="roiSummaryGrid" aria-label="ROI totals"></section>
+      <section class="roi-table-card" aria-label="ROI estimate table">
+        <h2>Tool-Level Estimates</h2>
+        <p>Each row shows the build effort, expected maintenance, and estimated CSM time savings by tool.</p>
+        <div class="roi-table-wrap">
+          <table class="roi-table">
+            <thead>
+              <tr>
+                <th>Tool / Agent</th>
+                <th class="num">Build Hrs</th>
+                <th class="num">Ideation</th>
+                <th class="num">Specs</th>
+                <th class="num">Development</th>
+                <th class="num">Test & Rollout</th>
+                <th class="num">Maint Hrs / Month</th>
+                <th class="num">First-Year Maint Hrs</th>
+                <th class="num">Build FTE</th>
+                <th class="num">Maint FTE / Year</th>
+                <th class="num">Hrs Saved / CSM / Month</th>
+                <th class="num">Annual FTE Gain</th>
+              </tr>
+            </thead>
+            <tbody id="roiTableBody"></tbody>
+            <tfoot id="roiTableFoot"></tfoot>
+          </table>
+        </div>
+      </section>
+    </section>
+  </div>
+
+  <div class="detail-backdrop" id="detailBackdrop"></div>
+  <aside class="detail-panel" id="detailPanel" aria-live="polite" aria-label="Tool details">
+    <div class="detail-head">
+      <div>
+        <div class="detail-kicker" id="detailKicker"></div>
+        <h2 id="detailTitle">Tool details</h2>
+        <p class="detail-stage" id="detailStage"></p>
+      </div>
+      <button class="close-button" id="closeDetail" type="button">
+        <svg aria-hidden="true"><use href="#icon-back"></use></svg>
+        Back to View
+      </button>
+    </div>
+    <div class="detail-body" id="detailBody"></div>
+  </aside>
+
+  <script>
+    const tools = [
+      {
+        id: "implementation-summary",
+        number: "1.0",
+        name: "Implementation Summary",
+        stage: "Implementation",
+        action: "CSM intro call preparation",
+        team: "Pre Sales",
+        type: "Tool with Server",
+        effort: "Low",
+        value: "High",
+        priority: "High",
+        status: "Ideation",
+        goal: "Share the relevant data from presales discussions with the CSM.",
+        dependencies: "presales, notes, sfdc",
+        input: "Couvama? Pre-Sales Notes?",
+        hosting: "Salesforce",
+        impact: "Success Plans context",
+        goalDate: "May 29, 2026",
+        hours: 45,
+        details: [
+          "Carries sales context into implementation and onboarding so the CSM does not start from a blank page.",
+          "Best used as a structured bridge between presales notes, CRM context, customer goals, and the first CSM-facing account summary."
+        ],
+        outputs: ["Presales context summary", "Known goals and stakeholders", "Early success-plan inputs"]
+      },
+      {
+        id: "implementation-handoff-agent",
+        number: "1.1",
+        name: "Implementation Handoff Agent",
+        stage: "Implementation",
+        action: "Handoff readiness and risk check",
+        team: "PS",
+        type: "Agent",
+        effort: "Low",
+        value: "High",
+        priority: "High",
+        status: "Prototype",
+        goal: "Prepare a clean CSM-ready account brief with context gaps, stakeholder map, goals, KPI alignment, and handoff risks.",
+        dependencies: "api, presales, scope",
+        input: "Implementation notes, stakeholder list, scope, goals, KPIs, open actions, training status",
+        hosting: "HTML tool, GPT",
+        impact: "Define one output pack and readiness score",
+        goalDate: "June 12, 2026",
+        hours: 80,
+        purpose: "Turn implementation outputs into a clean CSM-ready account brief.",
+        details: [
+          "Collects project closure details, prepares the CSM intro call brief, checks whether steering committee participation is needed, and confirms goal and KPI alignment inputs.",
+          "It should come early because it creates the structured account record that the rest of the lifecycle depends on."
+        ],
+        outputs: ["CSM handoff summary", "Adoption readiness score", "Missing-data checklist", "First 30-day action plan"]
+      },
+      {
+        id: "elevator",
+        number: "1.2",
+        name: "Elevator",
+        stage: "Implementation",
+        action: "Shared account memory",
+        team: "Ops",
+        type: "Orchestrating Layer",
+        effort: "High",
+        value: "High",
+        priority: "High",
+        status: "Ideation",
+        goal: "Create one place where data from these tools is stored and searchable.",
+        dependencies: "crm, support, warehouse",
+        input: "CRM, support, notes, product usage, contracts",
+        hosting: "Search layer, warehouse",
+        impact: "Shared searchable orchestration layer",
+        goalDate: "September 15, 2026",
+        hours: 120,
+        details: [
+          "Acts as the shared context layer for the lifecycle so agents can retrieve account history, risks, usage patterns, and renewal context from a common memory.",
+          "This is marked as implementation foundation because the later agents become more useful once account data is searchable and connected."
+        ],
+        outputs: ["Central account context", "Searchable customer record", "Shared orchestration layer"]
+      },
+      {
+        id: "csm-intro-prep",
+        number: "2.0",
+        name: "CSM Intro Prep",
+        stage: "Adoption",
+        action: "Second intro call preparation",
+        team: "CSM",
+        type: "Custom GPT",
+        effort: "Low",
+        value: "Medium",
+        priority: "High",
+        status: "Ideation",
+        goal: "Draft the first CSM intro brief, agenda, and account snapshot.",
+        dependencies: "handoff, stakeholders, goals",
+        input: "Handoff pack, contacts, goals, open actions",
+        hosting: "GPT, CRM notes",
+        impact: "Faster first calls with less prep",
+        goalDate: "June 19, 2026",
+        hours: 24,
+        details: [
+          "Turns handoff context into a customer-ready CSM intro agenda and concise account snapshot.",
+          "Useful for creating a consistent first CSM experience after implementation handoff."
+        ],
+        outputs: ["Intro call brief", "Agenda", "Account snapshot"]
+      },
+      {
+        id: "success-plan-creation",
+        number: "2.1",
+        name: "Success Plan Creation and Maintenance",
+        stage: "Adoption",
+        action: "Create success plan",
+        team: "CSM",
+        type: "Tool with Server",
+        effort: "Medium",
+        value: "High",
+        priority: "High",
+        status: "Prototype",
+        goal: "Create, maintain, and review the success plan with milestones, KPIs, owners, and drift detection.",
+        dependencies: "templates, cadence, crm",
+        input: "Customer goals, milestones, stakeholders, scope, timelines, KPIs, meeting outcomes",
+        hosting: "CRM, templates, GPT",
+        impact: "Design one shared success-plan workflow",
+        goalDate: "June 30, 2026",
+        hours: 72,
+        purpose: "Drive onboarding and early value realization after go-live.",
+        details: [
+          "Maps customer goals to JAGGAER capabilities, tracks milestones, confirms ownership, and recommends next-best enablement actions.",
+          "The roadmap calls this one of the fastest ROI areas because adoption, utilization, rollout, and training are central to CSM operations."
+        ],
+        outputs: ["Success plan", "Milestone status", "Recommended enablement actions", "Plan drift alerts"]
+      },
+      {
+        id: "kpi-analyzer",
+        number: "2.2",
+        name: "KPI Analyzer",
+        stage: "Adoption",
+        action: "Introduce value dashboard",
+        team: "CSM",
+        type: "Custom GPT",
+        effort: "Medium",
+        value: "High",
+        priority: "High",
+        status: "Prototype",
+        goal: "Review usage and recommend next steps.",
+        dependencies: "playbook, prompt, snowflake",
+        input: "Snowflake",
+        hosting: "BI layer, GPT",
+        impact: "Faster proof of value",
+        goalDate: "July 10, 2026",
+        hours: 40,
+        details: [
+          "Reads KPI or usage data and turns it into practical next steps for the CSM.",
+          "Fits the value dashboard moment because the tool helps connect onboarding progress to measurable outcomes."
+        ],
+        outputs: ["KPI summary", "Usage recommendations", "Proof-of-value talking points"]
+      },
+      {
+        id: "meeting-prep-follow-up",
+        number: "2.3",
+        name: "Meeting Prep and Follow-Up Agent",
+        stage: "Adoption",
+        action: "Adoption cadence and follow-through",
+        team: "CSM",
+        type: "Agent",
+        effort: "Medium",
+        value: "High",
+        priority: "High",
+        status: "Ideation",
+        goal: "Draft agenda, notes, and action recap for customer touchpoints.",
+        dependencies: "notes, stakeholders, actions",
+        input: "CRM notes, emails, success plan, support updates",
+        hosting: "GPT, CRM",
+        impact: "Saves prep time and improves follow-through",
+        goalDate: "July 17, 2026",
+        hours: 70,
+        details: [
+          "Prepares agendas from current account context and turns meeting outcomes into action recaps.",
+          "Useful during onboarding and later touchpoints because it keeps actions, owners, and commitments from drifting."
+        ],
+        outputs: ["Meeting agenda", "Customer recap", "Owner action list"]
+      },
+      {
+        id: "release-search-library",
+        number: "3.0",
+        name: "Release Search Library",
+        stage: "Sustain Growth",
+        action: "Product release enablement",
+        team: "CSM",
+        type: "Tool with Server",
+        effort: "Low",
+        value: "High",
+        priority: "Medium",
+        status: "Prototype",
+        goal: "Search release content and map updates to customer impact.",
+        dependencies: "releases, library, index",
+        input: "Release notes, KB articles, enablement docs",
+        hosting: "Search index, web app",
+        impact: "Faster release prep",
+        goalDate: "June 26, 2026",
+        hours: 56,
+        details: [
+          "Makes release content searchable and easier to connect to customer modules, open asks, and enablement needs.",
+          "Supports the regular release enablement motion in the sustain growth stage."
+        ],
+        outputs: ["Searchable release library", "Customer impact matches", "Enablement references"]
+      },
+      {
+        id: "release-assistant",
+        number: "3.1",
+        name: "Release Assistant",
+        stage: "Sustain Growth",
+        action: "Release talking points",
+        team: "CSM",
+        type: "Custom GPT",
+        effort: "Low",
+        value: "Medium",
+        priority: "Medium",
+        status: "Ideation",
+        goal: "Turn release notes into customer-ready talking points.",
+        dependencies: "library, releases, modules",
+        input: "Release notes, customer modules, open asks",
+        hosting: "GPT",
+        impact: "Clearer release conversations",
+        goalDate: "July 24, 2026",
+        hours: 24,
+        details: [
+          "Summarizes product changes in customer language and highlights why a release matters for a specific account.",
+          "Works best when paired with the searchable release library."
+        ],
+        outputs: ["Customer-ready release summary", "Module-specific talking points", "Follow-up prompts"]
+      },
+      {
+        id: "operational-performance-reviews",
+        number: "3.2",
+        name: "Operational Performance Reviews",
+        stage: "Sustain Growth",
+        action: "Operational performance review",
+        team: "CSM",
+        type: "Matik",
+        effort: "Low",
+        value: "High",
+        priority: "Medium",
+        status: "Prototype",
+        goal: "Draft review decks with KPI movement, risks, and actions.",
+        dependencies: "kpis, dashboard, matik",
+        input: "KPI trends, adoption data, support trends, goals",
+        hosting: "Matik, GPT",
+        impact: "Faster review creation",
+        goalDate: "August 7, 2026",
+        hours: 30,
+        details: [
+          "Turns KPI movement, adoption data, and support trends into an operational review deck.",
+          "Helps CSMs keep the growth-stage account rhythm evidence-based without rebuilding the story every time."
+        ],
+        outputs: ["Operational review deck", "KPI movement story", "Risk and action summary"]
+      },
+      {
+        id: "health-risk-agent",
+        number: "3.3",
+        name: "Health and Risk Agent",
+        stage: "Sustain Growth",
+        action: "Health monitoring",
+        team: "AM",
+        type: "Agent",
+        effort: "Medium",
+        value: "High",
+        priority: "High",
+        status: "Ideation",
+        goal: "Score health using adoption, support, engagement, and escalation signals.",
+        dependencies: "usage, support, meetings",
+        input: "Product usage, tickets, meeting cadence, stakeholder sentiment",
+        hosting: "Tool with Server",
+        impact: "Earlier risk detection",
+        goalDate: "August 21, 2026",
+        hours: 90,
+        purpose: "Continuously detect risk, stalled adoption, weak engagement, and escalation triggers.",
+        details: [
+          "Combines product adoption, stakeholder engagement, support signals, and technical risk into a simple account health view.",
+          "The roadmap suggests starting with product adoption at 50%, customer engagement and expertise at 20%, and technical or support health at 30%."
+        ],
+        outputs: ["Overall health score", "Risk reasons", "Next-best action", "Escalation recommendation"]
+      },
+      {
+        id: "support-trends",
+        number: "3.4",
+        name: "Support Trends",
+        stage: "Sustain Growth",
+        action: "Support pattern detection",
+        team: "GCC",
+        type: "Tool with Server",
+        effort: "Medium",
+        value: "Medium",
+        priority: "Medium",
+        status: "Ideation",
+        goal: "Summarize support patterns, root issues, and friction signals.",
+        dependencies: "support, cases, gcc",
+        input: "Case volume, severity, product area, time to resolution",
+        hosting: "Support system, GPT",
+        impact: "Better issue context before meetings",
+        goalDate: "July 31, 2026",
+        hours: 44,
+        details: [
+          "Converts support history into trends that can inform CSM meetings, operational reviews, and escalation prevention.",
+          "Useful for finding repeated friction areas before they turn into renewal risk."
+        ],
+        outputs: ["Support trend summary", "Root issue patterns", "Meeting prep context"]
+      },
+      {
+        id: "escalation-management-agent",
+        number: "3.5",
+        name: "Escalation Management Agent",
+        stage: "Sustain Growth",
+        action: "Manage customer escalations",
+        team: "GCC",
+        type: "Agent",
+        effort: "Medium",
+        value: "High",
+        priority: "High",
+        status: "Ideation",
+        goal: "Coordinate escalations with owners, updates, risks, and next steps.",
+        dependencies: "kpi, sfdc, snowflake",
+        input: "SF or Snowflake",
+        hosting: "GPT, workflow tool",
+        impact: "Faster escalation follow-up",
+        goalDate: "September 12, 2026",
+        hours: 68,
+        details: [
+          "Keeps escalation work moving by summarizing status, owners, open risks, and next steps.",
+          "Connects support and account context so CSMs can communicate clearly during high-friction moments."
+        ],
+        outputs: ["Escalation summary", "Owner tracker", "Next-step update"]
+      },
+      {
+        id: "single-threaded-detection",
+        number: "3.6",
+        name: "Single Threaded Detection",
+        stage: "Sustain Growth",
+        action: "Stakeholder coverage risk",
+        team: "AM",
+        type: "Tool with Server",
+        effort: "Medium",
+        value: "High",
+        priority: "High",
+        status: "Ideation",
+        goal: "Flag accounts that rely on too few customer contacts.",
+        dependencies: "contacts, engagement, crm",
+        input: "CRM contacts, meeting attendance, email activity",
+        hosting: "CRM, rules engine",
+        impact: "Reduces relationship risk",
+        goalDate: "September 1, 2026",
+        hours: 48,
+        details: [
+          "Detects when an account relationship depends on too few people or too little executive engagement.",
+          "Supports proactive account management by surfacing relationship risk before renewal or expansion conversations."
+        ],
+        outputs: ["Relationship risk flag", "Coverage gaps", "Suggested stakeholder actions"]
+      },
+      {
+        id: "executive-relationship-building",
+        number: "3.7",
+        name: "Executive Relationship Building",
+        stage: "Sustain Growth",
+        action: "Executive stakeholder focus",
+        team: "AM",
+        type: "Custom GPT",
+        effort: "Low",
+        value: "Medium",
+        priority: "Medium",
+        status: "Ideation",
+        goal: "Brief AMs on executive stakeholders, gaps, and outreach chances.",
+        dependencies: "orgmap, history, crm",
+        input: "Stakeholder map, meeting history, sponsor notes",
+        hosting: "CRM, GPT",
+        impact: "Stronger sponsor coverage",
+        goalDate: "August 28, 2026",
+        hours: 20,
+        details: [
+          "Uses stakeholder history and sponsor notes to suggest stronger executive coverage.",
+          "Pairs naturally with single-threaded detection because it turns relationship gaps into outreach opportunities."
+        ],
+        outputs: ["Executive brief", "Stakeholder gaps", "Outreach recommendations"]
+      },
+      {
+        id: "success-stories",
+        number: "4.0",
+        name: "Success Stories",
+        stage: "Renewal",
+        action: "Coordinate customer references",
+        team: "CSM",
+        type: "Custom GPT",
+        effort: "Low",
+        value: "Medium",
+        priority: "Medium",
+        status: "Ideation",
+        goal: "Turn results and quotes into short success stories.",
+        dependencies: "approval, quotes, outcomes",
+        input: "Meeting notes, KPI gains, quotes, reference data",
+        hosting: "GPT, templates",
+        impact: "Reusable proof points for AM and marketing",
+        goalDate: "August 14, 2026",
+        hours: 24,
+        details: [
+          "Converts customer outcomes, quotes, and KPI gains into reusable proof points.",
+          "Supports reference coordination and gives renewal conversations a stronger evidence base."
+        ],
+        outputs: ["Success story draft", "Reference proof points", "Approval-ready narrative"]
+      },
+      {
+        id: "whitespace-analysis",
+        number: "4.1",
+        name: "Whitespace Analysis",
+        stage: "Renewal",
+        action: "Identify expansion opportunities",
+        team: "AM",
+        type: "Tool with Server",
+        effort: "Medium",
+        value: "High",
+        priority: "Medium",
+        status: "Ideation",
+        goal: "Identify cross-sell whitespace from product fit and usage.",
+        dependencies: "product, usage, crm",
+        input: "Product footprint, usage, org structure, goals",
+        hosting: "CRM, product data",
+        impact: "Surfaces expansion paths earlier",
+        goalDate: "August 21, 2026",
+        hours: 64,
+        details: [
+          "Looks at product footprint, customer goals, usage signals, and organizational context to find expansion paths.",
+          "Best positioned near renewal because it can convert measured value into practical cross-sell or upsell hypotheses."
+        ],
+        outputs: ["Whitespace map", "Expansion hypotheses", "Product-fit rationale"]
+      },
+      {
+        id: "renewal-report-agent",
+        number: "4.2",
+        name: "Renewal Report Agent",
+        stage: "Renewal",
+        action: "Renewal assessment",
+        team: "AM",
+        type: "Agent",
+        effort: "Medium",
+        value: "High",
+        priority: "High",
+        status: "Ideation",
+        goal: "Draft a renewal-ready summary with value, risks, and expansion.",
+        dependencies: "health, value, contracts",
+        input: "Contract data, KPI gains, support trends, stakeholder status",
+        hosting: "GPT, CRM",
+        impact: "Shortens renewal prep",
+        goalDate: "September 5, 2026",
+        hours: 60,
+        purpose: "Prepare renewal plans and expansion hypotheses using measured value.",
+        details: [
+          "Compiles achieved outcomes versus plan, pulls value metrics, flags renewal risk, and summarizes expansion opportunities.",
+          "It becomes more reliable after handoff, adoption, and health data already exist."
+        ],
+        outputs: ["Renewal-ready summary", "Risk and value narrative", "Expansion opportunity summary"]
+      },
+      {
+        id: "manager-assistant",
+        number: "M.0",
+        name: "Manager's Assistant",
+        stage: "Manager Tools",
+        action: "Managers 1:1",
+        team: "CSM",
+        type: "Managers 1:1",
+        effort: "Medium",
+        value: "High",
+        priority: "Low",
+        status: "Ideation",
+        goal: "Assist managers in the 1:1s, recommend actions on CSM, mentoring areas, performance flags.",
+        dependencies: "",
+        input: "",
+        hosting: "",
+        impact: "",
+        goalDate: "",
+        hours: "",
+        source: "AI roadmap copied to wsl.xlsx",
+        details: [
+          "Supports the manager 1:1 motion by turning CSM context into coaching prompts, recommended actions, and performance flags.",
+          "The updated workbook does not yet specify dependencies, data inputs, hosting, impact, or goal date for this tool."
+        ],
+        outputs: ["1:1 talking points", "Mentoring areas", "Performance flags", "Recommended manager actions"]
+      },
+      {
+        id: "manager-overview",
+        number: "M.1",
+        name: "Manager's Overview",
+        stage: "Manager Tools",
+        action: "Managers promotion",
+        team: "CSM",
+        type: "Managers promotion",
+        effort: "Medium",
+        value: "High",
+        priority: "Low",
+        status: "Ideation",
+        goal: "Assist managers with promotions, merits and staff planning.",
+        dependencies: "",
+        input: "",
+        hosting: "",
+        impact: "",
+        goalDate: "",
+        hours: "",
+        source: "AI roadmap copied to wsl.xlsx",
+        details: [
+          "Gives managers a planning view for promotion, merit, and staffing discussions.",
+          "The updated workbook does not yet specify dependencies, data inputs, hosting, impact, or goal date for this tool."
+        ],
+        outputs: ["Promotion planning context", "Merit discussion inputs", "Staff planning prompts"]
+      },
+      {
+        id: "manager-capacity-portfolios",
+        number: "M.2",
+        name: "Manager Capacity and Portfolios",
+        stage: "Manager Tools",
+        action: "Managers account assignments",
+        team: "CSM",
+        type: "Managers account assignments",
+        effort: "Medium",
+        value: "High",
+        priority: "Low",
+        status: "Ideation",
+        goal: "Assist managers to assign accounts and portfolio capacity.",
+        dependencies: "",
+        input: "",
+        hosting: "",
+        impact: "",
+        goalDate: "",
+        hours: "",
+        source: "AI roadmap copied to wsl.xlsx",
+        details: [
+          "Supports account assignment and portfolio balancing decisions for CSM managers.",
+          "The updated workbook does not yet specify dependencies, data inputs, hosting, impact, or goal date for this tool."
+        ],
+        outputs: ["Portfolio capacity view", "Account assignment support", "Load-balancing prompts"]
+      },
+      {
+        id: "manager-icp",
+        number: "M.3",
+        name: "Manager ICP",
+        stage: "Manager Tools",
+        action: "Managers ICP",
+        team: "CSM",
+        type: "Managers ICP",
+        effort: "Medium",
+        value: "High",
+        priority: "Low",
+        status: "Prototype",
+        goal: "Assist managers with ICP calculations.",
+        dependencies: "",
+        input: "",
+        hosting: "",
+        impact: "",
+        goalDate: "",
+        hours: "",
+        source: "AI roadmap copied to wsl.xlsx",
+        details: [
+          "Helps managers calculate ICP-related planning inputs from the manager roadmap.",
+          "The updated workbook does not yet specify dependencies, data inputs, hosting, impact, or goal date for this tool."
+        ],
+        outputs: ["ICP calculation support", "Planning assumptions", "Manager review inputs"]
+      }
+    ];
+
+    const stages = [
+      {
+        number: "1",
+        title: "Implementation",
+        note: "Provide CSM with account context."
+      },
+      {
+        number: "2",
+        title: "Adoption",
+        note: "Assist CSM with meetings and goals."
+      },
+      {
+        number: "3",
+        title: "Sustain Growth",
+        note: "Assist CSM with ongoing adoption."
+      },
+      {
+        number: "4",
+        title: "Renewal",
+        note: "Assist with renewal readiness and growth."
+      }
+    ];
+
+    const managerToolIds = [
+      "manager-assistant",
+      "manager-overview",
+      "manager-capacity-portfolios",
+      "manager-icp"
+    ];
+
+    const lifecycleGroups = {
+      "1": [
+        { label: "Handoff", ids: ["implementation-summary", "implementation-handoff-agent"] }
+      ],
+      "2": [
+        { label: "Intro", ids: ["csm-intro-prep"] },
+        { label: "Plan", ids: ["success-plan-creation", "kpi-analyzer"] },
+        { label: "Cadence", ids: ["meeting-prep-follow-up"] }
+      ],
+      "3": [
+        { label: "Release", ids: ["release-search-library", "release-assistant"] },
+        { label: "Review", ids: ["operational-performance-reviews"] },
+        { label: "Risk", ids: ["health-risk-agent", "support-trends", "escalation-management-agent", "single-threaded-detection"] },
+        { label: "Sponsors", ids: ["executive-relationship-building"] }
+      ],
+      "4": [
+        { label: "Proof", ids: ["success-stories"] },
+        { label: "Renewal", ids: ["whitespace-analysis", "renewal-report-agent"] }
+      ]
+    };
+
+    const toolActionSubtitles = {
+      "implementation-summary": "Provide project summary to CSM",
+      "implementation-handoff-agent": "Prepare handoff brief and risks",
+      "elevator": "Store shared account context",
+      "csm-intro-prep": "Draft CSM intro brief",
+      "success-plan-creation": "Create and maintain success plan",
+      "kpi-analyzer": "Review usage and recommend next steps",
+      "meeting-prep-follow-up": "Draft agendas and follow-ups",
+      "release-search-library": "Search releases by account impact",
+      "release-assistant": "Turn releases into talking points",
+      "operational-performance-reviews": "Draft operational review decks",
+      "health-risk-agent": "Score health and flag risks",
+      "support-trends": "Summarize support patterns",
+      "escalation-management-agent": "Coordinate escalation next steps",
+      "single-threaded-detection": "Flag stakeholder coverage risk",
+      "executive-relationship-building": "Brief AMs on executive gaps",
+      "success-stories": "Turn outcomes into success stories",
+      "whitespace-analysis": "Identify expansion opportunities",
+      "renewal-report-agent": "Draft renewal-ready summary",
+      "manager-assistant": "Recommend 1:1 coaching actions",
+      "manager-overview": "Support promotion and staffing decisions",
+      "manager-capacity-portfolios": "Balance accounts and portfolios",
+      "manager-icp": "Assist ICP calculations"
+    };
+
+    const toolById = new Map(tools.map((tool) => [tool.id, tool]));
+    const roiTotals = {
+      toolCount: 22,
+      buildHrs: 1171,
+      ideationHrs: 132,
+      specHrs: 197,
+      developmentHrs: 603,
+      testingHrs: 239,
+      maintenanceHrsMonth: 116,
+      firstYearMaintenanceHrs: 1392,
+      buildFte: 0.73,
+      maintenanceFte: 0.87,
+      savedHrsMonth: 96.5,
+      annualFteGain: 19.3
+    };
+    const roiOrder = [
+      "implementation-summary",
+      "implementation-handoff-agent",
+      "csm-intro-prep",
+      "release-search-library",
+      "success-plan-creation",
+      "kpi-analyzer",
+      "meeting-prep-follow-up",
+      "release-assistant",
+      "support-trends",
+      "operational-performance-reviews",
+      "success-stories",
+      "health-risk-agent",
+      "whitespace-analysis",
+      "executive-relationship-building",
+      "single-threaded-detection",
+      "renewal-report-agent",
+      "escalation-management-agent",
+      "elevator",
+      "manager-assistant",
+      "manager-overview",
+      "manager-capacity-portfolios",
+      "manager-icp"
+    ];
+    const roiEstimates = {
+      "implementation-summary": { buildHrs: 45, ideationHrs: 5, specHrs: 7, developmentHrs: 24, testingHrs: 9, maintenanceHrsMonth: 5, firstYearMaintenanceHrs: 60, buildFte: 0.03, maintenanceFte: 0.04, savedHrsMonth: 2, annualFteGain: 0.4 },
+      "implementation-handoff-agent": { buildHrs: 80, ideationHrs: 8, specHrs: 12, developmentHrs: 44, testingHrs: 16, maintenanceHrsMonth: 10, firstYearMaintenanceHrs: 120, buildFte: 0.05, maintenanceFte: 0.08, savedHrsMonth: 2, annualFteGain: 0.4 },
+      "csm-intro-prep": { buildHrs: 24, ideationHrs: 4, specHrs: 5, developmentHrs: 10, testingHrs: 5, maintenanceHrsMonth: 2, firstYearMaintenanceHrs: 24, buildFte: 0.02, maintenanceFte: 0.02, savedHrsMonth: 4, annualFteGain: 0.8 },
+      "release-search-library": { buildHrs: 56, ideationHrs: 6, specHrs: 8, developmentHrs: 31, testingHrs: 11, maintenanceHrsMonth: 6, firstYearMaintenanceHrs: 72, buildFte: 0.04, maintenanceFte: 0.05, savedHrsMonth: 8, annualFteGain: 1.6 },
+      "success-plan-creation": { buildHrs: 72, ideationHrs: 7, specHrs: 11, developmentHrs: 40, testingHrs: 14, maintenanceHrsMonth: 7, firstYearMaintenanceHrs: 84, buildFte: 0.05, maintenanceFte: 0.05, savedHrsMonth: 12, annualFteGain: 2.4 },
+      "kpi-analyzer": { buildHrs: 40, ideationHrs: 6, specHrs: 8, developmentHrs: 18, testingHrs: 8, maintenanceHrsMonth: 2, firstYearMaintenanceHrs: 24, buildFte: 0.03, maintenanceFte: 0.02, savedHrsMonth: 12, annualFteGain: 2.4 },
+      "meeting-prep-follow-up": { buildHrs: 70, ideationHrs: 7, specHrs: 11, developmentHrs: 38, testingHrs: 14, maintenanceHrsMonth: 8, firstYearMaintenanceHrs: 96, buildFte: 0.04, maintenanceFte: 0.06, savedHrsMonth: 12, annualFteGain: 2.4 },
+      "release-assistant": { buildHrs: 24, ideationHrs: 4, specHrs: 5, developmentHrs: 10, testingHrs: 5, maintenanceHrsMonth: 2, firstYearMaintenanceHrs: 24, buildFte: 0.02, maintenanceFte: 0.02, savedHrsMonth: 6, annualFteGain: 1.2 },
+      "support-trends": { buildHrs: 44, ideationHrs: 4, specHrs: 7, developmentHrs: 24, testingHrs: 9, maintenanceHrsMonth: 4, firstYearMaintenanceHrs: 48, buildFte: 0.03, maintenanceFte: 0.03, savedHrsMonth: 2, annualFteGain: 0.4 },
+      "operational-performance-reviews": { buildHrs: 30, ideationHrs: 3, specHrs: 6, developmentHrs: 13, testingHrs: 8, maintenanceHrsMonth: 3, firstYearMaintenanceHrs: 36, buildFte: 0.02, maintenanceFte: 0.02, savedHrsMonth: 12, annualFteGain: 2.4 },
+      "success-stories": { buildHrs: 24, ideationHrs: 4, specHrs: 5, developmentHrs: 10, testingHrs: 5, maintenanceHrsMonth: 2, firstYearMaintenanceHrs: 24, buildFte: 0.02, maintenanceFte: 0.02, savedHrsMonth: 4, annualFteGain: 0.8 },
+      "health-risk-agent": { buildHrs: 90, ideationHrs: 9, specHrs: 14, developmentHrs: 49, testingHrs: 18, maintenanceHrsMonth: 11, firstYearMaintenanceHrs: 132, buildFte: 0.06, maintenanceFte: 0.08, savedHrsMonth: 4, annualFteGain: 0.8 },
+      "whitespace-analysis": { buildHrs: 64, ideationHrs: 6, specHrs: 10, developmentHrs: 35, testingHrs: 13, maintenanceHrsMonth: 6, firstYearMaintenanceHrs: 72, buildFte: 0.04, maintenanceFte: 0.05, savedHrsMonth: 4, annualFteGain: 0.8 },
+      "executive-relationship-building": { buildHrs: 20, ideationHrs: 3, specHrs: 4, developmentHrs: 9, testingHrs: 4, maintenanceHrsMonth: 2, firstYearMaintenanceHrs: 24, buildFte: 0.01, maintenanceFte: 0.02, savedHrsMonth: 2, annualFteGain: 0.4 },
+      "single-threaded-detection": { buildHrs: 48, ideationHrs: 5, specHrs: 7, developmentHrs: 26, testingHrs: 10, maintenanceHrsMonth: 5, firstYearMaintenanceHrs: 60, buildFte: 0.03, maintenanceFte: 0.04, savedHrsMonth: 0.5, annualFteGain: 0.1 },
+      "renewal-report-agent": { buildHrs: 60, ideationHrs: 6, specHrs: 9, developmentHrs: 33, testingHrs: 12, maintenanceHrsMonth: 7, firstYearMaintenanceHrs: 84, buildFte: 0.04, maintenanceFte: 0.05, savedHrsMonth: 4, annualFteGain: 0.8 },
+      "escalation-management-agent": { buildHrs: 68, ideationHrs: 7, specHrs: 10, developmentHrs: 37, testingHrs: 14, maintenanceHrsMonth: 8, firstYearMaintenanceHrs: 96, buildFte: 0.04, maintenanceFte: 0.06, savedHrsMonth: 2, annualFteGain: 0.4 },
+      "elevator": { buildHrs: 120, ideationHrs: 10, specHrs: 18, developmentHrs: 68, testingHrs: 24, maintenanceHrsMonth: 14, firstYearMaintenanceHrs: 168, buildFte: 0.08, maintenanceFte: 0.11, savedHrsMonth: 4, annualFteGain: 0.8 },
+      "manager-assistant": { buildHrs: 48, ideationHrs: 7, specHrs: 10, developmentHrs: 21, testingHrs: 10, maintenanceHrsMonth: 3, firstYearMaintenanceHrs: 36, buildFte: 0.03, maintenanceFte: 0.02, savedHrsMonth: null, annualFteGain: 0 },
+      "manager-overview": { buildHrs: 48, ideationHrs: 7, specHrs: 10, developmentHrs: 21, testingHrs: 10, maintenanceHrsMonth: 3, firstYearMaintenanceHrs: 36, buildFte: 0.03, maintenanceFte: 0.02, savedHrsMonth: null, annualFteGain: 0 },
+      "manager-capacity-portfolios": { buildHrs: 48, ideationHrs: 7, specHrs: 10, developmentHrs: 21, testingHrs: 10, maintenanceHrsMonth: 3, firstYearMaintenanceHrs: 36, buildFte: 0.03, maintenanceFte: 0.02, savedHrsMonth: null, annualFteGain: 0 },
+      "manager-icp": { buildHrs: 48, ideationHrs: 7, specHrs: 10, developmentHrs: 21, testingHrs: 10, maintenanceHrsMonth: 3, firstYearMaintenanceHrs: 36, buildFte: 0.03, maintenanceFte: 0.02, savedHrsMonth: null, annualFteGain: 0 }
+    };
+    const savingsByValue = {
+      High: { min: 15, max: 25 },
+      Medium: { min: 8, max: 15 },
+      Low: { min: 2, max: 8 }
+    };
+    const monthlyFteHours = 160;
+
+    function formatRoiNumber(value, digits = 0) {
+      if (value === null || value === undefined || value === "") return "Not estimated";
+      return Number(value).toLocaleString(undefined, {
+        minimumFractionDigits: digits,
+        maximumFractionDigits: digits
+      });
+    }
+
+    function roiForTool(tool) {
+      return tool ? roiEstimates[tool.id] : null;
+    }
+
+    function savingsRange(tool) {
+      return savingsByValue[tool.value] || { min: 0, max: 0 };
+    }
+
+    function savingsLabel(tool) {
+      const estimate = roiForTool(tool);
+      if (estimate && estimate.savedHrsMonth !== null) {
+        return `${formatRoiNumber(estimate.savedHrsMonth, estimate.savedHrsMonth % 1 ? 1 : 0)} hrs / CSM / month`;
+      }
+      const range = savingsRange(tool);
+      return range.max ? `${range.min}-${range.max} hrs` : "Not specified";
+    }
+
+    function fteLabel(tool) {
+      const estimate = roiForTool(tool);
+      if (estimate && estimate.savedHrsMonth !== null) {
+        return `${formatRoiNumber(estimate.annualFteGain, 1)} annual FTE gained`;
+      }
+      const range = savingsRange(tool);
+      if (!range.max) return "Not specified";
+      return `${(range.min / monthlyFteHours).toFixed(2)}-${(range.max / monthlyFteHours).toFixed(2)} FTE gained`;
+    }
+
+    const flowGrid = document.getElementById("flowGrid");
+    const elevatorLayer = document.getElementById("elevatorLayer");
+    const managerOverviewLayer = document.getElementById("managerOverviewLayer");
+    const managerGrid = document.getElementById("managerGrid");
+    const roiSummaryGrid = document.getElementById("roiSummaryGrid");
+    const roiTableBody = document.getElementById("roiTableBody");
+    const roiTableFoot = document.getElementById("roiTableFoot");
+    const tabButtons = document.querySelectorAll(".view-tab");
+    const viewPanels = document.querySelectorAll(".view-panel");
+    const detailBackdrop = document.getElementById("detailBackdrop");
+    const detailPanel = document.getElementById("detailPanel");
+    const detailKicker = document.getElementById("detailKicker");
+    const detailTitle = document.getElementById("detailTitle");
+    const detailStage = document.getElementById("detailStage");
+    const detailBody = document.getElementById("detailBody");
+    const closeDetail = document.getElementById("closeDetail");
+
+    function iconForType(type) {
+      if (type === "Agent") return "icon-agent";
+      if (type === "Custom GPT") return "icon-gpt";
+      if (type === "Matik") return "icon-deck";
+      if (type === "Orchestrating Layer") return "icon-layer";
+      return "icon-tool";
+    }
+
+    function kindForType(type) {
+      if (type === "Agent") return "agent";
+      if (type === "Custom GPT") return "gpt";
+      if (type === "Matik") return "matik";
+      if (type === "Orchestrating Layer") return "orchestrator";
+      return "tool";
+    }
+
+    function escapeHtml(value) {
+      return String(value ?? "")
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+    }
+
+    function renderToolButton(tool, options = {}) {
+      if (!tool) return "";
+      const priorityTone = (tool.priority || "Medium").toLowerCase();
+      const priorityClass = `priority-dot ${priorityTone}`;
+      const prototypeBadge = tool.status === "Prototype" ? `<span class="prototype-badge">Prototype</span>` : "";
+      const iconType = options.iconType || tool.type;
+      const kind = options.kind || kindForType(tool.type);
+      const typeLabel = options.typeLabel || tool.type;
+      const subtitle = options.subtitle || toolActionSubtitles[tool.id] || `${typeLabel} / ${tool.team}`;
+      return `
+        <button class="tool-button" type="button" data-tool-id="${escapeHtml(tool.id)}" data-type="${escapeHtml(typeLabel)}" data-kind="${escapeHtml(kind)}" aria-label="Open details for ${escapeHtml(tool.number)} ${escapeHtml(tool.name)}" title="Open details for ${escapeHtml(tool.name)}">
+          <span class="tool-icon"><svg aria-hidden="true"><use href="#${iconForType(iconType)}"></use></svg></span>
+          <span class="tool-copy">
+            <strong>${escapeHtml(tool.number)} ${escapeHtml(tool.name)}</strong>
+            <span>${escapeHtml(subtitle)}</span>
+          </span>
+          <span class="tool-side">
+            ${prototypeBadge}
+            <span class="${priorityClass}" aria-hidden="true"></span>
+          </span>
+        </button>
+      `;
+    }
+
+    function renderToolClusters(stageNumber) {
+      const stageTools = tools
+        .filter((tool) => tool.number.startsWith(`${stageNumber}.`))
+        .filter((tool) => tool.id !== "elevator");
+      const stageToolIds = new Set(stageTools.map((tool) => tool.id));
+      const groupedIds = new Set((lifecycleGroups[stageNumber] || []).flatMap((group) => group.ids));
+      const groups = (lifecycleGroups[stageNumber] || [])
+        .map((group) => ({
+          label: group.label,
+          tools: group.ids.map((id) => toolById.get(id)).filter((tool) => tool && stageToolIds.has(tool.id))
+        }))
+        .filter((group) => group.tools.length);
+      const leftovers = stageTools.filter((tool) => !groupedIds.has(tool.id));
+
+      if (leftovers.length) groups.push({ label: "Other", tools: leftovers });
+
+      return groups.map((group, index) => `
+        <div class="tool-cluster" role="group" aria-label="${escapeHtml(group.label)} tool group">
+          <span class="tool-cluster-label">${escapeHtml(group.label)}</span>
+          ${group.tools.map((tool) => renderToolButton(tool)).join("")}
+        </div>
+      `).join("");
+    }
+
+    function renderFlow() {
+      elevatorLayer.innerHTML = renderToolButton(toolById.get("elevator"));
+      elevatorLayer.querySelectorAll("[data-tool-id]").forEach((button) => {
+        button.addEventListener("click", () => openTool(button.dataset.toolId));
+      });
+
+      flowGrid.innerHTML = stages.map((stage) => `
+        <section class="stage" data-stage="${escapeHtml(stage.number)}" aria-labelledby="stage-${stage.number}">
+          <header class="stage-head">
+            <span class="stage-number">${escapeHtml(stage.number)}</span>
+            <div class="stage-title">
+              <h2 id="stage-${stage.number}">${escapeHtml(stage.title)}</h2>
+              <p>${escapeHtml(stage.note)}</p>
+            </div>
+          </header>
+          <div class="action-stack">
+            ${renderToolClusters(stage.number)}
+          </div>
+        </section>
+      `).join("");
+
+      flowGrid.querySelectorAll("[data-tool-id]").forEach((button) => {
+        button.addEventListener("click", () => openTool(button.dataset.toolId));
+      });
+    }
+
+    function renderManagerTools() {
+      const overview = toolById.get("manager-overview");
+      const feederIds = managerToolIds.filter((id) => id !== "manager-overview");
+
+      managerOverviewLayer.innerHTML = renderToolButton(overview, {
+        kind: "orchestrator",
+        iconType: "Orchestrating Layer",
+        typeLabel: "Manager Overview"
+      });
+      managerOverviewLayer.querySelectorAll("[data-tool-id]").forEach((button) => {
+        button.addEventListener("click", () => openTool(button.dataset.toolId));
+      });
+
+      managerGrid.innerHTML = feederIds.map((id) => {
+        const tool = toolById.get(id);
+        if (!tool) return "";
+        return `
+          <section class="stage" data-stage="manager" aria-labelledby="stage-${escapeHtml(tool.id)}">
+            <header class="stage-head">
+              <span class="stage-number">${escapeHtml(tool.number)}</span>
+              <div class="stage-title">
+                <h2 id="stage-${escapeHtml(tool.id)}">${escapeHtml(tool.action)}</h2>
+                <p>${escapeHtml(tool.name)}.</p>
+              </div>
+            </header>
+            <div class="action-stack">
+              ${renderToolButton(tool)}
+            </div>
+          </section>
+        `;
+      }).join("");
+
+      managerGrid.querySelectorAll("[data-tool-id]").forEach((button) => {
+        button.addEventListener("click", () => openTool(button.dataset.toolId));
+      });
+    }
+
+    function renderRoi() {
+      if (!roiSummaryGrid || !roiTableBody || !roiTableFoot) return;
+
+      const summaryCards = [
+        { value: `${formatRoiNumber(roiTotals.buildFte, 2)} FTE`, label: "Build capacity required", tone: "cost" },
+        { value: `${formatRoiNumber(roiTotals.maintenanceFte, 2)} FTE`, label: "Annual maintenance capacity", tone: "cost" },
+        { value: `${formatRoiNumber(roiTotals.savedHrsMonth, 1)} hrs`, label: "Monthly hours saved per CSM", tone: "gain" },
+        { value: `${formatRoiNumber(roiTotals.annualFteGain, 1)} FTE`, label: "Annual CSM capacity gained", tone: "gain" }
+      ];
+
+      roiSummaryGrid.innerHTML = summaryCards.map((card) => `
+        <article class="roi-card ${escapeHtml(card.tone)}">
+          <strong>${escapeHtml(card.value)}</strong>
+          <span>${escapeHtml(card.label)}</span>
+        </article>
+      `).join("");
+
+      const rows = roiOrder
+        .map((id) => ({ tool: toolById.get(id), estimate: roiEstimates[id] }))
+        .filter((row) => row.tool && row.estimate);
+
+      const numberCell = (value, digits = 0) => `<td class="num">${escapeHtml(formatRoiNumber(value, digits))}</td>`;
+
+      roiTableBody.innerHTML = rows.map(({ tool, estimate }) => `
+        <tr>
+          <td class="tool-name">${escapeHtml(tool.name)}</td>
+          ${numberCell(estimate.buildHrs)}
+          ${numberCell(estimate.ideationHrs)}
+          ${numberCell(estimate.specHrs)}
+          ${numberCell(estimate.developmentHrs)}
+          ${numberCell(estimate.testingHrs)}
+          ${numberCell(estimate.maintenanceHrsMonth)}
+          ${numberCell(estimate.firstYearMaintenanceHrs)}
+          ${numberCell(estimate.buildFte, 2)}
+          ${numberCell(estimate.maintenanceFte, 2)}
+          ${numberCell(estimate.savedHrsMonth, estimate.savedHrsMonth && estimate.savedHrsMonth % 1 ? 1 : 0)}
+          ${numberCell(estimate.annualFteGain, 1)}
+        </tr>
+      `).join("");
+
+      roiTableFoot.innerHTML = `
+        <tr>
+          <td class="tool-name">${escapeHtml(roiTotals.toolCount)} tools</td>
+          ${numberCell(roiTotals.buildHrs)}
+          ${numberCell(roiTotals.ideationHrs)}
+          ${numberCell(roiTotals.specHrs)}
+          ${numberCell(roiTotals.developmentHrs)}
+          ${numberCell(roiTotals.testingHrs)}
+          ${numberCell(roiTotals.maintenanceHrsMonth)}
+          ${numberCell(roiTotals.firstYearMaintenanceHrs)}
+          ${numberCell(roiTotals.buildFte, 2)}
+          ${numberCell(roiTotals.maintenanceFte, 2)}
+          ${numberCell(roiTotals.savedHrsMonth, 1)}
+          ${numberCell(roiTotals.annualFteGain, 1)}
+        </tr>
+      `;
+    }
+
+    function showTab(targetId) {
+      closeTool();
+      viewPanels.forEach((panel) => {
+        panel.hidden = panel.id !== targetId;
+      });
+      tabButtons.forEach((button) => {
+        const isActive = button.dataset.tabTarget === targetId;
+        button.classList.toggle("is-active", isActive);
+        button.setAttribute("aria-selected", String(isActive));
+      });
+    }
+
+    function listMarkup(items) {
+      if (!items || !items.length) return "";
+      return `<ul class="detail-list">${items.map((item) => `<li>${escapeHtml(item)}</li>`).join("")}</ul>`;
+    }
+
+    function metric(label, value) {
+      return `
+        <div class="detail-metric">
+          <span>${escapeHtml(label)}</span>
+          <strong>${escapeHtml(value || "Not specified")}</strong>
+        </div>
+      `;
+    }
+
+    function openTool(id) {
+      const tool = toolById.get(id);
+      if (!tool) return;
+      const detailStageTone = /^[1-4]\./.test(tool.number) ? tool.number.charAt(0) : "manager";
+      detailPanel.dataset.stage = detailStageTone;
+
+      detailKicker.innerHTML = `
+        <span class="detail-chip">${escapeHtml(tool.number)}</span>
+        <span class="detail-chip">${escapeHtml(tool.type)}</span>
+        <span class="detail-chip">${escapeHtml(tool.priority)} priority</span>
+      `;
+      detailTitle.textContent = tool.name;
+      detailStage.textContent = `${tool.stage} / ${tool.action}`;
+      detailBody.innerHTML = `
+        <section class="detail-section">
+          <h3>Primary Goal</h3>
+          <p>${escapeHtml(tool.goal)}</p>
+        </section>
+        ${tool.purpose ? `
+          <section class="detail-section">
+            <h3>Roadmap Purpose</h3>
+            <p>${escapeHtml(tool.purpose)}</p>
+          </section>
+        ` : ""}
+        <section class="detail-section">
+          <h3>Details</h3>
+          ${listMarkup(tool.details)}
+        </section>
+        <section class="detail-section">
+          <h3>Key Outputs</h3>
+          ${listMarkup(tool.outputs)}
+        </section>
+        <section class="detail-section">
+          <h3>Roadmap Fields</h3>
+          <div class="detail-grid">
+            ${metric("Team", tool.team)}
+            ${metric("Status", tool.status)}
+            ${metric("Effort", tool.effort)}
+            ${metric("Value", tool.value)}
+            ${metric("Hrs Saved / CSM / Month", savingsLabel(tool))}
+            ${metric("FTE Capacity Gained", fteLabel(tool))}
+            ${metric("Goal Date", tool.goalDate)}
+            ${metric("Dependencies", tool.dependencies)}
+            ${metric("Hosting", tool.hosting)}
+          </div>
+        </section>
+        <section class="detail-section">
+          <h3>Data Source / Input</h3>
+          <p>${escapeHtml(tool.input || "Not specified")}</p>
+        </section>
+        <section class="detail-section">
+          <h3>Impact For CSMs</h3>
+          <p>${escapeHtml(tool.impact || "Not specified")}</p>
+        </section>
+      `;
+
+      document.body.classList.add("detail-open");
+      closeDetail.focus();
+    }
+
+    function closeTool() {
+      document.body.classList.remove("detail-open");
+    }
+
+    closeDetail.addEventListener("click", closeTool);
+    detailBackdrop.addEventListener("click", closeTool);
+    document.addEventListener("keydown", (event) => {
+      if (event.key === "Escape") closeTool();
+    });
+    tabButtons.forEach((button) => {
+      button.addEventListener("click", () => showTab(button.dataset.tabTarget));
+    });
+
+    renderFlow();
+    renderManagerTools();
+    renderRoi();
+  </script>
+</body>
+</html>
