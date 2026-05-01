@@ -1,0 +1,2071 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>New Value Calculator</title>
+  <style>
+    :root {
+      --ink: #15213a;
+      --muted: #637088;
+      --line: #dce3ee;
+      --soft: #f6f8fb;
+      --panel: #ffffff;
+      --teal: #008f8a;
+      --teal-dark: #006a67;
+      --blue: #3159c9;
+      --amber: #f2a900;
+      --coral: #e35d4f;
+      --green: #2f9e66;
+      --shadow: 0 18px 50px rgba(21, 33, 58, 0.12);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    h1,
+    h2,
+    h3,
+    p,
+    label,
+    button,
+    span,
+    strong,
+    td,
+    th {
+      overflow-wrap: anywhere;
+    }
+
+    body {
+      margin: 0;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color: var(--ink);
+      background:
+        linear-gradient(180deg, #eef5f8 0, rgba(238, 245, 248, 0) 360px),
+        #fbfcfe;
+      letter-spacing: 0;
+    }
+
+    button,
+    input,
+    select {
+      font: inherit;
+    }
+
+    .app-shell {
+      max-width: 1480px;
+      margin: 0 auto;
+      padding: 24px;
+    }
+
+    .topbar {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 20px;
+      align-items: end;
+      padding: 12px 0 22px;
+    }
+
+    .topbar > div {
+      min-width: 0;
+    }
+
+    .eyebrow {
+      color: var(--teal-dark);
+      font-size: 0.78rem;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    h1 {
+      margin: 6px 0 8px;
+      font-size: clamp(2rem, 4vw, 4.4rem);
+      line-height: 0.98;
+      max-width: 940px;
+      letter-spacing: 0;
+    }
+
+    .lede {
+      margin: 0;
+      max-width: 780px;
+      color: var(--muted);
+      font-size: 1.02rem;
+      line-height: 1.55;
+    }
+
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      justify-content: flex-end;
+      min-width: 0;
+    }
+
+    .button {
+      border: 1px solid var(--line);
+      background: var(--panel);
+      color: var(--ink);
+      border-radius: 8px;
+      padding: 10px 13px;
+      cursor: pointer;
+      font-weight: 750;
+      box-shadow: 0 6px 18px rgba(21, 33, 58, 0.07);
+      max-width: 100%;
+      min-width: 0;
+      text-align: center;
+    }
+
+    .button.primary {
+      border-color: var(--teal);
+      background: var(--teal);
+      color: #fff;
+    }
+
+    .upload-input {
+      display: none;
+    }
+
+    .print-meta {
+      display: none;
+      color: var(--muted);
+      font-size: 0.9rem;
+      margin-top: 12px;
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 430px;
+      gap: 22px;
+      align-items: start;
+    }
+
+    .panel {
+      background: rgba(255, 255, 255, 0.92);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      box-shadow: var(--shadow);
+    }
+
+    .inputs-panel {
+      overflow: hidden;
+    }
+
+    .tabs {
+      display: flex;
+      gap: 4px;
+      padding: 10px;
+      border-bottom: 1px solid var(--line);
+      background: #fff;
+      position: sticky;
+      top: 0;
+      z-index: 5;
+    }
+
+    .tab {
+      border: 0;
+      border-radius: 8px;
+      padding: 10px 13px;
+      background: transparent;
+      color: var(--muted);
+      cursor: pointer;
+      font-weight: 800;
+      min-width: 0;
+    }
+
+    .tab.active {
+      background: var(--ink);
+      color: #fff;
+    }
+
+    .view {
+      display: none;
+      padding: 16px;
+    }
+
+    .view.active {
+      display: block;
+    }
+
+    .intro-strip {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .step {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 13px;
+      background: var(--soft);
+      min-height: 108px;
+      min-width: 0;
+    }
+
+    .step strong {
+      display: block;
+      color: var(--teal-dark);
+      font-size: 0.83rem;
+      margin-bottom: 7px;
+    }
+
+    .step p {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.45;
+      font-size: 0.93rem;
+    }
+
+    .filter-row {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      flex-wrap: wrap;
+      margin: 0 0 16px;
+    }
+
+    .select,
+    .small-input {
+      border: 1px solid var(--line);
+      background: #fff;
+      color: var(--ink);
+      border-radius: 8px;
+      min-height: 40px;
+      padding: 8px 10px;
+      font-weight: 700;
+      max-width: 100%;
+      min-width: 0;
+    }
+
+    .toggle {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--muted);
+      font-weight: 750;
+      min-height: 40px;
+      padding: 0 4px;
+      min-width: 0;
+    }
+
+    .toggle input {
+      width: 18px;
+      height: 18px;
+      accent-color: var(--teal);
+    }
+
+    .group {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+      margin-bottom: 12px;
+      overflow: hidden;
+    }
+
+    .group summary {
+      list-style: none;
+      cursor: pointer;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(72px, auto);
+      gap: 12px;
+      align-items: center;
+      padding: 15px 16px;
+      background: linear-gradient(90deg, #fff, #f8fbfc);
+      border-bottom: 1px solid var(--line);
+    }
+
+    .group summary::-webkit-details-marker {
+      display: none;
+    }
+
+    .group-title {
+      font-weight: 850;
+      font-size: 1.03rem;
+      min-width: 0;
+    }
+
+    .group-count {
+      color: var(--muted);
+      font-size: 0.85rem;
+      font-weight: 800;
+      min-width: 0;
+      text-align: right;
+    }
+
+    .question-list {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+      padding: 14px;
+    }
+
+    .question {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 13px;
+      background: #fff;
+      min-width: 0;
+    }
+
+    .question.hidden {
+      display: none;
+    }
+
+    .question-head {
+      min-height: 82px;
+      min-width: 0;
+    }
+
+    .question-title {
+      display: block;
+      font-weight: 800;
+      line-height: 1.28;
+      font-size: 0.95rem;
+      min-width: 0;
+      hyphens: auto;
+    }
+
+    .question-meta {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: 8px;
+      min-width: 0;
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      border-radius: 999px;
+      padding: 4px 8px;
+      font-size: 0.74rem;
+      font-weight: 850;
+      background: #edf4f4;
+      color: var(--teal-dark);
+      max-width: 100%;
+      min-width: 0;
+      line-height: 1.15;
+    }
+
+    .pill.must {
+      background: #eff4ff;
+      color: var(--blue);
+    }
+
+    .pill.nice {
+      background: #fff6e0;
+      color: #936300;
+    }
+
+    .control-row {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(138px, 158px);
+      gap: 10px;
+      align-items: center;
+      margin-top: 11px;
+      min-width: 0;
+    }
+
+    input[type="range"] {
+      width: 100%;
+      accent-color: var(--teal);
+      min-width: 0;
+    }
+
+    .value-field {
+      display: grid;
+      grid-template-columns: minmax(42px, 1fr) minmax(0, auto);
+      align-items: center;
+      gap: 6px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 6px 8px;
+      background: var(--soft);
+      min-width: 0;
+    }
+
+    .value-field input {
+      width: 100%;
+      min-width: 0;
+      border: 0;
+      background: transparent;
+      color: var(--ink);
+      font-weight: 850;
+      outline: 0;
+    }
+
+    .unit {
+      color: var(--muted);
+      font-size: 0.77rem;
+      font-weight: 800;
+      line-height: 1.1;
+      min-width: 0;
+      text-align: right;
+    }
+
+    .hint {
+      color: var(--muted);
+      font-size: 0.81rem;
+      line-height: 1.35;
+      margin-top: 9px;
+    }
+
+    .results {
+      position: sticky;
+      top: 20px;
+      overflow: hidden;
+      min-width: 0;
+    }
+
+    .results-header {
+      padding: 18px 18px 12px;
+      border-bottom: 1px solid var(--line);
+      background:
+        linear-gradient(135deg, rgba(0, 143, 138, 0.12), rgba(49, 89, 201, 0.12)),
+        #fff;
+    }
+
+    .results-header h2 {
+      margin: 0 0 6px;
+      font-size: 1.15rem;
+    }
+
+    .results-header p {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.4;
+      font-size: 0.92rem;
+    }
+
+    .metric-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+      padding: 14px;
+      background: #fff;
+    }
+
+    .metric {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 12px;
+      min-height: 100px;
+      background: var(--soft);
+      min-width: 0;
+    }
+
+    .metric.primary {
+      grid-column: 1 / -1;
+      min-height: 118px;
+      background: var(--ink);
+      color: #fff;
+      border-color: var(--ink);
+    }
+
+    .metric-label {
+      color: inherit;
+      opacity: 0.72;
+      font-size: 0.76rem;
+      font-weight: 850;
+      text-transform: uppercase;
+      line-height: 1.2;
+    }
+
+    .metric-value {
+      margin-top: 8px;
+      font-size: 1.55rem;
+      font-weight: 900;
+      line-height: 1;
+      overflow-wrap: anywhere;
+    }
+
+    .metric.primary .metric-value {
+      font-size: 3rem;
+    }
+
+    .metric-sub {
+      margin-top: 8px;
+      color: inherit;
+      opacity: 0.72;
+      font-size: 0.82rem;
+      line-height: 1.35;
+      min-width: 0;
+    }
+
+    .chart-area {
+      padding: 0 14px 16px;
+      background: #fff;
+    }
+
+    .bar-row {
+      display: grid;
+      grid-template-columns: minmax(88px, 132px) minmax(0, 1fr) minmax(86px, 108px);
+      gap: 8px;
+      align-items: center;
+      margin: 9px 0;
+      font-size: 0.83rem;
+      min-width: 0;
+    }
+
+    .bar-label {
+      color: var(--ink);
+      font-weight: 800;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .bar-track {
+      height: 12px;
+      border-radius: 999px;
+      background: #e7edf4;
+      overflow: hidden;
+      min-width: 0;
+    }
+
+    .bar-fill {
+      height: 100%;
+      min-width: 2px;
+      border-radius: 999px;
+      background: var(--teal);
+    }
+
+    .bar-value {
+      text-align: right;
+      color: var(--muted);
+      font-weight: 850;
+      min-width: 0;
+    }
+
+    .section-title {
+      margin: 4px 0 12px;
+      font-size: 1rem;
+    }
+
+    .result-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .result-card {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 14px;
+      background: #fff;
+      min-width: 0;
+    }
+
+    .result-card h3 {
+      margin: 0 0 8px;
+      font-size: 0.98rem;
+    }
+
+    .split-line {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 128px);
+      gap: 12px;
+      padding: 7px 0;
+      border-bottom: 1px solid #edf1f6;
+      color: var(--muted);
+      font-size: 0.9rem;
+      min-width: 0;
+    }
+
+    .split-line:last-child {
+      border-bottom: 0;
+    }
+
+    .split-line strong {
+      color: var(--ink);
+      min-width: 0;
+      text-align: right;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      overflow: hidden;
+      display: table;
+    }
+
+    th,
+    td {
+      padding: 10px;
+      text-align: right;
+      border-bottom: 1px solid var(--line);
+      font-size: 0.9rem;
+      min-width: 0;
+      max-width: 180px;
+    }
+
+    th:first-child,
+    td:first-child {
+      text-align: left;
+    }
+
+    th {
+      background: var(--soft);
+      color: var(--muted);
+      font-size: 0.78rem;
+      text-transform: uppercase;
+    }
+
+    tr:last-child td {
+      border-bottom: 0;
+    }
+
+    .assumption-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .formula-note {
+      border-left: 4px solid var(--teal);
+      padding: 10px 12px;
+      background: var(--soft);
+      border-radius: 0 8px 8px 0;
+      margin-bottom: 10px;
+      min-width: 0;
+    }
+
+    .formula-note strong {
+      display: block;
+      margin-bottom: 4px;
+    }
+
+    .formula-note span {
+      color: var(--muted);
+      line-height: 1.42;
+      font-size: 0.9rem;
+    }
+
+    .empty-state {
+      color: var(--muted);
+      border: 1px dashed var(--line);
+      border-radius: 8px;
+      padding: 20px;
+      text-align: center;
+      background: #fff;
+    }
+
+    @media (max-width: 1180px) {
+      .layout {
+        grid-template-columns: 1fr;
+      }
+
+      .results {
+        position: static;
+      }
+    }
+
+    @media (max-width: 820px) {
+      .app-shell {
+        padding: 14px;
+      }
+
+      .topbar {
+        grid-template-columns: 1fr;
+      }
+
+      .actions {
+        justify-content: flex-start;
+      }
+
+      .actions .button {
+        flex: 1 1 150px;
+      }
+
+      .tabs {
+        overflow-x: auto;
+      }
+
+      .tab {
+        flex: 1 0 auto;
+      }
+
+      .intro-strip,
+      .question-list,
+      .result-grid,
+      .assumption-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .control-row {
+        grid-template-columns: 1fr;
+      }
+
+      .value-field {
+        grid-template-columns: minmax(0, 1fr) auto;
+      }
+
+      .metric.primary .metric-value {
+        font-size: 2.35rem;
+      }
+
+      .bar-row {
+        grid-template-columns: minmax(0, 1fr);
+      }
+
+      .bar-label {
+        white-space: normal;
+      }
+
+      .bar-value {
+        text-align: left;
+      }
+
+      .split-line {
+        grid-template-columns: minmax(0, 1fr);
+        gap: 3px;
+      }
+
+      .split-line strong {
+        text-align: left;
+      }
+
+      table {
+        display: block;
+        overflow-x: auto;
+      }
+    }
+
+    @media print {
+      @page {
+        size: letter;
+        margin: 0.45in;
+      }
+
+      * {
+        print-color-adjust: exact;
+        -webkit-print-color-adjust: exact;
+      }
+
+      body {
+        background: #fff;
+      }
+
+      .app-shell {
+        max-width: none;
+        padding: 0;
+      }
+
+      .topbar {
+        display: block;
+        padding: 0 0 16px;
+        border-bottom: 1px solid var(--line);
+      }
+
+      h1 {
+        font-size: 34px;
+        line-height: 1.05;
+        margin-bottom: 6px;
+      }
+
+      .lede {
+        max-width: none;
+        font-size: 10.5pt;
+      }
+
+      .actions,
+      .tabs,
+      #inputsView,
+      #assumptionsView {
+        display: none !important;
+      }
+
+      .print-meta {
+        display: block;
+      }
+
+      .layout {
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+        margin-top: 16px;
+      }
+
+      .results {
+        order: 1;
+        position: static;
+      }
+
+      .inputs-panel {
+        order: 2;
+      }
+
+      .panel,
+      .result-card,
+      table {
+        box-shadow: none;
+        break-inside: avoid;
+      }
+
+      #resultsView {
+        display: block !important;
+        padding: 0;
+      }
+
+      .results-header {
+        padding: 14px;
+      }
+
+      .metric-grid {
+        grid-template-columns: repeat(4, 1fr);
+        gap: 8px;
+        padding: 10px;
+      }
+
+      .metric {
+        min-height: 78px;
+        padding: 10px;
+      }
+
+      .metric.primary {
+        grid-column: 1 / -1;
+        min-height: 88px;
+      }
+
+      .metric-value,
+      .metric.primary .metric-value {
+        font-size: 22pt;
+      }
+
+      .metric-sub,
+      .bar-value,
+      .bar-label,
+      td,
+      th,
+      .split-line,
+      .formula-note span {
+        font-size: 8.5pt;
+      }
+
+      .chart-area {
+        padding: 0 10px 10px;
+      }
+
+      .result-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 8px;
+      }
+
+      .section-title {
+        margin-top: 14px;
+      }
+
+      .formula-note {
+        break-inside: avoid;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="app-shell">
+    <header class="topbar">
+      <div>
+        <div class="eyebrow">JAGGAER value calculator</div>
+        <h1>New Value Calculator</h1>
+        <p class="lede">Model the measurable value of JAGGAER across spend visibility, supplier management, sourcing, contracts, procurement, payments, and accounts payable. Build a tailored ROI story that connects operational improvements to financial impact.</p>
+        <div class="print-meta" id="printMeta">Prepared from the JAGGAER New Value Calculator.</div>
+      </div>
+      <div class="actions">
+        <button class="button" id="resetBtn" type="button">Reset benchmark</button>
+        <button class="button" id="downloadExcelBtn" type="button">Download customer Excel</button>
+        <button class="button" id="uploadExcelBtn" type="button">Upload completed Excel</button>
+        <input class="upload-input" id="excelUpload" type="file" accept=".xlsx,.xls,.csv,.tsv,text/csv,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel">
+        <button class="button" id="pdfBtn" type="button">Export as PDF</button>
+        <button class="button primary" id="copyBtn" type="button">Copy summary</button>
+      </div>
+    </header>
+
+    <section class="layout">
+      <div class="panel inputs-panel">
+        <nav class="tabs" aria-label="Calculator sections">
+          <button class="tab active" type="button" data-tab="inputs">Inputs</button>
+          <button class="tab" type="button" data-tab="results">Details</button>
+          <button class="tab" type="button" data-tab="assumptions">Assumptions</button>
+        </nav>
+
+        <section class="view active" id="inputsView">
+          <div class="intro-strip">
+            <div class="step">
+              <strong>1. Set the customer baseline</strong>
+              <p>Start with operating spend, addressable spend, contract coverage, supplier counts, events, POs, pCard activity, and invoices.</p>
+            </div>
+            <div class="step">
+              <strong>2. Tune the operating model</strong>
+              <p>Adjust workload, cost, salary, and efficiency assumptions where the customer can validate a better number.</p>
+            </div>
+            <div class="step">
+              <strong>3. Read the value story</strong>
+              <p>Review annual savings, multi-year benefit, payback, NPV, and ROI multiple in the summary panel.</p>
+            </div>
+          </div>
+
+          <div class="filter-row">
+            <select class="select" id="processFilter" aria-label="Filter process"></select>
+            <label class="toggle"><input id="mustOnly" type="checkbox"> Must-have inputs only</label>
+          </div>
+
+          <div id="questionGroups"></div>
+        </section>
+
+        <section class="view" id="resultsView">
+          <h2 class="section-title">Savings Detail</h2>
+          <div class="result-grid" id="moduleCards"></div>
+          <h2 class="section-title" style="margin-top:18px;">Year-by-Year ROI</h2>
+          <div id="yearTable"></div>
+          <h2 class="section-title" style="margin-top:18px;">Workbook Calculation Logic</h2>
+          <div id="formulaNotes"></div>
+        </section>
+
+        <section class="view" id="assumptionsView">
+          <h2 class="section-title">ROI Assumptions</h2>
+          <div class="assumption-grid" id="assumptionControls"></div>
+          <h2 class="section-title" style="margin-top:18px;">Other Savings Opportunities</h2>
+          <div class="assumption-grid" id="otherControls"></div>
+        </section>
+      </div>
+
+      <aside class="panel results" aria-live="polite">
+        <div class="results-header">
+          <h2 id="summaryTitle">Potential Customer ROI</h2>
+          <p id="summaryNarrative">Move the sliders to build a customer-specific value story.</p>
+        </div>
+        <div class="metric-grid">
+          <div class="metric primary">
+            <div class="metric-label">Total value ROI</div>
+            <div class="metric-value" id="roiMultiple">0.0x</div>
+            <div class="metric-sub" id="roiSub">Benefit divided by total investment.</div>
+          </div>
+          <div class="metric">
+            <div class="metric-label">Annual value</div>
+            <div class="metric-value" id="annualValue">$0</div>
+            <div class="metric-sub">Hard savings plus process efficiency.</div>
+          </div>
+          <div class="metric">
+            <div class="metric-label">Payback</div>
+            <div class="metric-value" id="payback">0 mo</div>
+            <div class="metric-sub">Estimated cumulative cash-flow break-even.</div>
+          </div>
+          <div class="metric">
+            <div class="metric-label">Net present value</div>
+            <div class="metric-value" id="npv">$0</div>
+            <div class="metric-sub">Discounted by customer WACC.</div>
+          </div>
+          <div class="metric">
+            <div class="metric-label">3-year benefit</div>
+            <div class="metric-value" id="totalBenefit">$0</div>
+            <div class="metric-sub">Realized by adoption schedule.</div>
+          </div>
+        </div>
+        <div class="chart-area">
+          <h3 class="section-title">Annual Savings Mix</h3>
+          <div id="breakdownBars"></div>
+        </div>
+      </aside>
+    </section>
+  </main>
+
+  <script>
+    const QUESTIONS = [
+      { id: "totalOperationalSpendM", process: "General", label: "Total operational spend", type: "Must Have", unit: "$M/yr", value: 1300, min: 1, max: 5000, step: 1, hint: "Annual spend on goods and services, excluding payroll and taxes." },
+      { id: "addressableSpendM", process: "General", label: "Addressable spend", type: "Good to Have", unit: "$M/yr", value: 215, min: 0, max: 3000, step: 1, hint: "Annual spend that procurement can categorize, manage, source, or contract." },
+      { id: "tier1Pct", process: "General", label: "Tier 1 spend: addressable spend on contract", type: "Must Have", unit: "%", value: 60, min: 0, max: 100, step: 1, hint: "Spend fully on contract with known pricing and terms." },
+      { id: "tier2Pct", process: "General", label: "Tier 2 spend: addressable spend not on contract", type: "Must Have", unit: "%", value: 20, min: 0, max: 100, step: 1, hint: "Maverick spend where a contract exists but is not used." },
+      { id: "tier3Pct", process: "General", label: "Tier 3 spend: addressable spend with no contract", type: "Must Have", unit: "%", value: 20, min: 0, max: 100, step: 1, hint: "Uncontracted or one-time sourced spend." },
+      { id: "possibleAddressableSpendM", process: "General", label: "Total possible addressable spend", type: "Must Have", unit: "$M/yr", value: 215, min: 0, max: 3000, step: 1, hint: "Additional spend that could be brought under procurement management." },
+      { id: "waccPct", process: "General", label: "Weighted average cost of capital", type: "Must Have", unit: "%", value: 11, min: 0, max: 35, step: 0.25, hint: "Discount rate used for NPV." },
+      { id: "spendGrowthPct", process: "General", label: "Spend growth rate", type: "Good to Have", unit: "%/yr", value: 5, min: -20, max: 40, step: 0.5, hint: "Expected annual growth across the analysis period." },
+      { id: "sumIncreasePct", process: "General", label: "Estimated increase in spend under management", type: "Nice to Have", unit: "%/yr", value: 15, min: 0, max: 50, step: 1, hint: "Annual increase in spend that can be managed, sourced, or contracted." },
+
+      { id: "analyticsSalary", process: "Spend Analytics", label: "Estimated annual salary/blended rate for analytics personnel", type: "Good to Have", unit: "$/yr", value: 50000, min: 20000, max: 250000, step: 1000, hint: "Average annual cost for people preparing spend analytics." },
+      { id: "analyticsCollectionHrs", process: "Spend Analytics", label: "Time spent on spend collection and cleansing", type: "Good to Have", unit: "hrs/yr", value: 300, min: 0, max: 2000, step: 10, hint: "Annual effort to compile, cleanse, and prepare spend data." },
+      { id: "analyticsReportHrsWk", process: "Spend Analytics", label: "Time spent preparing spend-based reports", type: "Good to Have", unit: "hrs/wk", value: 3, min: 0, max: 80, step: 0.5, hint: "Weekly effort to prepare procurement or departmental spend reports." },
+      { id: "contractLeakagePct", process: "Spend Analytics", label: "Estimate of contract leakage", type: "Nice to Have", unit: "%/yr", value: 1.5, min: 0, max: 20, step: 0.25, hint: "Savings leakage from cost creep, poor visibility, or demand issues." },
+      { id: "invoicePricingInaccuracyPct", process: "Spend Analytics", label: "Estimate of invoice pricing inaccuracies", type: "Nice to Have", unit: "%/yr", value: 11, min: 0, max: 30, step: 0.5, hint: "Estimated invoice error rate with inaccurate pricing." },
+
+      { id: "supplierCount", process: "Supplier Management", label: "Number of suppliers", type: "Must Have", unit: "suppliers", value: 676, min: 0, max: 25000, step: 10, hint: "Total suppliers available for purchasing." },
+      { id: "diverseSupplierCount", process: "Supplier Management", label: "Number of diverse suppliers", type: "Must Have", unit: "suppliers", value: 75, min: 0, max: 10000, step: 5, hint: "Suppliers supporting diversity programs." },
+      { id: "supplierSalary", process: "Supplier Management", label: "Estimated annual salary/blended rate for supplier management personnel", type: "Good to Have", unit: "$/yr", value: 75000, min: 20000, max: 250000, step: 1000, hint: "Average annual cost for supplier management roles." },
+      { id: "supplierDocHours", process: "Supplier Management", label: "Time spent managing supplier documentation", type: "Good to Have", unit: "hrs/supplier", value: 0.5, min: 0, max: 20, step: 0.1, hint: "Annual documentation maintenance per supplier." },
+      { id: "newSuppliersEvaluated", process: "Supplier Management", label: "Number of new suppliers evaluated", type: "Good to Have", unit: "suppliers/yr", value: 34, min: 0, max: 5000, step: 1, hint: "New suppliers considered for the supplier master." },
+      { id: "newSupplierEvalHours", process: "Supplier Management", label: "Time spent evaluating new suppliers", type: "Good to Have", unit: "hrs/supplier", value: 0.5, min: 0, max: 40, step: 0.1, hint: "Time to review supplier profile, banking, credit, capability, or compliance information." },
+      { id: "tinHours", process: "Supplier Management", label: "Time spent managing supplier TIN match", type: "Good to Have", unit: "hrs/supplier", value: 0.1, min: 0, max: 10, step: 0.1, hint: "Annual TIN matching effort per supplier." },
+      { id: "supplierCertHours", process: "Supplier Management", label: "Time spent managing supplier certifications and qualifications", type: "Good to Have", unit: "hrs/supplier", value: 0.3, min: 0, max: 20, step: 0.1, hint: "Insurance, sanctions, HIPAA, Conflict Minerals, RoHS, ISO, and related certification work." },
+      { id: "diversityHours", process: "Supplier Management", label: "Time spent managing supplier diversity", type: "Good to Have", unit: "hrs/diverse supplier", value: 2, min: 0, max: 20, step: 0.25, hint: "Annual effort to gather and update diversity certifications." },
+      { id: "secondTierDiversityHours", process: "Supplier Management", label: "Time spent managing 2nd Tier supplier diversity", type: "Good to Have", unit: "hrs/diverse supplier", value: 2, min: 0, max: 20, step: 0.25, hint: "Annual effort to update internal diverse supplier spend." },
+      { id: "newSuppliersOnboarded", process: "Supplier Management", label: "Number of new suppliers onboarded each year", type: "Good to Have", unit: "suppliers/yr", value: 3, min: 0, max: 5000, step: 1, hint: "New suppliers added to the supplier master or ERP." },
+      { id: "onboardingDocHours", process: "Supplier Management", label: "Time spent managing onboarding documentation", type: "Good to Have", unit: "hrs/supplier", value: 1, min: 0, max: 40, step: 0.25, hint: "Banking, tax forms, approvals, and ERP updates." },
+      { id: "suppliersOffboarded", process: "Supplier Management", label: "Number of new suppliers offboarded each year", type: "Good to Have", unit: "suppliers/yr", value: 68, min: 0, max: 5000, step: 1, hint: "Unused suppliers removed from the ERP or supplier master." },
+      { id: "coldCallSuppliers", process: "Supplier Management", label: "Number of cold call suppliers registered/evaluated", type: "Nice to Have", unit: "suppliers/yr", value: 0, min: 0, max: 5000, step: 1, hint: "Supplier-initiated requests to be added to the supply base." },
+      { id: "offboardingDocHours", process: "Supplier Management", label: "Time spent managing offboarding documentation", type: "Nice to Have", unit: "hrs/supplier", value: 1, min: 0, max: 40, step: 0.25, hint: "Effort to remove suppliers from ERP/accounting systems." },
+
+      { id: "sourcingEvents", process: "Sourcing", label: "Number of sourcing events", type: "Must Have", unit: "events/yr", value: 25, min: 0, max: 1000, step: 1, hint: "Annual RFI, RFP, and RFQ event volume." },
+      { id: "sourcingSalary", process: "Sourcing", label: "Estimated annual salary/blended rate for sourcing personnel", type: "Good to Have", unit: "$/yr", value: 70000, min: 20000, max: 250000, step: 1000, hint: "Average annual cost for sourcing roles." },
+      { id: "sourcingEventHours", process: "Sourcing", label: "Time spent creating, executing, and evaluating a sourcing event", type: "Good to Have", unit: "hrs/event", value: 29, min: 0, max: 250, step: 1, hint: "Administrative time to prepare, issue, manage, evaluate, and award an RFx." },
+      { id: "avgSourcingEventSize", process: "Sourcing", label: "Average size of a typical sourcing event", type: "Good to Have", unit: "$/event", value: 50000, min: 0, max: 10000000, step: 1000, hint: "Average annualized value of goods or services in a sourcing event." },
+      { id: "avgSourcingSavingsPct", process: "Sourcing", label: "Average savings achieved through sourcing", type: "Nice to Have", unit: "%/event", value: 7, min: 0, max: 35, step: 0.5, hint: "Average negotiated savings target per event." },
+
+      { id: "advancedCategories", process: "Advanced Sourcing", label: "Number of categories sourced", type: "Good to Have", unit: "categories", value: 2, min: 0, max: 100, step: 1, hint: "Categories that can use advanced sourcing techniques." },
+      { id: "advancedDollars", process: "Advanced Sourcing", label: "Anticipated aggregate dollars to be sourced", type: "Must Have", unit: "$", value: 0, min: 0, max: 500000000, step: 100000, hint: "Annual dollars planned for advanced sourcing." },
+      { id: "advancedEvents", process: "Advanced Sourcing", label: "Number of sourcing events per year", type: "Must Have", unit: "events/yr", value: 3, min: 0, max: 500, step: 1, hint: "Events needed to source the advanced sourcing categories." },
+      { id: "advancedProcurementDollars", process: "Advanced Sourcing", label: "Total estimated procurement dollars", type: "Inherited from Spend Data Input tab", unit: "$", value: 210600000, min: 0, max: 1000000000, step: 100000, hint: "Workbook value inherited from addressable spend." },
+      { id: "advancedSpendUnderMgmtPct", process: "Advanced Sourcing", label: "Total spend under management that uses advanced sourcing techniques", type: "Calculated from inherited information", unit: "%", value: 0, min: 0, max: 100, step: 1, hint: "Share of total managed spend using optimization or advanced sourcing." },
+      { id: "advancedSuppliers", process: "Advanced Sourcing", label: "Planned number of suppliers in a typical advanced sourcing event", type: "Good to Have", unit: "suppliers", value: 200, min: 0, max: 5000, step: 5, hint: "Supplier participation in complex sourcing events." },
+      { id: "advancedHistoricalSavingsPct", process: "Advanced Sourcing", label: "Average cost savings achieved using current/conventional sourcing methods", type: "Must Have", unit: "%", value: 5, min: 0, max: 40, step: 0.5, hint: "Savings achieved before advanced sourcing techniques." },
+      { id: "advancedAdditionalSavingsPct", process: "Advanced Sourcing", label: "Anticipated savings using advanced sourcing techniques", type: "VA team estimate", unit: "%", value: 12, min: 0, max: 40, step: 0.5, hint: "Incremental savings from expressive bidding, optimization, and scenario building." },
+      { id: "advancedTeamMembers", process: "Advanced Sourcing", label: "Number of team members currently involved in sourcing", type: "Must Have", unit: "FTE", value: 4, min: 0, max: 100, step: 0.25, hint: "FTE involved in current sourcing execution." },
+      { id: "advancedFteSalary", process: "Advanced Sourcing", label: "Average salary of FTE", type: "Must Have", unit: "$/yr", value: 104000, min: 20000, max: 300000, step: 1000, hint: "Average annual salary for sourcing FTEs." },
+      { id: "advancedBurdenPct", process: "Advanced Sourcing", label: "Overhead/Burden rate", type: "Nice to Have", unit: "%", value: 18, min: 0, max: 80, step: 1, hint: "Benefits and overhead burden on sourcing FTE salary." },
+      { id: "advancedDurationMonths", process: "Advanced Sourcing", label: "Average duration of a sourcing event", type: "Good to Have", unit: "months", value: 6, min: 0, max: 36, step: 0.5, hint: "Time to create, approve, run, award, and complete the event." },
+      { id: "advancedFteReduction", process: "Advanced Sourcing", label: "Estimated reduction in FTEs necessary to execute sourcing events", type: "VA team estimate", unit: "FTE", value: 1, min: 0, max: 50, step: 0.25, hint: "Reduced staffing need for advanced sourcing event execution." },
+      { id: "advancedTimeReductionMonths", process: "Advanced Sourcing", label: "Estimated reduction in time to market", type: "VA team estimate", unit: "months", value: 1, min: 0, max: 24, step: 0.5, hint: "Months removed from the sourcing cycle." },
+
+      { id: "contractCreationPeople", process: "Contract Lifecycle Management", label: "People participating in/managing contract creation", type: "Must Have", unit: "people", value: 2, min: 0, max: 500, step: 1, hint: "FTE involved in contract creation." },
+      { id: "contractCreationSalary", process: "Contract Lifecycle Management", label: "Salary/blended rate for contract creation process", type: "Good to Have", unit: "$/yr", value: 104000, min: 20000, max: 300000, step: 1000, hint: "Average salary for legal and contract administrators." },
+      { id: "contractExecutionPeople", process: "Contract Lifecycle Management", label: "People participating in/managing contract review, negotiation, and approval", type: "Must Have", unit: "people", value: 25, min: 0, max: 1000, step: 1, hint: "FTE involved in contract execution." },
+      { id: "contractExecutionSalary", process: "Contract Lifecycle Management", label: "Salary/blended rate for contract review, negotiation, and approval", type: "Good to Have", unit: "$/yr", value: 104000, min: 20000, max: 300000, step: 1000, hint: "Average salary for contract execution participants." },
+      { id: "contractStoragePeople", process: "Contract Lifecycle Management", label: "People participating in/managing contract scanning, filing, and archiving", type: "Must Have", unit: "people", value: 3, min: 0, max: 500, step: 1, hint: "FTE involved in contract storage." },
+      { id: "contractStorageSalary", process: "Contract Lifecycle Management", label: "Salary/blended rate for contract scanning, filing, and archiving", type: "Good to Have", unit: "$/yr", value: 50000, min: 20000, max: 300000, step: 1000, hint: "Average salary for contract storage participants." },
+      { id: "contractSearchPeople", process: "Contract Lifecycle Management", label: "People participating in/managing contract searching, tracking, and finding", type: "Must Have", unit: "people", value: 3, min: 0, max: 500, step: 1, hint: "FTE involved in contract information management." },
+      { id: "contractSearchSalary", process: "Contract Lifecycle Management", label: "Salary/blended rate for contract searching, tracking, and finding", type: "Good to Have", unit: "$/yr", value: 50000, min: 20000, max: 300000, step: 1000, hint: "Average salary for contract search and tracking participants." },
+      { id: "contractCount", process: "Contract Lifecycle Management", label: "Number of contracts", type: "Good to Have", unit: "contracts", value: 0, min: 0, max: 100000, step: 10, hint: "Current active contracts managed or monitored." },
+      { id: "newContractsAnnual", process: "Contract Lifecycle Management", label: "Annual number of new contracts", type: "Good to Have", unit: "contracts/yr", value: 0, min: 0, max: 25000, step: 10, hint: "New contracts established each year." },
+      { id: "missedCommitmentContracts", process: "Contract Lifecycle Management", label: "Contracts with missed or underperformed commitments", type: "Good to Have", unit: "contracts", value: 40, min: 0, max: 10000, step: 1, hint: "Contracts with penalties, issues, or underperformance." },
+      { id: "contractResolutionHours", process: "Contract Lifecycle Management", label: "Time managing resolution/corrective action for missed commitments", type: "Good to Have", unit: "hrs/contract", value: 0, min: 0, max: 200, step: 1, hint: "Average effort to resolve contract issues." },
+      { id: "contractExpirePct", process: "Contract Lifecycle Management", label: "Spend under contract that expires each year", type: "Must Have", unit: "%", value: 5, min: 0, max: 100, step: 1, hint: "Annual percentage of active contract spend expiring." },
+      { id: "contractAutoRenewPct", process: "Contract Lifecycle Management", label: "Spend under contract that auto-renews", type: "Must Have", unit: "%", value: 5, min: 0, max: 100, step: 1, hint: "Annual percentage of contract spend subject to auto-renewal." },
+      { id: "contractCreationHours", process: "Contract Lifecycle Management", label: "Time spent managing contract creation", type: "Nice to Have", unit: "hrs/contract", value: 0, min: 0, max: 300, step: 1, hint: "Time to assemble a contract." },
+      { id: "contractExecutionHours", process: "Contract Lifecycle Management", label: "Time spent managing contract review, negotiation, and approval", type: "Nice to Have", unit: "hrs/contract", value: 0, min: 0, max: 300, step: 1, hint: "Time to review, negotiate, redline, approve, and sign." },
+      { id: "contractStorageHours", process: "Contract Lifecycle Management", label: "Time spent managing contract scanning, filing, and archiving", type: "Nice to Have", unit: "hrs/contract", value: 0, min: 0, max: 100, step: 1, hint: "Time to incorporate a contract into a repository." },
+      { id: "contractSearchHours", process: "Contract Lifecycle Management", label: "Time spent managing contract searching, tracking, and finding", type: "Nice to Have", unit: "hrs/contract", value: 0, min: 0, max: 100, step: 1, hint: "Time to find contracts, terms, deliverables, or expirations." },
+      { id: "autoRenewSavingsPct", process: "Contract Lifecycle Management", label: "Savings from re-sourcing or renegotiating auto-renewing contracts", type: "Nice to Have", unit: "%/contract", value: 5, min: 0, max: 35, step: 0.5, hint: "Savings from addressing contracts before renewal." },
+
+      { id: "poCount", process: "eProcurement", label: "Total number of POs", type: "Must Have", unit: "POs/yr", value: 8919, min: 0, max: 500000, step: 100, hint: "Annual purchase transactions initiated by requisition, PO, non-PO, or request form." },
+      { id: "maverickRedirectPct", process: "eProcurement", label: "Maverick spend that can be redirected to existing contracts", type: "Good to Have", unit: "%/yr", value: 10, min: 0, max: 100, step: 1, hint: "Tier 2 spend redirected to Tier 1 contract buying." },
+      { id: "poProcessHours", process: "eProcurement", label: "Time to process a PO from request to order placement", type: "Good to Have", unit: "hrs/PO", value: 15, min: 0, max: 80, step: 0.5, hint: "Requestor and approver effort per requisition or PO." },
+      { id: "nonPoReviewHoursWk", process: "eProcurement", label: "Time reviewing non-PO, restricted, or non-catalog transactions", type: "Good to Have", unit: "hrs/wk/person", value: 10, min: 0, max: 80, step: 0.5, hint: "Weekly review effort for transaction compliance." },
+      { id: "redirectedTier2SavingsPct", process: "eProcurement", label: "Redirected Tier 2 savings", type: "Nice to Have", unit: "%", value: 10, min: 0, max: 35, step: 0.5, hint: "Average negotiated savings when maverick spend returns to contract." },
+      { id: "poProcessCost", process: "eProcurement", label: "Cost to process a PO from request to order placement", type: "Nice to Have", unit: "$/PO", value: 56, min: 0, max: 250, step: 1, hint: "Current request-to-order processing cost." },
+      { id: "nonPoRequestCount", process: "eProcurement", label: "Annual requests for non-PO, restricted, or non-catalog goods and services", type: "Nice to Have", unit: "requests/yr", value: 12000, min: 0, max: 500000, step: 100, hint: "Annual purchases requiring additional policy review." },
+
+      { id: "pCardDoAMin", process: "pCard", label: "Minimum spend/transaction requiring delegation of authority approval", type: "Must Have", unit: "$/transaction", value: 5000, min: 0, max: 100000, step: 100, hint: "Spend threshold requiring additional approvals." },
+      { id: "pCardDoASpend", process: "pCard", label: "Total spend requiring delegation of authority approval", type: "Must Have", unit: "$/yr", value: 0, min: 0, max: 500000000, step: 100000, hint: "Annual spend requiring additional approval." },
+      { id: "pCardDoATransactions", process: "pCard", label: "PO/non-PO transactions requiring delegation of authority approval", type: "Must Have", unit: "transactions/yr", value: 0, min: 0, max: 500000, step: 100, hint: "Annual transactions requiring approval." },
+      { id: "pCardBelowDoASpend", process: "pCard", label: "Total spend that does not require delegation of authority approval", type: "Must Have", unit: "$/yr", value: 0, min: 0, max: 500000000, step: 100000, hint: "Annual spend below the approval threshold." },
+      { id: "pCardBelowDoATransactions", process: "pCard", label: "Transactions that do not require delegation of authority approval", type: "Must Have", unit: "transactions/yr", value: 0, min: 0, max: 500000, step: 100, hint: "Annual transactions below the approval threshold." },
+      { id: "pCardBudgetOwners", process: "pCard", label: "People/budget owners participating in pCard reporting", type: "Must Have", unit: "people", value: 100, min: 0, max: 10000, step: 10, hint: "Budget owners involved in pCard reporting and review." },
+      { id: "pCardSalary", process: "pCard", label: "Estimated annual salary/blended rate for pCard management personnel", type: "Good to Have", unit: "$/yr", value: 50000, min: 20000, max: 250000, step: 1000, hint: "Average annual cost for pCard reporting and management roles." },
+      { id: "pCardReportHoursWk", process: "pCard", label: "Time spent generating pCard spend reports", type: "Good to Have", unit: "hrs/wk/person", value: 1, min: 0, max: 80, step: 0.5, hint: "Weekly reporting effort per person or budget owner." },
+      { id: "pCardDoAPct", process: "pCard", label: "Spend requiring delegation of authority that could be paid with pCard", type: "Nice to Have", unit: "%", value: 5, min: 0, max: 100, step: 1, hint: "Share of above-threshold spend suitable for pCard." },
+      { id: "pCardOverrideSpend", process: "pCard", label: "Spend requiring delegation of authority that could be paid with pCard", type: "Nice to Have", unit: "$/yr", value: 0, min: 0, max: 500000000, step: 100000, hint: "Optional direct annual dollar override." },
+
+      { id: "manualInvoices", process: "Accounts Payable", label: "Total number of manually processed invoices", type: "Must Have", unit: "invoices/yr", value: 11000, min: 0, max: 1000000, step: 100, hint: "Annual PO and non-PO invoices processed manually." },
+      { id: "poInvoicePct", process: "Accounts Payable", label: "PO-related invoices as a percent of total", type: "Must Have", unit: "%", value: 50, min: 0, max: 100, step: 1, hint: "Share of invoices tied to purchase orders." },
+      { id: "invoiceProcessHours", process: "Accounts Payable", label: "Time to process an invoice from receipt to approval for payment", type: "Nice to Have", unit: "hrs/invoice", value: 0, min: 0, max: 20, step: 0.25, hint: "Manual effort per invoice." },
+      { id: "invoiceProcessCost", process: "Accounts Payable", label: "Cost to process an invoice from receipt to approval for payment", type: "Nice to Have", unit: "$/invoice", value: 20.7, min: 0, max: 100, step: 0.25, hint: "Current invoice processing cost." }
+    ];
+
+    const ASSUMPTIONS = [
+      { id: "analysisYears", label: "Analysis period", unit: "years", value: 3, min: 3, max: 5, step: 1 },
+      { id: "includeProcess", label: "Include process efficiency in ROI", unit: "0/1", value: 1, min: 0, max: 1, step: 1 },
+      { id: "year1Adoption", label: "Year 1 benefit realization", unit: "%", value: 50, min: 0, max: 100, step: 1 },
+      { id: "year2Adoption", label: "Year 2 benefit realization", unit: "%", value: 75, min: 0, max: 100, step: 1 },
+      { id: "year3Adoption", label: "Year 3 benefit realization", unit: "%", value: 95, min: 0, max: 100, step: 1 },
+      { id: "year4Adoption", label: "Year 4 benefit realization", unit: "%", value: 95, min: 0, max: 100, step: 1 },
+      { id: "year5Adoption", label: "Year 5 benefit realization", unit: "%", value: 95, min: 0, max: 100, step: 1 },
+      { id: "startupCost", label: "Software license, implementation, and integration estimate", unit: "$", value: 533550, min: 0, max: 5000000, step: 1000 },
+      { id: "recurringCost", label: "Recurring subscription and enablement fees", unit: "$/yr", value: 262050, min: 0, max: 3000000, step: 1000 }
+    ];
+
+    const OTHER_SAVINGS = [
+      { id: "other1", label: "Other savings opportunity 1", unit: "$/yr", value: 0, min: 0, max: 5000000, step: 1000 },
+      { id: "other2", label: "Other savings opportunity 2", unit: "$/yr", value: 0, min: 0, max: 5000000, step: 1000 },
+      { id: "other3", label: "Other savings opportunity 3", unit: "$/yr", value: 0, min: 0, max: 5000000, step: 1000 }
+    ];
+
+    const state = {
+      questions: Object.fromEntries(QUESTIONS.map((q) => [q.id, q.value])),
+      assumptions: Object.fromEntries(ASSUMPTIONS.map((q) => [q.id, q.value])),
+      other: Object.fromEntries(OTHER_SAVINGS.map((q) => [q.id, q.value]))
+    };
+
+    const fmtCurrency = (value, compact = true) => {
+      const abs = Math.abs(value || 0);
+      const maximumFractionDigits = abs >= 1000000 ? 1 : 0;
+      return new Intl.NumberFormat("en-US", {
+        style: "currency",
+        currency: "USD",
+        notation: compact && abs >= 1000000 ? "compact" : "standard",
+        maximumFractionDigits
+      }).format(value || 0);
+    };
+
+    const fmtNumber = (value, maxDigits = 1) => new Intl.NumberFormat("en-US", {
+      maximumFractionDigits: maxDigits
+    }).format(value || 0);
+
+    const pct = (value) => (Number(value) || 0) / 100;
+    const safeDiv = (a, b) => b ? a / b : 0;
+    const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
+
+    function q(id) {
+      return Number(state.questions[id]) || 0;
+    }
+
+    function a(id) {
+      return Number(state.assumptions[id]) || 0;
+    }
+
+    function other(id) {
+      return Number(state.other[id]) || 0;
+    }
+
+    function annualizeSalary(salary) {
+      return safeDiv(salary, 2080);
+    }
+
+    function getSpendModel() {
+      const operationalM = q("totalOperationalSpendM");
+      const addressableM = q("addressableSpendM") || operationalM * 0.27 * 0.6;
+      const possibleAddressableM = Math.max(q("possibleAddressableSpendM"), addressableM);
+      const tierTotal = q("tier1Pct") + q("tier2Pct") + q("tier3Pct");
+      const tier1Pct = tierTotal ? q("tier1Pct") / tierTotal : 0;
+      const tier2Pct = tierTotal ? q("tier2Pct") / tierTotal : 0;
+      const tier3Pct = tierTotal ? q("tier3Pct") / tierTotal : 0;
+      const tier1M = addressableM * tier1Pct;
+      const tier2M = addressableM * tier2Pct;
+      const tier3M = addressableM * tier3Pct;
+      const potentialIncreaseM = Math.max(possibleAddressableM - addressableM, 0);
+
+      return {
+        operationalM,
+        addressableM,
+        possibleAddressableM,
+        tier1M,
+        tier2M,
+        tier3M,
+        potentialIncreaseM
+      };
+    }
+
+    function calculate() {
+      const spend = getSpendModel();
+      const sumIncreaseRate = pct(q("sumIncreasePct"));
+      const otherHard = other("other1") + other("other2") + other("other3");
+
+      const analyticsHourly = annualizeSalary(q("analyticsSalary"));
+      const analyticsCollection = q("analyticsCollectionHrs") * analyticsHourly * 0.85;
+      const analyticsReporting = q("analyticsReportHrsWk") * 4 * 12 * analyticsHourly * 0.75;
+      const analyticsTotalPotentialSum = Math.max(spend.potentialIncreaseM + spend.tier3M, 0);
+      const analyticsIncrementalSum = analyticsTotalPotentialSum * 1000000 * sumIncreaseRate * 0.04;
+      const analyticsLeakage = spend.tier1M * 1000000 * pct(q("contractLeakagePct")) * 0.06;
+      const analyticsPricing = spend.addressableM * 1000000 * pct(q("invoicePricingInaccuracyPct")) * 0.01 * 0.9;
+      const spendAnalytics = {
+        hard: analyticsIncrementalSum + analyticsLeakage + analyticsPricing,
+        process: analyticsCollection + analyticsReporting
+      };
+
+      const supplierHourly = annualizeSalary(q("supplierSalary"));
+      const supplierDoc = q("supplierCount") * q("supplierDocHours") * supplierHourly * 0.75;
+      const supplierEvaluation = q("newSuppliersEvaluated") * q("newSupplierEvalHours") * supplierHourly * 0.75;
+      const supplierColdCalls = q("coldCallSuppliers") * supplierHourly * 0.75;
+      const regulatoryHours = (q("supplierCount") * (q("tinHours") + q("supplierCertHours"))) + (q("diverseSupplierCount") * (q("diversityHours") + q("secondTierDiversityHours")));
+      const supplierRegulatory = regulatoryHours * supplierHourly * 0.75;
+      const supplierOnboarding = q("newSuppliersOnboarded") * q("onboardingDocHours") * supplierHourly * 0.75;
+      const supplierOffboarding = q("suppliersOffboarded") * q("offboardingDocHours") * supplierHourly * 0.75;
+      const supplierManagement = {
+        hard: 0,
+        process: supplierDoc + supplierEvaluation + supplierColdCalls + supplierRegulatory + supplierOnboarding + supplierOffboarding
+      };
+
+      const sourcingHourly = annualizeSalary(q("sourcingSalary"));
+      const sourcingFutureHours = q("sourcingEventHours") * 0.383;
+      const sourcingAdminSavings = Math.max(q("sourcingEventHours") - sourcingFutureHours, 0) * q("sourcingEvents") * sourcingHourly;
+      const projectedIncreaseM = Math.max((spend.tier3M + spend.potentialIncreaseM) * sumIncreaseRate, 0);
+      const additionalEvents = q("avgSourcingEventSize") ? projectedIncreaseM * 1000000 / q("avgSourcingEventSize") : 0;
+      const sourcingAdditionalAdmin = q("sourcingEvents") ? additionalEvents * safeDiv(sourcingAdminSavings, q("sourcingEvents")) : 0;
+      const sourcingHard = projectedIncreaseM * 1000000 * pct(q("avgSourcingSavingsPct"));
+      const sourcing = {
+        hard: sourcingHard,
+        process: sourcingAdminSavings + sourcingAdditionalAdmin
+      };
+
+      const advancedDollars = q("advancedDollars") || q("advancedProcurementDollars") * pct(q("advancedSpendUnderMgmtPct"));
+      const advancedHard = advancedDollars * pct(q("advancedAdditionalSavingsPct"));
+      const advancedMonthlyLoaded = q("advancedFteSalary") / 12 * (1 + pct(q("advancedBurdenPct")));
+      const advancedHistoricalCost = q("advancedTeamMembers") * advancedMonthlyLoaded * q("advancedDurationMonths");
+      const advancedFteSavings = q("advancedTeamMembers") ? safeDiv(advancedHistoricalCost, q("advancedTeamMembers")) * clamp(q("advancedFteReduction"), 0, q("advancedTeamMembers")) : 0;
+      const advancedTimeSavings = q("advancedDurationMonths") ? safeDiv(advancedHistoricalCost, q("advancedDurationMonths")) * q("advancedTimeReductionMonths") : 0;
+      const advancedSourcing = {
+        hard: advancedHard,
+        process: advancedFteSavings + advancedTimeSavings
+      };
+
+      const clmLabor =
+        q("contractCreationPeople") * q("contractCreationSalary") * 0.10 +
+        q("contractExecutionPeople") * q("contractExecutionSalary") * 0.10 +
+        q("contractStoragePeople") * q("contractStorageSalary") * 0.30 +
+        q("contractSearchPeople") * q("contractSearchSalary") * 0.30;
+      const clmRisk = q("missedCommitmentContracts") * 1000;
+      const clmHourly = annualizeSalary((q("contractCreationSalary") + q("contractExecutionSalary") + q("contractStorageSalary") + q("contractSearchSalary")) / 4);
+      const clmResolution = q("missedCommitmentContracts") * q("contractResolutionHours") * clmHourly * 0.75;
+      const clmTimeInputs =
+        q("newContractsAnnual") * (
+          q("contractCreationHours") * annualizeSalary(q("contractCreationSalary")) +
+          q("contractExecutionHours") * annualizeSalary(q("contractExecutionSalary")) +
+          q("contractStorageHours") * annualizeSalary(q("contractStorageSalary")) +
+          q("contractSearchHours") * annualizeSalary(q("contractSearchSalary"))
+        ) * 0.30;
+      const clmHard = spend.tier1M * 1000000 * (pct(q("contractExpirePct")) + pct(q("contractAutoRenewPct"))) * pct(q("autoRenewSavingsPct"));
+      const clm = {
+        hard: clmHard,
+        process: clmLabor + clmRisk + clmResolution + clmTimeInputs
+      };
+
+      const eprocHard = spend.tier2M * 1000000 * pct(q("maverickRedirectPct")) * pct(q("redirectedTier2SavingsPct"));
+      const eprocPoSavings = q("poCount") * Math.max(q("poProcessCost") - 23, 0);
+      const eprocCompliance = q("nonPoReviewHoursWk") * 52 * sourcingHourly * 0.75;
+      const eprocurement = {
+        hard: eprocHard,
+        process: eprocPoSavings + eprocCompliance
+      };
+
+      const addressableDollars = spend.addressableM * 1000000;
+      const doaSpend = q("pCardDoASpend") || addressableDollars * 0.8;
+      const belowDoaSpend = q("pCardBelowDoASpend") || Math.max(addressableDollars - doaSpend, 0);
+      const doaTransactions = q("pCardDoATransactions") || (q("pCardDoAMin") ? doaSpend / q("pCardDoAMin") * 0.5 : 0);
+      const belowTransactions = q("pCardBelowDoATransactions") || (q("pCardDoAMin") ? belowDoaSpend / q("pCardDoAMin") : 0);
+      const pCardSpend = q("pCardOverrideSpend") || doaSpend * pct(q("pCardDoAPct"));
+      const pCardHard = (pCardSpend + belowDoaSpend) * 0.015;
+      const pCardTransactionSavings = doaTransactions * pct(q("pCardDoAPct")) * 60 + belowTransactions * 5.4;
+      const pCardReporting = q("pCardBudgetOwners") * q("pCardReportHoursWk") * 4 * 12 * annualizeSalary(q("pCardSalary")) * 0.75;
+      const pCard = {
+        hard: pCardHard,
+        process: pCardTransactionSavings + pCardReporting
+      };
+
+      const invoices = q("manualInvoices");
+      const poInvoices = invoices * pct(q("poInvoicePct"));
+      const nonPoInvoices = Math.max(invoices - poInvoices, 0);
+      const invoiceCost = q("invoiceProcessCost");
+      const currentInvoiceCost = invoices * invoiceCost;
+      const targetedPo = poInvoices * 0.5;
+      const targetedNonPo = nonPoInvoices * 0.5;
+      const futureInvoiceCost =
+        targetedPo * 10.79 +
+        (poInvoices - targetedPo) * invoiceCost +
+        targetedNonPo * 11.26 +
+        (nonPoInvoices - targetedNonPo) * invoiceCost;
+      const apLabor = q("invoiceProcessHours") * invoices * analyticsHourly * 0.25;
+      const accountsPayable = {
+        hard: 0,
+        process: Math.max(currentInvoiceCost - futureInvoiceCost, 0) + apLabor
+      };
+
+      const modules = [
+        { name: "Spend Analytics", key: "spendAnalytics", hard: spendAnalytics.hard, process: spendAnalytics.process, color: "var(--teal)" },
+        { name: "Supplier Management", key: "supplierManagement", hard: supplierManagement.hard, process: supplierManagement.process, color: "var(--blue)" },
+        { name: "Sourcing", key: "sourcing", hard: sourcing.hard, process: sourcing.process, color: "var(--amber)" },
+        { name: "Advanced Sourcing", key: "advancedSourcing", hard: advancedSourcing.hard, process: advancedSourcing.process, color: "var(--coral)" },
+        { name: "CLM", key: "clm", hard: clm.hard, process: clm.process, color: "var(--green)" },
+        { name: "eProcurement", key: "eprocurement", hard: eprocurement.hard, process: eprocurement.process, color: "#7b61ff" },
+        { name: "pCard", key: "pCard", hard: pCard.hard, process: pCard.process, color: "#c77521" },
+        { name: "Accounts Payable", key: "accountsPayable", hard: accountsPayable.hard, process: accountsPayable.process, color: "#60758f" },
+        { name: "Other", key: "other", hard: otherHard, process: 0, color: "#0d9488" }
+      ];
+
+      const annualHard = modules.reduce((sum, item) => sum + item.hard, 0);
+      const annualProcess = modules.reduce((sum, item) => sum + item.process, 0);
+      const annualValue = annualHard + annualProcess;
+      const annualRoiValue = annualHard + (a("includeProcess") ? annualProcess : 0);
+      const analysisYears = clamp(Math.round(a("analysisYears")), 3, 5);
+      const startup = a("startupCost");
+      const recurring = a("recurringCost");
+      const wacc = pct(q("waccPct"));
+      const growth = pct(q("spendGrowthPct"));
+      const years = [];
+      let totalBenefit = 0;
+      let totalInvestment = 0;
+      let npv = 0;
+
+      for (let year = 1; year <= analysisYears; year += 1) {
+        const adoption = pct(a(`year${year}Adoption`) || a("year3Adoption"));
+        const growthFactor = Math.pow(1 + growth, year - 1);
+        const benefit = annualRoiValue * adoption * growthFactor;
+        const investment = year === 1 ? startup : recurring;
+        const net = benefit - investment;
+        totalBenefit += benefit;
+        totalInvestment += investment;
+        npv += net / Math.pow(1 + wacc, year);
+        years.push({ year, adoption, growthFactor, benefit, investment, net });
+      }
+
+      let cumulative = 0;
+      let paybackMonths = null;
+      for (let month = 1; month <= analysisYears * 12; month += 1) {
+        const yearIndex = Math.ceil(month / 12);
+        const year = years[yearIndex - 1];
+        if (month === 1) cumulative -= startup;
+        if (month > 12 && (month - 1) % 12 === 0) cumulative -= recurring;
+        cumulative += safeDiv(year.benefit, 12);
+        if (cumulative >= 0 && paybackMonths === null) paybackMonths = month;
+      }
+
+      return {
+        spend,
+        modules,
+        annualHard,
+        annualProcess,
+        annualValue,
+        annualRoiValue,
+        analysisYears,
+        totalBenefit,
+        totalInvestment,
+        netBenefit: totalBenefit - totalInvestment,
+        roiMultiple: safeDiv(totalBenefit, totalInvestment),
+        hardOnlyMultiple: safeDiv(years.reduce((sum, year) => sum + annualHard * year.adoption * year.growthFactor, 0), totalInvestment),
+        npv,
+        paybackMonths,
+        years,
+        otherHard
+      };
+    }
+
+    function renderQuestionControls() {
+      const processFilter = document.getElementById("processFilter");
+      const processes = ["All processes", ...new Set(QUESTIONS.map((item) => item.process))];
+      processFilter.innerHTML = processes.map((process) => `<option value="${process}">${process}</option>`).join("");
+
+      const container = document.getElementById("questionGroups");
+      const groups = [...new Set(QUESTIONS.map((item) => item.process))];
+      container.innerHTML = groups.map((group, index) => {
+        const items = QUESTIONS.filter((item) => item.process === group);
+        return `
+          <details class="group" data-process="${group}" ${index < 3 ? "open" : ""}>
+            <summary>
+              <span class="group-title">${group}</span>
+              <span class="group-count">${items.length} inputs</span>
+            </summary>
+            <div class="question-list">
+              ${items.map(renderQuestion).join("")}
+            </div>
+          </details>
+        `;
+      }).join("");
+
+      bindControlEvents(container, "questions");
+    }
+
+    function renderQuestion(item) {
+      const typeClass = item.type.includes("Must") ? "must" : item.type.includes("Nice") || item.type.includes("VA") ? "nice" : "";
+      return `
+        <article class="question" data-id="${item.id}" data-type="${item.type}">
+          <div class="question-head">
+            <label class="question-title" for="range-${item.id}">${item.label}</label>
+            <div class="question-meta">
+              <span class="pill ${typeClass}">${item.type}</span>
+              <span class="pill">${item.unit}</span>
+            </div>
+          </div>
+          <div class="control-row">
+            <input id="range-${item.id}" data-id="${item.id}" data-store="questions" type="range" min="${item.min}" max="${item.max}" step="${item.step}" value="${item.value}">
+            <div class="value-field">
+              <input aria-label="${item.label}" data-id="${item.id}" data-store="questions" type="number" min="${item.min}" max="${item.max}" step="${item.step}" value="${item.value}">
+              <span class="unit">${item.unit}</span>
+            </div>
+          </div>
+          <div class="hint">${item.hint}</div>
+        </article>
+      `;
+    }
+
+    function renderAssumptionControls() {
+      document.getElementById("assumptionControls").innerHTML = ASSUMPTIONS.map((item) => renderSmallControl(item, "assumptions")).join("");
+      document.getElementById("otherControls").innerHTML = OTHER_SAVINGS.map((item) => renderSmallControl(item, "other")).join("");
+      bindControlEvents(document.getElementById("assumptionControls"), "assumptions");
+      bindControlEvents(document.getElementById("otherControls"), "other");
+    }
+
+    function renderSmallControl(item, store) {
+      return `
+        <article class="question">
+          <div class="question-head">
+            <label class="question-title" for="range-${store}-${item.id}">${item.label}</label>
+            <div class="question-meta"><span class="pill">${item.unit}</span></div>
+          </div>
+          <div class="control-row">
+            <input id="range-${store}-${item.id}" data-id="${item.id}" data-store="${store}" type="range" min="${item.min}" max="${item.max}" step="${item.step}" value="${item.value}">
+            <div class="value-field">
+              <input aria-label="${item.label}" data-id="${item.id}" data-store="${store}" type="number" min="${item.min}" max="${item.max}" step="${item.step}" value="${item.value}">
+              <span class="unit">${item.unit}</span>
+            </div>
+          </div>
+        </article>
+      `;
+    }
+
+    function bindControlEvents(root) {
+      root.querySelectorAll("input[data-id]").forEach((input) => {
+        input.addEventListener("input", (event) => {
+          const target = event.currentTarget;
+          const id = target.dataset.id;
+          const store = target.dataset.store;
+          const value = Number(target.value) || 0;
+          state[store][id] = value;
+          root.querySelectorAll(`input[data-store="${store}"][data-id="${id}"]`).forEach((peer) => {
+            if (peer !== target) peer.value = value;
+          });
+          update();
+        });
+      });
+    }
+
+    function applyFilters() {
+      const process = document.getElementById("processFilter").value;
+      const mustOnly = document.getElementById("mustOnly").checked;
+      document.querySelectorAll(".group").forEach((group) => {
+        const processMatch = process === "All processes" || group.dataset.process === process;
+        group.style.display = processMatch ? "" : "none";
+        if (processMatch && process !== "All processes") group.open = true;
+      });
+      document.querySelectorAll(".question[data-type]").forEach((card) => {
+        const type = card.dataset.type || "";
+        card.classList.toggle("hidden", mustOnly && !type.includes("Must"));
+      });
+    }
+
+    function renderModuleCards(result) {
+      const cards = result.modules
+        .filter((item) => item.hard || item.process)
+        .map((item) => `
+          <article class="result-card">
+            <h3>${item.name}</h3>
+            <div class="split-line"><span>Hard savings</span><strong>${fmtCurrency(item.hard)}</strong></div>
+            <div class="split-line"><span>Process efficiency</span><strong>${fmtCurrency(item.process)}</strong></div>
+            <div class="split-line"><span>Annual value</span><strong>${fmtCurrency(item.hard + item.process)}</strong></div>
+          </article>
+        `);
+      document.getElementById("moduleCards").innerHTML = cards.length ? cards.join("") : `<div class="empty-state">No savings are currently modeled.</div>`;
+    }
+
+    function renderYearTable(result) {
+      document.getElementById("yearTable").innerHTML = `
+        <table>
+          <thead>
+            <tr>
+              <th>Year</th>
+              <th>Adoption</th>
+              <th>Benefit</th>
+              <th>Investment</th>
+              <th>Net value</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${result.years.map((year) => `
+              <tr>
+                <td>Year ${year.year}</td>
+                <td>${fmtNumber(year.adoption * 100, 0)}%</td>
+                <td>${fmtCurrency(year.benefit)}</td>
+                <td>${fmtCurrency(year.investment)}</td>
+                <td>${fmtCurrency(year.net)}</td>
+              </tr>
+            `).join("")}
+          </tbody>
+        </table>
+      `;
+    }
+
+    function renderBreakdown(result) {
+      const rows = result.modules
+        .map((item) => ({ ...item, total: item.hard + item.process }))
+        .filter((item) => item.total > 0)
+        .sort((a, b) => b.total - a.total);
+      const max = rows.reduce((value, item) => Math.max(value, item.total), 0);
+      document.getElementById("breakdownBars").innerHTML = rows.length ? rows.map((item) => `
+        <div class="bar-row">
+          <div class="bar-label" title="${item.name}">${item.name}</div>
+          <div class="bar-track"><div class="bar-fill" style="width:${safeDiv(item.total, max) * 100}%; background:${item.color};"></div></div>
+          <div class="bar-value">${fmtCurrency(item.total)}</div>
+        </div>
+      `).join("") : `<div class="empty-state">Savings mix appears here as inputs change.</div>`;
+    }
+
+    function renderFormulaNotes() {
+      const notes = [
+        ["Spend Analytics", "Labor savings from collection and reporting time, plus hard-dollar value from increased spend under management, contract leakage reduction, and invoice pricing recovery."],
+        ["Supplier Management", "Supplier documentation, new supplier evaluation, regulatory/certification work, diversity management, onboarding, and offboarding hours are multiplied by loaded hourly cost and a 75% automation savings assumption."],
+        ["Sourcing", "Traditional RFx administration is compared to an eSourcing effort level, then additional spend under management is multiplied by average sourcing savings."],
+        ["Advanced Sourcing", "Incremental hard savings equal advanced sourced dollars times incremental savings; efficiency uses reduced FTE and shorter sourcing duration."],
+        ["CLM", "Labor savings are applied to creation, execution, storage, and search processes; expiring and auto-renewing Tier 1 spend is multiplied by renegotiation savings."],
+        ["eProcurement", "Maverick spend redirected to existing contracts creates hard savings; PO cost reduction and compliance review time create process efficiency."],
+        ["pCard", "Rebate value is calculated from eligible pCard spend; process value comes from transaction savings and reporting efficiency."],
+        ["Accounts Payable", "Current manual invoice cost is compared with a future electronic processing scenario for targeted PO and non-PO invoices."],
+        ["ROI", "Annual savings are phased by adoption rates, adjusted by spend growth, offset by startup and recurring costs, then discounted using WACC for NPV."]
+      ];
+      document.getElementById("formulaNotes").innerHTML = notes.map(([title, text]) => `
+        <div class="formula-note"><strong>${title}</strong><span>${text}</span></div>
+      `).join("");
+    }
+
+    function updateSummary(result) {
+      const includeProcess = a("includeProcess") === 1;
+      document.getElementById("summaryTitle").textContent = `${result.analysisYears}-Year JAGGAER ROI`;
+      document.getElementById("summaryNarrative").textContent = `${fmtCurrency(result.annualHard)} annual hard savings and ${fmtCurrency(result.annualProcess)} in annual process efficiency${includeProcess ? " are included in the ROI model." : "; process efficiency is shown but excluded from ROI."}`;
+      document.getElementById("roiMultiple").textContent = `${fmtNumber(result.roiMultiple, 1)}x`;
+      document.getElementById("roiSub").textContent = `${fmtCurrency(result.totalBenefit)} benefit / ${fmtCurrency(result.totalInvestment)} investment. Hard-only ROI: ${fmtNumber(result.hardOnlyMultiple, 1)}x.`;
+      document.getElementById("annualValue").textContent = fmtCurrency(result.annualValue);
+      document.getElementById("payback").textContent = result.paybackMonths ? `${result.paybackMonths} mo` : `>${result.analysisYears * 12} mo`;
+      document.getElementById("npv").textContent = fmtCurrency(result.npv);
+      document.getElementById("totalBenefit").textContent = fmtCurrency(result.totalBenefit);
+    }
+
+    function update() {
+      applyFilters();
+      const result = calculate();
+      renderModuleCards(result);
+      renderYearTable(result);
+      renderBreakdown(result);
+      updateSummary(result);
+    }
+
+    function resetBenchmark() {
+      QUESTIONS.forEach((item) => state.questions[item.id] = item.value);
+      ASSUMPTIONS.forEach((item) => state.assumptions[item.id] = item.value);
+      OTHER_SAVINGS.forEach((item) => state.other[item.id] = item.value);
+      document.querySelectorAll("input[data-id]").forEach((input) => {
+        const id = input.dataset.id;
+        const store = input.dataset.store;
+        input.value = state[store][id];
+      });
+      update();
+    }
+
+    const CUSTOMER_EXCEL_HEADERS = ["Process", "Input ID", "Question", "Customer Value", "Unit", "Importance", "Definition / Notes"];
+
+    function xmlEscape(value) {
+      return String(value ?? "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;");
+    }
+
+    function columnName(index) {
+      let name = "";
+      let value = index;
+      while (value > 0) {
+        const remainder = (value - 1) % 26;
+        name = String.fromCharCode(65 + remainder) + name;
+        value = Math.floor((value - 1) / 26);
+      }
+      return name;
+    }
+
+    function excelCell(rowIndex, columnIndex, value) {
+      const ref = `${columnName(columnIndex)}${rowIndex}`;
+      if (typeof value === "number" && Number.isFinite(value)) {
+        return `<c r="${ref}"><v>${value}</v></c>`;
+      }
+      const text = xmlEscape(value);
+      return `<c r="${ref}" t="inlineStr"><is><t xml:space="preserve">${text}</t></is></c>`;
+    }
+
+    function buildCustomerRows() {
+      return QUESTIONS.map((item) => [
+        item.process,
+        item.id,
+        item.label,
+        state.questions[item.id],
+        item.unit,
+        item.type,
+        item.hint
+      ]);
+    }
+
+    function buildWorksheetXml() {
+      const rows = [
+        ["JAGGAER Customer Value Input Sheet"],
+        ["Complete the Customer Value column and send the file back. Please do not edit the Input ID column."],
+        [],
+        CUSTOMER_EXCEL_HEADERS,
+        ...buildCustomerRows()
+      ];
+      const rowXml = rows.map((row, rowIndex) => {
+        const cells = row.map((value, cellIndex) => excelCell(rowIndex + 1, cellIndex + 1, value)).join("");
+        return `<row r="${rowIndex + 1}">${cells}</row>`;
+      }).join("");
+
+      return `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">
+  <cols>
+    <col min="1" max="1" width="24" customWidth="1"/>
+    <col min="2" max="2" width="30" customWidth="1"/>
+    <col min="3" max="3" width="64" customWidth="1"/>
+    <col min="4" max="4" width="18" customWidth="1"/>
+    <col min="5" max="5" width="16" customWidth="1"/>
+    <col min="6" max="6" width="18" customWidth="1"/>
+    <col min="7" max="7" width="82" customWidth="1"/>
+  </cols>
+  <sheetData>${rowXml}</sheetData>
+</worksheet>`;
+    }
+
+    function crc32(bytes) {
+      if (!crc32.table) {
+        crc32.table = Array.from({ length: 256 }, (_, index) => {
+          let value = index;
+          for (let bit = 0; bit < 8; bit += 1) {
+            value = value & 1 ? 0xedb88320 ^ (value >>> 1) : value >>> 1;
+          }
+          return value >>> 0;
+        });
+      }
+      let crc = 0xffffffff;
+      for (const byte of bytes) {
+        crc = crc32.table[(crc ^ byte) & 0xff] ^ (crc >>> 8);
+      }
+      return (crc ^ 0xffffffff) >>> 0;
+    }
+
+    function uint16(value) {
+      const bytes = new Uint8Array(2);
+      new DataView(bytes.buffer).setUint16(0, value, true);
+      return bytes;
+    }
+
+    function uint32(value) {
+      const bytes = new Uint8Array(4);
+      new DataView(bytes.buffer).setUint32(0, value >>> 0, true);
+      return bytes;
+    }
+
+    function concatBytes(parts) {
+      const total = parts.reduce((sum, part) => sum + part.length, 0);
+      const output = new Uint8Array(total);
+      let offset = 0;
+      parts.forEach((part) => {
+        output.set(part, offset);
+        offset += part.length;
+      });
+      return output;
+    }
+
+    function createZip(files) {
+      const encoder = new TextEncoder();
+      const localParts = [];
+      const centralParts = [];
+      let offset = 0;
+
+      files.forEach((file) => {
+        const nameBytes = encoder.encode(file.name);
+        const dataBytes = encoder.encode(file.content);
+        const crc = crc32(dataBytes);
+        const localHeader = concatBytes([
+          uint32(0x04034b50), uint16(20), uint16(0), uint16(0), uint16(0), uint16(0),
+          uint32(crc), uint32(dataBytes.length), uint32(dataBytes.length),
+          uint16(nameBytes.length), uint16(0), nameBytes
+        ]);
+        localParts.push(localHeader, dataBytes);
+
+        const centralHeader = concatBytes([
+          uint32(0x02014b50), uint16(20), uint16(20), uint16(0), uint16(0), uint16(0), uint16(0),
+          uint32(crc), uint32(dataBytes.length), uint32(dataBytes.length),
+          uint16(nameBytes.length), uint16(0), uint16(0), uint16(0), uint16(0), uint32(0), uint32(offset), nameBytes
+        ]);
+        centralParts.push(centralHeader);
+        offset += localHeader.length + dataBytes.length;
+      });
+
+      const centralDirectory = concatBytes(centralParts);
+      const endOfCentralDirectory = concatBytes([
+        uint32(0x06054b50), uint16(0), uint16(0), uint16(files.length), uint16(files.length),
+        uint32(centralDirectory.length), uint32(offset), uint16(0)
+      ]);
+
+      return concatBytes([...localParts, centralDirectory, endOfCentralDirectory]).buffer;
+    }
+
+    function buildCustomerWorkbook() {
+      const now = new Date().toISOString();
+      return createZip([
+        {
+          name: "[Content_Types].xml",
+          content: `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">
+  <Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/>
+  <Default Extension="xml" ContentType="application/xml"/>
+  <Override PartName="/docProps/app.xml" ContentType="application/vnd.openxmlformats-officedocument.extended-properties+xml"/>
+  <Override PartName="/docProps/core.xml" ContentType="application/vnd.openxmlformats-package.core-properties+xml"/>
+  <Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/>
+  <Override PartName="/xl/worksheets/sheet1.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/>
+  <Override PartName="/xl/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.styles+xml"/>
+</Types>`
+        },
+        {
+          name: "_rels/.rels",
+          content: `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
+  <Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="xl/workbook.xml"/>
+  <Relationship Id="rId2" Type="http://schemas.openxmlformats.org/package/2006/relationships/metadata/core-properties" Target="docProps/core.xml"/>
+  <Relationship Id="rId3" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/extended-properties" Target="docProps/app.xml"/>
+</Relationships>`
+        },
+        {
+          name: "docProps/app.xml",
+          content: `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Properties xmlns="http://schemas.openxmlformats.org/officeDocument/2006/extended-properties" xmlns:vt="http://schemas.openxmlformats.org/officeDocument/2006/docPropsVTypes"><Application>JAGGAER Value Calculator</Application></Properties>`
+        },
+        {
+          name: "docProps/core.xml",
+          content: `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<cp:coreProperties xmlns:cp="http://schemas.openxmlformats.org/package/2006/metadata/core-properties" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <dc:title>JAGGAER Customer Value Inputs</dc:title>
+  <dc:creator>JAGGAER Value Calculator</dc:creator>
+  <dcterms:created xsi:type="dcterms:W3CDTF">${now}</dcterms:created>
+  <dcterms:modified xsi:type="dcterms:W3CDTF">${now}</dcterms:modified>
+</cp:coreProperties>`
+        },
+        {
+          name: "xl/workbook.xml",
+          content: `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">
+  <sheets><sheet name="Customer Inputs" sheetId="1" r:id="rId1"/></sheets>
+</workbook>`
+        },
+        {
+          name: "xl/_rels/workbook.xml.rels",
+          content: `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
+  <Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet1.xml"/>
+  <Relationship Id="rId2" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/>
+</Relationships>`
+        },
+        {
+          name: "xl/styles.xml",
+          content: `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">
+  <fonts count="1"><font><sz val="11"/><name val="Calibri"/></font></fonts>
+  <fills count="1"><fill><patternFill patternType="none"/></fill></fills>
+  <borders count="1"><border/></borders>
+  <cellStyleXfs count="1"><xf numFmtId="0" fontId="0" fillId="0" borderId="0"/></cellStyleXfs>
+  <cellXfs count="1"><xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="0"/></cellXfs>
+  <cellStyles count="1"><cellStyle name="Normal" xfId="0" builtinId="0"/></cellStyles>
+</styleSheet>`
+        },
+        { name: "xl/worksheets/sheet1.xml", content: buildWorksheetXml() }
+      ]);
+    }
+
+    function downloadCustomerExcel() {
+      const workbook = buildCustomerWorkbook();
+      const blob = new Blob([workbook], {
+        type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+      });
+      const date = new Date().toISOString().slice(0, 10);
+      const link = document.createElement("a");
+      link.href = URL.createObjectURL(blob);
+      link.download = `JAGGAER Customer Value Inputs ${date}.xlsx`;
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      setTimeout(() => URL.revokeObjectURL(link.href), 500);
+    }
+
+    function parseNumber(value) {
+      if (typeof value === "number") return value;
+      const cleaned = String(value ?? "")
+        .trim()
+        .replace(/[$,%]/g, "")
+        .replace(/,/g, "");
+      if (!cleaned || cleaned.startsWith("#")) return NaN;
+      return Number(cleaned);
+    }
+
+    function localNameChildren(node, name) {
+      return Array.from(node.children || []).filter((child) => child.localName === name);
+    }
+
+    function firstDescendant(node, name) {
+      return Array.from(node.getElementsByTagName("*")).find((child) => child.localName === name);
+    }
+
+    function parseSharedStrings(xmlText) {
+      if (!xmlText) return [];
+      const doc = new DOMParser().parseFromString(xmlText, "application/xml");
+      return Array.from(doc.getElementsByTagName("*"))
+        .filter((node) => node.localName === "si")
+        .map((node) => Array.from(node.getElementsByTagName("*"))
+          .filter((child) => child.localName === "t")
+          .map((child) => child.textContent || "")
+          .join(""));
+    }
+
+    function cellColumnIndex(ref) {
+      const letters = String(ref || "").match(/[A-Z]+/i)?.[0] || "A";
+      return [...letters.toUpperCase()].reduce((sum, char) => sum * 26 + char.charCodeAt(0) - 64, 0) - 1;
+    }
+
+    function parseWorksheetRows(xmlText, sharedStrings = []) {
+      const doc = new DOMParser().parseFromString(xmlText, "application/xml");
+      return Array.from(doc.getElementsByTagName("*"))
+        .filter((node) => node.localName === "row")
+        .map((row) => {
+          const values = [];
+          localNameChildren(row, "c").forEach((cell) => {
+            const colIndex = cellColumnIndex(cell.getAttribute("r"));
+            const type = cell.getAttribute("t");
+            let value = "";
+            if (type === "s") {
+              const index = Number(firstDescendant(cell, "v")?.textContent || 0);
+              value = sharedStrings[index] || "";
+            } else if (type === "inlineStr") {
+              value = Array.from(cell.getElementsByTagName("*"))
+                .filter((child) => child.localName === "t")
+                .map((child) => child.textContent || "")
+                .join("");
+            } else {
+              value = firstDescendant(cell, "v")?.textContent || "";
+            }
+            values[colIndex] = value;
+          });
+          return values;
+        });
+    }
+
+    async function inflateZipData(bytes) {
+      if (typeof DecompressionStream === "undefined") {
+        throw new Error("This browser cannot read compressed XLSX files. Upload the downloaded template, or save the sheet as CSV and upload that.");
+      }
+      for (const format of ["deflate-raw", "deflate"]) {
+        try {
+          const stream = new Blob([bytes]).stream().pipeThrough(new DecompressionStream(format));
+          return new Uint8Array(await new Response(stream).arrayBuffer());
+        } catch (error) {
+          // Try the next browser-supported deflate flavor.
+        }
+      }
+      throw new Error("Unable to decompress this XLSX file.");
+    }
+
+    async function unzipWorkbook(buffer) {
+      const bytes = new Uint8Array(buffer);
+      const view = new DataView(buffer);
+      const decoder = new TextDecoder();
+      const entries = {};
+      let offset = 0;
+
+      while (offset + 30 < bytes.length && view.getUint32(offset, true) === 0x04034b50) {
+        const method = view.getUint16(offset + 8, true);
+        const compressedSize = view.getUint32(offset + 18, true);
+        const fileNameLength = view.getUint16(offset + 26, true);
+        const extraLength = view.getUint16(offset + 28, true);
+        const nameStart = offset + 30;
+        const nameEnd = nameStart + fileNameLength;
+        const dataStart = nameEnd + extraLength;
+        const dataEnd = dataStart + compressedSize;
+        const name = decoder.decode(bytes.slice(nameStart, nameEnd));
+        const compressed = bytes.slice(dataStart, dataEnd);
+        let data;
+
+        if (method === 0) {
+          data = compressed;
+        } else if (method === 8) {
+          data = await inflateZipData(compressed);
+        } else {
+          throw new Error(`Unsupported XLSX compression method: ${method}`);
+        }
+
+        entries[name] = decoder.decode(data);
+        offset = dataEnd;
+      }
+
+      return entries;
+    }
+
+    async function parseXlsxFile(file) {
+      const entries = await unzipWorkbook(await file.arrayBuffer());
+      const worksheetPath = Object.keys(entries).find((name) => /^xl\/worksheets\/sheet\d+\.xml$/.test(name));
+      if (!worksheetPath) throw new Error("No worksheet found in the uploaded Excel file.");
+      return parseWorksheetRows(worksheetPath ? entries[worksheetPath] : "", parseSharedStrings(entries["xl/sharedStrings.xml"]));
+    }
+
+    function parseDelimitedRows(text) {
+      const delimiter = (text.split("\n")[0].match(/\t/g) || []).length > (text.split("\n")[0].match(/,/g) || []).length ? "\t" : ",";
+      const rows = [];
+      let row = [];
+      let cell = "";
+      let quoted = false;
+
+      for (let index = 0; index < text.length; index += 1) {
+        const char = text[index];
+        const next = text[index + 1];
+        if (char === '"' && quoted && next === '"') {
+          cell += '"';
+          index += 1;
+        } else if (char === '"') {
+          quoted = !quoted;
+        } else if (char === delimiter && !quoted) {
+          row.push(cell);
+          cell = "";
+        } else if ((char === "\n" || char === "\r") && !quoted) {
+          if (char === "\r" && next === "\n") index += 1;
+          row.push(cell);
+          rows.push(row);
+          row = [];
+          cell = "";
+        } else {
+          cell += char;
+        }
+      }
+      row.push(cell);
+      rows.push(row);
+      return rows.filter((item) => item.some((value) => String(value).trim()));
+    }
+
+    function parseTextWorkbook(text) {
+      if (/<table[\s>]/i.test(text)) {
+        const doc = new DOMParser().parseFromString(text, "text/html");
+        return Array.from(doc.querySelectorAll("tr")).map((row) =>
+          Array.from(row.querySelectorAll("th,td")).map((cell) => cell.textContent.trim())
+        );
+      }
+      return parseDelimitedRows(text);
+    }
+
+    function rowsToQuestionValues(rows) {
+      const validIds = new Set(QUESTIONS.map((item) => item.id));
+      const normalizedRows = rows.map((row) => row.map((cell) => String(cell ?? "").trim()));
+      const headerIndex = normalizedRows.findIndex((row) =>
+        row.some((cell) => cell.toLowerCase() === "input id") &&
+        row.some((cell) => cell.toLowerCase() === "customer value")
+      );
+      if (headerIndex < 0) throw new Error("Could not find the Input ID and Customer Value columns.");
+
+      const headers = normalizedRows[headerIndex].map((header) => header.toLowerCase());
+      const idIndex = headers.indexOf("input id");
+      const valueIndex = headers.indexOf("customer value");
+      const values = {};
+
+      normalizedRows.slice(headerIndex + 1).forEach((row) => {
+        const id = row[idIndex];
+        if (!validIds.has(id)) return;
+        const value = parseNumber(row[valueIndex]);
+        if (Number.isFinite(value)) values[id] = value;
+      });
+
+      return values;
+    }
+
+    function applyQuestionValues(values) {
+      let count = 0;
+      Object.entries(values).forEach(([id, value]) => {
+        const definition = QUESTIONS.find((item) => item.id === id);
+        if (!definition) return;
+        const nextValue = clamp(value, definition.min, definition.max);
+        state.questions[id] = nextValue;
+        document.querySelectorAll(`input[data-store="questions"][data-id="${id}"]`).forEach((input) => {
+          input.value = nextValue;
+        });
+        count += 1;
+      });
+      update();
+      return count;
+    }
+
+    function promptExcelUpload() {
+      document.getElementById("excelUpload").click();
+    }
+
+    async function handleExcelUpload(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      const button = document.getElementById("uploadExcelBtn");
+      try {
+        const rows = file.name.toLowerCase().endsWith(".xlsx")
+          ? await parseXlsxFile(file)
+          : parseTextWorkbook(await file.text());
+        const count = applyQuestionValues(rowsToQuestionValues(rows));
+        button.textContent = `Uploaded ${count} inputs`;
+        setTimeout(() => button.textContent = "Upload completed Excel", 1800);
+      } catch (error) {
+        alert(error.message || "Unable to upload this Excel file.");
+      } finally {
+        event.target.value = "";
+      }
+    }
+
+    async function copySummary() {
+      const result = calculate();
+      const lines = [
+        `JAGGAER ${result.analysisYears}-Year ROI Summary`,
+        `Annual hard savings: ${fmtCurrency(result.annualHard, false)}`,
+        `Annual process efficiency: ${fmtCurrency(result.annualProcess, false)}`,
+        `Total benefit: ${fmtCurrency(result.totalBenefit, false)}`,
+        `Total investment: ${fmtCurrency(result.totalInvestment, false)}`,
+        `ROI multiple: ${fmtNumber(result.roiMultiple, 1)}x`,
+        `NPV: ${fmtCurrency(result.npv, false)}`,
+        `Payback: ${result.paybackMonths ? `${result.paybackMonths} months` : `>${result.analysisYears * 12} months`}`
+      ];
+      try {
+        await navigator.clipboard.writeText(lines.join("\n"));
+        document.getElementById("copyBtn").textContent = "Copied";
+        setTimeout(() => document.getElementById("copyBtn").textContent = "Copy summary", 1400);
+      } catch (error) {
+        alert(lines.join("\n"));
+      }
+    }
+
+    function preparePrintMeta() {
+      const result = calculate();
+      const now = new Date();
+      const date = new Intl.DateTimeFormat("en-US", {
+        year: "numeric",
+        month: "long",
+        day: "numeric"
+      }).format(now);
+      document.getElementById("printMeta").textContent =
+        `Prepared ${date}. ${result.analysisYears}-year benefit: ${fmtCurrency(result.totalBenefit, false)}. ROI multiple: ${fmtNumber(result.roiMultiple, 1)}x.`;
+    }
+
+    function exportPdf() {
+      update();
+      preparePrintMeta();
+      window.print();
+    }
+
+    document.querySelectorAll(".tab").forEach((tab) => {
+      tab.addEventListener("click", () => {
+        document.querySelectorAll(".tab").forEach((item) => item.classList.remove("active"));
+        document.querySelectorAll(".view").forEach((item) => item.classList.remove("active"));
+        tab.classList.add("active");
+        document.getElementById(`${tab.dataset.tab}View`).classList.add("active");
+      });
+    });
+
+    document.getElementById("resetBtn").addEventListener("click", resetBenchmark);
+    document.getElementById("downloadExcelBtn").addEventListener("click", downloadCustomerExcel);
+    document.getElementById("uploadExcelBtn").addEventListener("click", promptExcelUpload);
+    document.getElementById("excelUpload").addEventListener("change", handleExcelUpload);
+    document.getElementById("pdfBtn").addEventListener("click", exportPdf);
+    document.getElementById("copyBtn").addEventListener("click", copySummary);
+    document.getElementById("processFilter").addEventListener("change", update);
+    document.getElementById("mustOnly").addEventListener("change", update);
+
+    window.addEventListener("beforeprint", preparePrintMeta);
+
+    renderQuestionControls();
+    renderAssumptionControls();
+    renderFormulaNotes();
+    update();
+  </script>
+</body>
+</html>

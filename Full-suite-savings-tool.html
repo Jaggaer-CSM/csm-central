@@ -1,0 +1,2109 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>UT Full-Suite Savings Calculator</title>
+  <style>
+    :root {
+      --ink: #17212b;
+      --muted: #617080;
+      --line: #d8e0e8;
+      --panel: #ffffff;
+      --bg: #f4f7f8;
+      --soft: #e8f3ef;
+      --soft-strong: #278064;
+      --hard: #fff1dc;
+      --hard-strong: #ad6c15;
+      --accent: #1f6f8b;
+      --accent-2: #874c62;
+      --danger: #b14040;
+      --shadow: 0 10px 26px rgba(23, 33, 43, 0.08);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      color: var(--ink);
+      background: var(--bg);
+      font-size: 14px;
+    }
+
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      background: rgba(244, 247, 248, 0.96);
+      border-bottom: 1px solid var(--line);
+      backdrop-filter: blur(10px);
+    }
+
+    .wrap {
+      width: min(1480px, calc(100vw - 32px));
+      margin: 0 auto;
+    }
+
+    .topbar {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 16px;
+      align-items: center;
+      min-height: 76px;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 22px;
+      line-height: 1.1;
+      letter-spacing: 0;
+    }
+
+    .subhead {
+      margin-top: 5px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    button,
+    .button {
+      border: 1px solid var(--line);
+      background: var(--panel);
+      color: var(--ink);
+      min-height: 38px;
+      padding: 8px 12px;
+      border-radius: 7px;
+      font: inherit;
+      cursor: pointer;
+      transition: border-color 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease;
+      white-space: nowrap;
+    }
+
+    button:hover {
+      border-color: #9db0bf;
+      box-shadow: 0 4px 12px rgba(23, 33, 43, 0.08);
+    }
+
+    button:active {
+      transform: translateY(1px);
+    }
+
+    button.primary {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: #fff;
+    }
+
+    button.secondary {
+      background: #eef6f8;
+      border-color: #b9d1dc;
+      color: #164a5f;
+    }
+
+    button.danger {
+      color: var(--danger);
+    }
+
+    main {
+      padding: 22px 0 42px;
+    }
+
+    .tabbar {
+      display: flex;
+      gap: 8px;
+      margin: 0 0 18px;
+      flex-wrap: wrap;
+    }
+
+    .tab-button {
+      min-height: 40px;
+      background: #fff;
+    }
+
+    .tab-button.active {
+      background: var(--ink);
+      border-color: var(--ink);
+      color: #fff;
+      box-shadow: none;
+    }
+
+    .tab-panel {
+      display: none;
+    }
+
+    .tab-panel.active {
+      display: block;
+    }
+
+    .metric-grid {
+      display: grid;
+      grid-template-columns: repeat(6, minmax(150px, 1fr));
+      gap: 10px;
+      margin-bottom: 18px;
+    }
+
+    .metric {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 14px;
+      box-shadow: var(--shadow);
+      min-width: 0;
+    }
+
+    .metric label {
+      display: block;
+      color: var(--muted);
+      font-size: 12px;
+      margin-bottom: 8px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .metric strong {
+      display: block;
+      font-size: 24px;
+      line-height: 1;
+      letter-spacing: 0;
+    }
+
+    .metric small {
+      display: block;
+      color: var(--muted);
+      margin-top: 8px;
+      min-height: 16px;
+    }
+
+    section {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      box-shadow: var(--shadow);
+      margin-bottom: 18px;
+      overflow: hidden;
+    }
+
+    section > .section-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 14px 16px;
+      border-bottom: 1px solid var(--line);
+      background: #fbfcfd;
+    }
+
+    h2 {
+      margin: 0;
+      font-size: 16px;
+      line-height: 1.2;
+      letter-spacing: 0;
+    }
+
+    .note {
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .section-body {
+      padding: 16px;
+    }
+
+    .inputs-needed {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(180px, 1fr));
+      gap: 10px;
+    }
+
+    .input-tile {
+      border: 1px solid var(--line);
+      border-radius: 7px;
+      padding: 12px;
+      min-height: 124px;
+      background: #fff;
+    }
+
+    .input-tile h3 {
+      margin: 0 0 8px;
+      font-size: 13px;
+      line-height: 1.25;
+    }
+
+    .input-tile p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.45;
+    }
+
+    .assumption-grid {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(170px, 1fr));
+      gap: 12px;
+    }
+
+    .field {
+      display: grid;
+      gap: 5px;
+    }
+
+    .field label {
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    input,
+    select {
+      width: 100%;
+      min-height: 36px;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      padding: 7px 9px;
+      color: var(--ink);
+      background: #fff;
+      font: inherit;
+    }
+
+    input:focus,
+    select:focus {
+      outline: 2px solid rgba(31, 111, 139, 0.18);
+      border-color: var(--accent);
+    }
+
+    input[type="checkbox"] {
+      width: 18px;
+      height: 18px;
+      min-height: 18px;
+      accent-color: var(--accent);
+    }
+
+    .table-wrap {
+      overflow: auto;
+      max-width: 100%;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    th,
+    td {
+      border-bottom: 1px solid var(--line);
+      padding: 8px;
+      vertical-align: middle;
+      text-align: right;
+      white-space: nowrap;
+    }
+
+    th {
+      position: sticky;
+      top: 0;
+      z-index: 1;
+      background: #f8fafb;
+      color: #40505f;
+      font-weight: 650;
+      font-size: 12px;
+    }
+
+    td:first-child,
+    th:first-child,
+    td.name,
+    th.name {
+      text-align: left;
+    }
+
+    tbody tr:hover {
+      background: #fbfdfe;
+    }
+
+    .model-table {
+      min-width: 1980px;
+    }
+
+    .model-table input[type="number"] {
+      text-align: right;
+      min-width: 106px;
+    }
+
+    .model-table input.name-input {
+      min-width: 250px;
+      text-align: left;
+    }
+
+    .model-table .tiny {
+      width: 44px;
+      text-align: center;
+    }
+
+    .result-table th,
+    .result-table td {
+      min-width: 130px;
+    }
+
+    .formula-table {
+      min-width: 980px;
+    }
+
+    .formula-table th:first-child,
+    .formula-table td:first-child {
+      min-width: 180px;
+    }
+
+    .formula-table td {
+      white-space: normal;
+      line-height: 1.4;
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 24px;
+      padding: 2px 8px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 650;
+    }
+
+    .pill.soft {
+      color: var(--soft-strong);
+      background: var(--soft);
+    }
+
+    .pill.hard {
+      color: var(--hard-strong);
+      background: var(--hard);
+    }
+
+    .split {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+      gap: 18px;
+    }
+
+    .status-line {
+      min-height: 18px;
+      margin-top: 10px;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .source-line {
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.45;
+    }
+
+    @media (max-width: 1100px) {
+      .metric-grid {
+        grid-template-columns: repeat(3, minmax(150px, 1fr));
+      }
+
+      .inputs-needed,
+      .assumption-grid,
+      .split {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+
+    @media (max-width: 720px) {
+      .wrap {
+        width: min(100vw - 20px, 1480px);
+      }
+
+      .topbar {
+        grid-template-columns: 1fr;
+        padding: 12px 0;
+      }
+
+      .actions {
+        justify-content: flex-start;
+      }
+
+      .metric-grid,
+      .inputs-needed,
+      .assumption-grid,
+      .split {
+        grid-template-columns: 1fr;
+      }
+
+      .metric strong {
+        font-size: 21px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="wrap topbar">
+      <div>
+        <h1>UT Full-Suite Savings Calculator</h1>
+        <div class="subhead">Sandwich model baseline to full-suite JAGGAER value case</div>
+      </div>
+      <div class="actions">
+        <button id="downloadPpt" class="primary" title="Create a PowerPoint summary from the current model">Download PowerPoint</button>
+        <button id="downloadXlsx" class="secondary" title="Create a one-sheet Excel workbook from the current model">Download Excel</button>
+        <button id="downloadBoth" title="Download both outputs">Export Both</button>
+        <button id="recalculate" class="secondary" title="Recalculate the current inputs">Update Calculation</button>
+        <button id="addRow" title="Add another institution">Add Institution</button>
+        <button id="showExample" title="Load the UT System example data">Show UT System Example</button>
+        <button id="resetData" class="danger" title="Clear the institution data and restore assumption defaults">Clear Data</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <div class="metric-grid" aria-label="Savings summary">
+      <div class="metric">
+        <label>Future Annual Value</label>
+        <strong id="metricFuture">$0</strong>
+        <small>Full-suite operational run rate</small>
+      </div>
+      <div class="metric">
+        <label>Current Baseline Value</label>
+        <strong id="metricCurrent">$0</strong>
+        <small>Known sandwich/current value</small>
+      </div>
+      <div class="metric">
+        <label>Net Incremental Value</label>
+        <strong id="metricNet">$0</strong>
+        <small>Future less current baseline</small>
+      </div>
+      <div class="metric">
+        <label>Hard Savings</label>
+        <strong id="metricHard">$0</strong>
+        <small>Contracts, sourcing, consortium</small>
+      </div>
+      <div class="metric">
+        <label>Soft Savings</label>
+        <strong id="metricSoft">$0</strong>
+        <small>Process and eSignature savings</small>
+      </div>
+      <div class="metric">
+        <label>YoY Escalation Benefit</label>
+        <strong id="metricYoy">$0</strong>
+        <small id="metricYoyTerm">Optional contract input</small>
+      </div>
+    </div>
+
+    <div class="tabbar" role="tablist" aria-label="Tool sections">
+      <button class="tab-button active" id="calculatorTab" data-tab="calculatorPanel" role="tab" aria-selected="true" aria-controls="calculatorPanel">Calculator</button>
+      <button class="tab-button" id="assumptionsTab" data-tab="assumptionsPanel" role="tab" aria-selected="false" aria-controls="assumptionsPanel">Assumptions & Formulas</button>
+    </div>
+
+    <div class="tab-panel active" id="calculatorPanel" role="tabpanel" aria-labelledby="calculatorTab">
+    <section>
+      <div class="section-head">
+        <h2>CSM Inputs Needed</h2>
+        <span class="note">Start blank, or load UT System as an example.</span>
+      </div>
+      <div class="section-body">
+        <div class="inputs-needed">
+          <div class="input-tile">
+            <h3>Institution scope</h3>
+            <p>Name each institution, choose whether core full-suite modules apply, and choose whether consortium savings should be included.</p>
+          </div>
+          <div class="input-tile">
+            <h3>Operating budget</h3>
+            <p>Required for estimated future PO volume, invoice volume, sourcing events, contract savings, eSignature volume, and consortium spend.</p>
+          </div>
+          <div class="input-tile">
+            <h3>Current sandwich baseline</h3>
+            <p>Provide current PO count, invoice count, sourcing events, contract/catalog spend, contract count, and consortium spend when the story needs incremental savings.</p>
+          </div>
+          <div class="input-tile">
+            <h3>Future overrides</h3>
+            <p>Override estimated full-suite POs, invoices, sourcing events, contracts, or consortium spend when the CSM has campus-specific data.</p>
+          </div>
+          <div class="input-tile">
+            <h3>Commercial baseline</h3>
+            <p>Optional annual subscription or renewal amount lets the tool quantify the 4.75% to 2.00% YoY escalation benefit from the system-wide master order form.</p>
+          </div>
+          <div class="input-tile">
+            <h3>Rates and assumptions</h3>
+            <p>Validate savings per PO, invoice, sourcing event size, labor rate, contract savings rate, addressable spend, consortium spend, and rebate assumptions.</p>
+          </div>
+          <div class="input-tile">
+            <h3>Output owner</h3>
+            <p>Set the prepared-by name and opportunity label so exported PowerPoint and Excel files are ready for customer or internal review.</p>
+          </div>
+          <div class="input-tile">
+            <h3>Interpretation</h3>
+            <p>Future annual value is the modeled full-suite run rate. Net incremental value subtracts the current baseline fields that are entered.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <div class="section-head">
+        <h2>Output Setup</h2>
+        <span class="note">Used in exported file names and first-slide labels.</span>
+      </div>
+      <div class="section-body">
+        <div class="assumption-grid">
+          <div class="field">
+            <label for="preparedFor">Prepared for</label>
+            <input id="preparedFor" value="UT System">
+          </div>
+          <div class="field">
+            <label for="preparedBy">Prepared by</label>
+            <input id="preparedBy" value="Customer Success">
+          </div>
+          <div class="field">
+            <label for="scenarioName">Scenario</label>
+            <input id="scenarioName" value="Full-Suite Migration">
+          </div>
+          <div class="field">
+            <label for="presentationDate">Date</label>
+            <input id="presentationDate" type="date">
+          </div>
+          <div class="field">
+            <label for="termYears">Master term years</label>
+            <input id="termYears" type="number" min="1" max="15" step="1" value="7">
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <div class="section-head">
+        <h2>Institution Model</h2>
+        <span class="note">Blank future fields use estimated values from operating budget.</span>
+      </div>
+      <div class="table-wrap">
+        <table class="model-table" id="modelTable">
+          <thead>
+            <tr>
+              <th class="name">Institution</th>
+              <th>Core Suite</th>
+              <th>Consortium</th>
+              <th>Operating Budget</th>
+              <th>Current POs</th>
+              <th>Future POs</th>
+              <th>Current Invoices</th>
+              <th>Future Invoices</th>
+              <th>Current Sourcing Events</th>
+              <th>Future Sourcing Events</th>
+              <th>Current Contract Spend</th>
+              <th>Current Contracts</th>
+              <th>Future Contracts</th>
+              <th>Current Consortium Spend</th>
+              <th>Future Consortium Spend</th>
+              <th>Annual Subscription</th>
+              <th>Remove</th>
+            </tr>
+          </thead>
+          <tbody id="modelRows"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <div class="split">
+      <section>
+        <div class="section-head">
+          <h2>Savings by Module</h2>
+          <span class="note">Annual operational value.</span>
+        </div>
+        <div class="table-wrap">
+          <table class="result-table" id="moduleTable">
+            <thead>
+              <tr>
+                <th class="name">Module</th>
+                <th>Type</th>
+                <th>Future</th>
+                <th>Current</th>
+                <th>Incremental</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </section>
+
+      <section>
+        <div class="section-head">
+          <h2>Institution Detail</h2>
+          <span class="note">Sorted by net incremental value.</span>
+        </div>
+        <div class="table-wrap">
+          <table class="result-table" id="institutionTable">
+            <thead>
+              <tr>
+                <th class="name">Institution</th>
+                <th>Future</th>
+                <th>Current</th>
+                <th>Incremental</th>
+                <th>YoY Benefit</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </section>
+    </div>
+    </div>
+
+    <div class="tab-panel" id="assumptionsPanel" role="tabpanel" aria-labelledby="assumptionsTab">
+    <section>
+      <div class="section-head">
+        <h2>Assumptions</h2>
+        <span class="note">Editable defaults from the source model.</span>
+      </div>
+      <div class="section-body">
+        <div class="assumption-grid" id="assumptionGrid"></div>
+        <div class="status-line" id="assumptionNotes"></div>
+      </div>
+    </section>
+
+    <section>
+      <div class="section-head">
+        <h2>Calculation Formulas</h2>
+        <span class="note">All formulas used by the calculator.</span>
+      </div>
+      <div class="table-wrap">
+        <table class="formula-table" id="formulaTable">
+          <thead>
+            <tr>
+              <th class="name">Value Lever</th>
+              <th>Future Full-Suite Formula</th>
+              <th>Current Baseline Formula</th>
+              <th>CSM Inputs</th>
+            </tr>
+          </thead>
+          <tbody id="formulaRows"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <section>
+      <div class="section-head">
+        <h2>Source Notes</h2>
+        <span class="note">Model lineage from the local files.</span>
+      </div>
+      <div class="section-body source-line">
+        Presentation assumptions: $33 per PO, $10 per invoice, $154K average sourcing event size, 18 hours per sourcing event, $50 hourly procurement labor, 3% sourcing hard savings, 25% addressable spend, 50% on-contract future spend, 5% contract savings in the workbook tables, $36 eSignature savings per contract, and 10% consortium spend in the presentation. Workbook note: the consortium sheet uses 8%, so that field stays editable. Email note: the system-wide master order form supports day-one suite access, flexible wave timing, centralized support, and a lower YoY increase of 2.00% versus 4.75%.
+      </div>
+    </section>
+    </div>
+  </main>
+
+  <script>
+    const DEFAULT_ASSUMPTIONS = {
+      poDollarsRatio: 33653,
+      poSavings: 33,
+      invoiceDollarsRatio: 18236,
+      invoiceSavings: 10,
+      sourcingGoalPct: 10,
+      avgEventSize: 154000,
+      sourcingHours: 18,
+      hourlyRate: 50,
+      sourcingSavingsPct: 3,
+      contractAddressablePct: 25,
+      onContractPct: 50,
+      contractSavingsPct: 5,
+      contractsPerDollar: 0.0000012428253880306842,
+      eSignSavings: 36,
+      consortiumAddressablePct: 25,
+      consortiumSpendPct: 10,
+      consortiumRebatePct: 1,
+      currentYoyPct: 4.75,
+      masterYoyPct: 2
+    };
+
+    const ASSUMPTION_FIELDS = [
+      ["poDollarsRatio", "Dollars per PO", "$", "Average full-suite budget/PO ratio"],
+      ["poSavings", "Savings per PO", "$", "Aberdeen process savings assumption"],
+      ["invoiceDollarsRatio", "Dollars per invoice", "$", "Average full-suite budget/invoice ratio"],
+      ["invoiceSavings", "Savings per invoice", "$", "Aberdeen process savings assumption"],
+      ["sourcingGoalPct", "Sourcing goal", "%", "Share of operating budget sourced"],
+      ["avgEventSize", "Average event size", "$", "Higher-ed sourcing event size"],
+      ["sourcingHours", "Hours saved/event", "", "Process hours saved"],
+      ["hourlyRate", "FTE hourly rate", "$", "Procurement labor rate"],
+      ["sourcingSavingsPct", "Sourcing hard savings", "%", "Savings per event"],
+      ["contractAddressablePct", "Contract addressable spend", "%", "Share of budget addressable"],
+      ["onContractPct", "Future on-contract spend", "%", "Share of addressable spend on contract"],
+      ["contractSavingsPct", "Contract savings rate", "%", "Workbook tables use 5%"],
+      ["contractsPerDollar", "Contracts per dollar", "", "Average Contracts+ ratio"],
+      ["eSignSavings", "eSignature per contract", "$", "Docusign savings estimate"],
+      ["consortiumAddressablePct", "Consortium addressable spend", "%", "Share of budget addressable"],
+      ["consortiumSpendPct", "Consortium spend share", "%", "Presentation uses 10%; workbook uses 8%"],
+      ["consortiumRebatePct", "Consortium rebate", "%", "Rebate on consortium spend"],
+      ["currentYoyPct", "Current YoY increase", "%", "Email cites current contracted rate"],
+      ["masterYoyPct", "Master YoY increase", "%", "Email cites new master rate"]
+    ];
+
+    const FORMULA_ROWS = [
+      {
+        lever: "eProcurement soft savings",
+        future: "Future POs x Savings per PO. If Future POs is blank, Future POs = Operating Budget / Dollars per PO.",
+        current: "Current POs x Savings per PO.",
+        inputs: "Operating Budget, Current POs, optional Future POs override."
+      },
+      {
+        lever: "Invoice soft savings",
+        future: "Future Invoices x Savings per Invoice. If Future Invoices is blank, Future Invoices = Operating Budget / Dollars per Invoice.",
+        current: "Current Invoices x Savings per Invoice.",
+        inputs: "Operating Budget, Current Invoices, optional Future Invoices override."
+      },
+      {
+        lever: "Sourcing process savings",
+        future: "Future Sourcing Events x Hours Saved per Event x FTE Hourly Rate. If Future Events is blank, Future Events = (Operating Budget x Sourcing Goal %) / Average Event Size.",
+        current: "Current Sourcing Events x Hours Saved per Event x FTE Hourly Rate.",
+        inputs: "Operating Budget, Current Sourcing Events, optional Future Sourcing Events override."
+      },
+      {
+        lever: "Sourcing hard savings",
+        future: "Future Sourcing Events x Average Event Size x Sourcing Hard Savings %.",
+        current: "Current Sourcing Events x Average Event Size x Sourcing Hard Savings %.",
+        inputs: "Operating Budget, Current Sourcing Events, optional Future Sourcing Events override."
+      },
+      {
+        lever: "Contracts+ hard savings",
+        future: "Operating Budget x Contract Addressable Spend % x Future On-Contract Spend % x Contract Savings Rate %.",
+        current: "Current Contract Spend x Contract Savings Rate %.",
+        inputs: "Operating Budget and Current Contract Spend."
+      },
+      {
+        lever: "eSignature soft savings",
+        future: "Future Contracts x eSignature Savings per Contract. If Future Contracts is blank, Future Contracts = Operating Budget x Contracts per Dollar.",
+        current: "Current Contracts x eSignature Savings per Contract.",
+        inputs: "Operating Budget, Current Contracts, optional Future Contracts override."
+      },
+      {
+        lever: "Consortium rebate",
+        future: "Future Consortium Spend x Consortium Rebate %. If Future Consortium Spend is blank, Future Consortium Spend = Operating Budget x Consortium Addressable Spend % x Consortium Spend Share %.",
+        current: "Current Consortium Spend x Consortium Rebate %.",
+        inputs: "Operating Budget, Current Consortium Spend, optional Future Consortium Spend override."
+      },
+      {
+        lever: "YoY escalation benefit",
+        future: "Sum by year: Annual Subscription x (1 + Current YoY %)^(year - 1) minus Annual Subscription x (1 + Master YoY %)^(year - 1).",
+        current: "No operational baseline is subtracted; this is a separate commercial benefit.",
+        inputs: "Annual Subscription, Master Term Years, Current YoY %, Master YoY %."
+      },
+      {
+        lever: "Net incremental value",
+        future: "Sum of future full-suite operational savings across included modules.",
+        current: "Sum of current baseline savings from entered sandwich/current fields.",
+        inputs: "All module inputs above. Blank current fields are treated as zero."
+      }
+    ];
+
+    const DEFAULT_ROWS = [
+      {
+        name: "The University of Texas at Arlington",
+        budget: 886604597,
+        core: true,
+        consortium: true,
+        currentPOs: 7116,
+        currentInvoices: "",
+        currentSourcingEvents: "",
+        currentContractSpend: 11100000,
+        currentContracts: "",
+        currentConsortiumSpend: "",
+        futurePOs: "",
+        futureInvoices: "",
+        futureSourcingEvents: "",
+        futureContracts: "",
+        futureConsortiumSpend: "",
+        annualSubscription: ""
+      },
+      {
+        name: "UT Health Northeast",
+        budget: 485917003,
+        core: true,
+        consortium: true,
+        currentPOs: 3670,
+        currentInvoices: "",
+        currentSourcingEvents: "",
+        currentContractSpend: 6900000,
+        currentContracts: "",
+        currentConsortiumSpend: "",
+        futurePOs: "",
+        futureInvoices: "",
+        futureSourcingEvents: "",
+        futureContracts: "",
+        futureConsortiumSpend: "",
+        annualSubscription: ""
+      },
+      {
+        name: "UT Health San Antonio",
+        budget: 1866682781,
+        core: true,
+        consortium: true,
+        currentPOs: 25255,
+        currentInvoices: "",
+        currentSourcingEvents: "",
+        currentContractSpend: 23600000,
+        currentContracts: "",
+        currentConsortiumSpend: "",
+        futurePOs: "",
+        futureInvoices: "",
+        futureSourcingEvents: "",
+        futureContracts: "",
+        futureConsortiumSpend: "",
+        annualSubscription: ""
+      },
+      {
+        name: "The University of Texas Permian Basin",
+        budget: 122032826,
+        core: true,
+        consortium: true,
+        currentPOs: 343,
+        currentInvoices: "",
+        currentSourcingEvents: "",
+        currentContractSpend: 273000,
+        currentContracts: "",
+        currentConsortiumSpend: "",
+        futurePOs: "",
+        futureInvoices: "",
+        futureSourcingEvents: "",
+        futureContracts: "",
+        futureConsortiumSpend: "",
+        annualSubscription: ""
+      },
+      {
+        name: "University of Texas System Administration",
+        budget: 299155685,
+        core: true,
+        consortium: true,
+        currentPOs: 236,
+        currentInvoices: "",
+        currentSourcingEvents: "",
+        currentContractSpend: 1800000,
+        currentContracts: "",
+        currentConsortiumSpend: "",
+        futurePOs: "",
+        futureInvoices: "",
+        futureSourcingEvents: "",
+        futureContracts: "",
+        futureConsortiumSpend: "",
+        annualSubscription: ""
+      },
+      {
+        name: "The University of Texas at Tyler",
+        budget: 223686083,
+        core: true,
+        consortium: true,
+        currentPOs: 1465,
+        currentInvoices: "",
+        currentSourcingEvents: "",
+        currentContractSpend: 2600000,
+        currentContracts: "",
+        currentConsortiumSpend: "",
+        futurePOs: "",
+        futureInvoices: "",
+        futureSourcingEvents: "",
+        futureContracts: "",
+        futureConsortiumSpend: "",
+        annualSubscription: ""
+      },
+      {
+        name: "University of Texas MD Anderson Cancer Center",
+        budget: 8297812316,
+        core: false,
+        consortium: true,
+        currentPOs: "",
+        currentInvoices: "",
+        currentSourcingEvents: "",
+        currentContractSpend: "",
+        currentContracts: "",
+        currentConsortiumSpend: "",
+        futurePOs: "",
+        futureInvoices: "",
+        futureSourcingEvents: "",
+        futureContracts: "",
+        futureConsortiumSpend: "",
+        annualSubscription: ""
+      },
+      {
+        name: "The University of Texas Southwestern Medical Center",
+        budget: 6189723956,
+        core: false,
+        consortium: true,
+        currentPOs: "",
+        currentInvoices: "",
+        currentSourcingEvents: "",
+        currentContractSpend: "",
+        currentContracts: "",
+        currentConsortiumSpend: "",
+        futurePOs: "",
+        futureInvoices: "",
+        futureSourcingEvents: "",
+        futureContracts: "",
+        futureConsortiumSpend: "",
+        annualSubscription: ""
+      },
+      {
+        name: "The University of Texas at Austin",
+        budget: 4423186387,
+        core: false,
+        consortium: true,
+        currentPOs: "",
+        currentInvoices: "",
+        currentSourcingEvents: "",
+        currentContractSpend: "",
+        currentContracts: "",
+        currentConsortiumSpend: "",
+        futurePOs: "",
+        futureInvoices: "",
+        futureSourcingEvents: "",
+        futureContracts: "",
+        futureConsortiumSpend: "",
+        annualSubscription: ""
+      },
+      {
+        name: "The University of Texas Medical Branch at Galveston",
+        budget: 3687502049,
+        core: false,
+        consortium: true,
+        currentPOs: "",
+        currentInvoices: "",
+        currentSourcingEvents: "",
+        currentContractSpend: "",
+        currentContracts: "",
+        currentConsortiumSpend: "",
+        futurePOs: "",
+        futureInvoices: "",
+        futureSourcingEvents: "",
+        futureContracts: "",
+        futureConsortiumSpend: "",
+        annualSubscription: ""
+      },
+      {
+        name: "UT Health Houston",
+        budget: 2814343940,
+        core: false,
+        consortium: true,
+        currentPOs: "",
+        currentInvoices: "",
+        currentSourcingEvents: "",
+        currentContractSpend: "",
+        currentContracts: "",
+        currentConsortiumSpend: "",
+        futurePOs: "",
+        futureInvoices: "",
+        futureSourcingEvents: "",
+        futureContracts: "",
+        futureConsortiumSpend: "",
+        annualSubscription: ""
+      },
+      {
+        name: "The University of Texas at Dallas",
+        budget: 901697231,
+        core: false,
+        consortium: true,
+        currentPOs: "",
+        currentInvoices: "",
+        currentSourcingEvents: "",
+        currentContractSpend: "",
+        currentContracts: "",
+        currentConsortiumSpend: "",
+        futurePOs: "",
+        futureInvoices: "",
+        futureSourcingEvents: "",
+        futureContracts: "",
+        futureConsortiumSpend: "",
+        annualSubscription: ""
+      },
+      {
+        name: "The University of Texas Rio Grande Valley",
+        budget: 801365410,
+        core: false,
+        consortium: true,
+        currentPOs: "",
+        currentInvoices: "",
+        currentSourcingEvents: "",
+        currentContractSpend: "",
+        currentContracts: "",
+        currentConsortiumSpend: "",
+        futurePOs: "",
+        futureInvoices: "",
+        futureSourcingEvents: "",
+        futureContracts: "",
+        futureConsortiumSpend: "",
+        annualSubscription: ""
+      },
+      {
+        name: "The University of Texas at San Antonio",
+        budget: 867363059,
+        core: false,
+        consortium: true,
+        currentPOs: "",
+        currentInvoices: "",
+        currentSourcingEvents: "",
+        currentContractSpend: "",
+        currentContracts: "",
+        currentConsortiumSpend: "",
+        futurePOs: "",
+        futureInvoices: "",
+        futureSourcingEvents: "",
+        futureContracts: "",
+        futureConsortiumSpend: "",
+        annualSubscription: ""
+      },
+      {
+        name: "The University of Texas at El Paso",
+        budget: 577084206,
+        core: false,
+        consortium: true,
+        currentPOs: "",
+        currentInvoices: "",
+        currentSourcingEvents: "",
+        currentContractSpend: "",
+        currentContracts: "",
+        currentConsortiumSpend: "",
+        futurePOs: "",
+        futureInvoices: "",
+        futureSourcingEvents: "",
+        futureContracts: "",
+        futureConsortiumSpend: "",
+        annualSubscription: ""
+      }
+    ];
+
+    function blankRow() {
+      return {
+        name: "",
+        budget: "",
+        core: true,
+        consortium: true,
+        currentPOs: "",
+        futurePOs: "",
+        currentInvoices: "",
+        futureInvoices: "",
+        currentSourcingEvents: "",
+        futureSourcingEvents: "",
+        currentContractSpend: "",
+        currentContracts: "",
+        futureContracts: "",
+        currentConsortiumSpend: "",
+        futureConsortiumSpend: "",
+        annualSubscription: ""
+      };
+    }
+
+    let assumptions = structuredClone(DEFAULT_ASSUMPTIONS);
+    let rows = [blankRow()];
+
+    const els = {
+      assumptionGrid: document.getElementById("assumptionGrid"),
+      formulaRows: document.getElementById("formulaRows"),
+      modelRows: document.getElementById("modelRows"),
+      moduleTable: document.querySelector("#moduleTable tbody"),
+      institutionTable: document.querySelector("#institutionTable tbody"),
+      preparedFor: document.getElementById("preparedFor"),
+      preparedBy: document.getElementById("preparedBy"),
+      scenarioName: document.getElementById("scenarioName"),
+      presentationDate: document.getElementById("presentationDate"),
+      termYears: document.getElementById("termYears")
+    };
+
+    const nf0 = new Intl.NumberFormat("en-US", { maximumFractionDigits: 0 });
+    const nf1 = new Intl.NumberFormat("en-US", { maximumFractionDigits: 1 });
+
+    function todayString() {
+      const d = new Date();
+      return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+    }
+
+    els.presentationDate.value = todayString();
+
+    function deepCopy(value) {
+      return JSON.parse(JSON.stringify(value));
+    }
+
+    function parseNumber(value) {
+      if (value === null || value === undefined || value === "") return 0;
+      const n = Number(String(value).replace(/[$,%\s,]/g, ""));
+      return Number.isFinite(n) ? n : 0;
+    }
+
+    function escapeXml(value) {
+      return String(value ?? "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&apos;");
+    }
+
+    function fmtMoney(value) {
+      const abs = Math.abs(value);
+      if (abs >= 1e9) return `$${nf1.format(value / 1e9)}B`;
+      if (abs >= 1e6) return `$${nf1.format(value / 1e6)}M`;
+      if (abs >= 1e3) return `$${nf0.format(value / 1e3)}K`;
+      return `$${nf0.format(value)}`;
+    }
+
+    function fmtNumber(value) {
+      return nf0.format(value || 0);
+    }
+
+    function percentToDecimal(value) {
+      return parseNumber(value) / 100;
+    }
+
+    function getTermYears() {
+      return Math.max(1, Math.round(parseNumber(els.termYears.value) || 7));
+    }
+
+    function assumptionDecimal(key) {
+      return percentToDecimal(assumptions[key]);
+    }
+
+    function computeYoySavings(baseAnnual) {
+      const base = parseNumber(baseAnnual);
+      if (!base) return 0;
+      const currentRate = assumptionDecimal("currentYoyPct");
+      const masterRate = assumptionDecimal("masterYoyPct");
+      const years = getTermYears();
+      let savings = 0;
+      for (let year = 1; year <= years; year += 1) {
+        savings += base * Math.pow(1 + currentRate, year - 1) - base * Math.pow(1 + masterRate, year - 1);
+      }
+      return savings;
+    }
+
+    function calcRow(row) {
+      const budget = parseNumber(row.budget);
+      const core = Boolean(row.core);
+      const consortium = Boolean(row.consortium);
+
+      const futurePOs = core ? parseNumber(row.futurePOs) || (budget / assumptions.poDollarsRatio) : 0;
+      const currentPOs = core ? parseNumber(row.currentPOs) : 0;
+      const futureInvoices = core ? parseNumber(row.futureInvoices) || (budget / assumptions.invoiceDollarsRatio) : 0;
+      const currentInvoices = core ? parseNumber(row.currentInvoices) : 0;
+
+      const futureSourcingEvents = core
+        ? parseNumber(row.futureSourcingEvents) || ((budget * assumptionDecimal("sourcingGoalPct")) / assumptions.avgEventSize)
+        : 0;
+      const currentSourcingEvents = core ? parseNumber(row.currentSourcingEvents) : 0;
+
+      const futureContracts = core ? parseNumber(row.futureContracts) || (budget * assumptions.contractsPerDollar) : 0;
+      const currentContracts = core ? parseNumber(row.currentContracts) : 0;
+
+      const futureConsortiumSpend = consortium
+        ? parseNumber(row.futureConsortiumSpend) || (budget * assumptionDecimal("consortiumAddressablePct") * assumptionDecimal("consortiumSpendPct"))
+        : 0;
+      const currentConsortiumSpend = consortium ? parseNumber(row.currentConsortiumSpend) : 0;
+
+      const values = {
+        eProcurementFuture: futurePOs * assumptions.poSavings,
+        eProcurementCurrent: currentPOs * assumptions.poSavings,
+        invoicingFuture: futureInvoices * assumptions.invoiceSavings,
+        invoicingCurrent: currentInvoices * assumptions.invoiceSavings,
+        sourcingProcessFuture: futureSourcingEvents * assumptions.sourcingHours * assumptions.hourlyRate,
+        sourcingProcessCurrent: currentSourcingEvents * assumptions.sourcingHours * assumptions.hourlyRate,
+        sourcingHardFuture: futureSourcingEvents * assumptions.avgEventSize * assumptionDecimal("sourcingSavingsPct"),
+        sourcingHardCurrent: currentSourcingEvents * assumptions.avgEventSize * assumptionDecimal("sourcingSavingsPct"),
+        contractHardFuture: core ? budget * assumptionDecimal("contractAddressablePct") * assumptionDecimal("onContractPct") * assumptionDecimal("contractSavingsPct") : 0,
+        contractHardCurrent: core ? parseNumber(row.currentContractSpend) * assumptionDecimal("contractSavingsPct") : 0,
+        eSignatureFuture: futureContracts * assumptions.eSignSavings,
+        eSignatureCurrent: currentContracts * assumptions.eSignSavings,
+        consortiumFuture: futureConsortiumSpend * assumptionDecimal("consortiumRebatePct"),
+        consortiumCurrent: currentConsortiumSpend * assumptionDecimal("consortiumRebatePct"),
+        yoyBenefit: computeYoySavings(row.annualSubscription)
+      };
+
+      const future = values.eProcurementFuture + values.invoicingFuture + values.sourcingProcessFuture +
+        values.sourcingHardFuture + values.contractHardFuture + values.eSignatureFuture + values.consortiumFuture;
+      const current = values.eProcurementCurrent + values.invoicingCurrent + values.sourcingProcessCurrent +
+        values.sourcingHardCurrent + values.contractHardCurrent + values.eSignatureCurrent + values.consortiumCurrent;
+
+      return {
+        ...row,
+        budget,
+        futurePOs,
+        currentPOs,
+        futureInvoices,
+        currentInvoices,
+        futureSourcingEvents,
+        currentSourcingEvents,
+        futureContracts,
+        currentContracts,
+        futureConsortiumSpend,
+        currentConsortiumSpend,
+        ...values,
+        future,
+        current,
+        net: future - current
+      };
+    }
+
+    function calculateModel() {
+      const detail = rows.map(calcRow);
+      const modules = [
+        ["eProcurement", "Soft", "eProcurementFuture", "eProcurementCurrent"],
+        ["Invoicing", "Soft", "invoicingFuture", "invoicingCurrent"],
+        ["Sourcing Process", "Soft", "sourcingProcessFuture", "sourcingProcessCurrent"],
+        ["Sourcing Hard Savings", "Hard", "sourcingHardFuture", "sourcingHardCurrent"],
+        ["Contracts+ Hard Savings", "Hard", "contractHardFuture", "contractHardCurrent"],
+        ["eSignature", "Soft", "eSignatureFuture", "eSignatureCurrent"],
+        ["Consortium", "Hard", "consortiumFuture", "consortiumCurrent"]
+      ].map(([name, type, futureKey, currentKey]) => {
+        const future = detail.reduce((sum, row) => sum + row[futureKey], 0);
+        const current = detail.reduce((sum, row) => sum + row[currentKey], 0);
+        return { name, type, future, current, net: future - current };
+      });
+
+      const totals = {
+        future: detail.reduce((sum, row) => sum + row.future, 0),
+        current: detail.reduce((sum, row) => sum + row.current, 0),
+        net: detail.reduce((sum, row) => sum + row.net, 0),
+        yoyBenefit: detail.reduce((sum, row) => sum + row.yoyBenefit, 0),
+        hardFuture: modules.filter(m => m.type === "Hard").reduce((sum, m) => sum + m.future, 0),
+        softFuture: modules.filter(m => m.type === "Soft").reduce((sum, m) => sum + m.future, 0),
+        institutions: detail.length,
+        coreInstitutions: detail.filter(row => row.core).length,
+        consortiumInstitutions: detail.filter(row => row.consortium).length
+      };
+
+      return { detail, modules, totals };
+    }
+
+    function renderAssumptions() {
+      els.assumptionGrid.innerHTML = ASSUMPTION_FIELDS.map(([key, label, prefix, help]) => `
+        <div class="field">
+          <label for="assumption-${key}">${label}${prefix === "%" ? " (%)" : ""}</label>
+          <input
+            id="assumption-${key}"
+            type="number"
+            step="any"
+            value="${assumptions[key]}"
+            data-assumption="${key}"
+            title="${escapeXml(help)}"
+          >
+        </div>
+      `).join("");
+
+      els.assumptionGrid.querySelectorAll("[data-assumption]").forEach(input => {
+        input.addEventListener("input", event => {
+          assumptions[event.target.dataset.assumption] = parseNumber(event.target.value);
+          renderResults();
+        });
+        input.addEventListener("keydown", calculateOnEnter);
+      });
+    }
+
+    function renderFormulaRows() {
+      els.formulaRows.innerHTML = FORMULA_ROWS.map(row => `
+        <tr>
+          <td class="name">${escapeXml(row.lever)}</td>
+          <td>${escapeXml(row.future)}</td>
+          <td>${escapeXml(row.current)}</td>
+          <td>${escapeXml(row.inputs)}</td>
+        </tr>
+      `).join("");
+    }
+
+    function renderRows() {
+      els.modelRows.innerHTML = rows.map((row, index) => `
+        <tr>
+          <td class="name"><input class="name-input" data-row="${index}" data-field="name" value="${escapeXml(row.name)}"></td>
+          <td class="tiny"><input type="checkbox" data-row="${index}" data-field="core" ${row.core ? "checked" : ""}></td>
+          <td class="tiny"><input type="checkbox" data-row="${index}" data-field="consortium" ${row.consortium ? "checked" : ""}></td>
+          <td><input type="number" step="1" data-row="${index}" data-field="budget" value="${row.budget}"></td>
+          <td><input type="number" step="1" data-row="${index}" data-field="currentPOs" value="${row.currentPOs}"></td>
+          <td><input type="number" step="1" data-row="${index}" data-field="futurePOs" value="${row.futurePOs}" placeholder="Auto"></td>
+          <td><input type="number" step="1" data-row="${index}" data-field="currentInvoices" value="${row.currentInvoices}"></td>
+          <td><input type="number" step="1" data-row="${index}" data-field="futureInvoices" value="${row.futureInvoices}" placeholder="Auto"></td>
+          <td><input type="number" step="1" data-row="${index}" data-field="currentSourcingEvents" value="${row.currentSourcingEvents}"></td>
+          <td><input type="number" step="1" data-row="${index}" data-field="futureSourcingEvents" value="${row.futureSourcingEvents}" placeholder="Auto"></td>
+          <td><input type="number" step="1" data-row="${index}" data-field="currentContractSpend" value="${row.currentContractSpend}"></td>
+          <td><input type="number" step="1" data-row="${index}" data-field="currentContracts" value="${row.currentContracts}"></td>
+          <td><input type="number" step="1" data-row="${index}" data-field="futureContracts" value="${row.futureContracts}" placeholder="Auto"></td>
+          <td><input type="number" step="1" data-row="${index}" data-field="currentConsortiumSpend" value="${row.currentConsortiumSpend}"></td>
+          <td><input type="number" step="1" data-row="${index}" data-field="futureConsortiumSpend" value="${row.futureConsortiumSpend}" placeholder="Auto"></td>
+          <td><input type="number" step="1" data-row="${index}" data-field="annualSubscription" value="${row.annualSubscription}"></td>
+          <td><button class="danger" data-remove="${index}" title="Remove row">Remove</button></td>
+        </tr>
+      `).join("");
+
+      els.modelRows.querySelectorAll("input").forEach(input => {
+        input.addEventListener("input", onRowInput);
+        input.addEventListener("change", onRowInput);
+        input.addEventListener("keydown", calculateOnEnter);
+      });
+
+      els.modelRows.querySelectorAll("[data-remove]").forEach(button => {
+        button.addEventListener("click", event => {
+          const index = Number(event.target.dataset.remove);
+          rows.splice(index, 1);
+          renderRows();
+          renderResults();
+        });
+      });
+    }
+
+    function onRowInput(event) {
+      const row = rows[Number(event.target.dataset.row)];
+      const field = event.target.dataset.field;
+      if (!row || !field) return;
+      row[field] = event.target.type === "checkbox" ? event.target.checked : event.target.value;
+      renderResults();
+    }
+
+    function calculateOnEnter(event) {
+      if (event.key !== "Enter") return;
+      event.preventDefault();
+      if (event.target.dataset.row !== undefined) onRowInput(event);
+      if (event.target.dataset.assumption) {
+        assumptions[event.target.dataset.assumption] = parseNumber(event.target.value);
+      }
+      renderResults();
+      event.target.blur();
+    }
+
+    function renderResults() {
+      const model = calculateModel();
+      document.getElementById("metricFuture").textContent = fmtMoney(model.totals.future);
+      document.getElementById("metricCurrent").textContent = fmtMoney(model.totals.current);
+      document.getElementById("metricNet").textContent = fmtMoney(model.totals.net);
+      document.getElementById("metricHard").textContent = fmtMoney(model.totals.hardFuture);
+      document.getElementById("metricSoft").textContent = fmtMoney(model.totals.softFuture);
+      document.getElementById("metricYoy").textContent = fmtMoney(model.totals.yoyBenefit);
+      document.getElementById("metricYoyTerm").textContent = `${getTermYears()}-year commercial benefit`;
+
+      document.getElementById("assumptionNotes").textContent =
+        `Core suite rows: ${model.totals.coreInstitutions}. Consortium rows: ${model.totals.consortiumInstitutions}. Contract savings rate is ${assumptions.contractSavingsPct}%; consortium spend share is ${assumptions.consortiumSpendPct}%.`;
+
+      els.moduleTable.innerHTML = model.modules.map(module => `
+        <tr>
+          <td class="name">${escapeXml(module.name)}</td>
+          <td><span class="pill ${module.type.toLowerCase()}">${module.type}</span></td>
+          <td>${fmtMoney(module.future)}</td>
+          <td>${fmtMoney(module.current)}</td>
+          <td>${fmtMoney(module.net)}</td>
+        </tr>
+      `).join("");
+
+      const detail = model.detail.slice().sort((a, b) => b.net - a.net);
+      els.institutionTable.innerHTML = detail.map(row => `
+        <tr>
+          <td class="name">${escapeXml(row.name)}</td>
+          <td>${fmtMoney(row.future)}</td>
+          <td>${fmtMoney(row.current)}</td>
+          <td>${fmtMoney(row.net)}</td>
+          <td>${fmtMoney(row.yoyBenefit)}</td>
+        </tr>
+      `).join("");
+    }
+
+    function addRow() {
+      rows.push(blankRow());
+      renderRows();
+      renderResults();
+    }
+
+    function resetData() {
+      assumptions = deepCopy(DEFAULT_ASSUMPTIONS);
+      rows = [blankRow()];
+      renderAssumptions();
+      renderRows();
+      renderResults();
+    }
+
+    function showExampleData() {
+      assumptions = deepCopy(DEFAULT_ASSUMPTIONS);
+      rows = deepCopy(DEFAULT_ROWS);
+      renderAssumptions();
+      renderRows();
+      renderResults();
+    }
+
+    function setActiveTab(panelId) {
+      document.querySelectorAll(".tab-button").forEach(button => {
+        const active = button.dataset.tab === panelId;
+        button.classList.toggle("active", active);
+        button.setAttribute("aria-selected", active ? "true" : "false");
+      });
+      document.querySelectorAll(".tab-panel").forEach(panel => {
+        panel.classList.toggle("active", panel.id === panelId);
+      });
+    }
+
+    function downloadBlob(blob, filename) {
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
+    }
+
+    function slug(value) {
+      return String(value || "savings-model").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+    }
+
+    function exportName(ext) {
+      return `${slug(els.preparedFor.value)}-${slug(els.scenarioName.value)}-savings.${ext}`;
+    }
+
+    function crc32(bytes) {
+      let c = -1;
+      for (let i = 0; i < bytes.length; i += 1) {
+        c = (c >>> 8) ^ CRC_TABLE[(c ^ bytes[i]) & 0xff];
+      }
+      return (c ^ -1) >>> 0;
+    }
+
+    const CRC_TABLE = (() => {
+      const table = new Uint32Array(256);
+      for (let i = 0; i < 256; i += 1) {
+        let c = i;
+        for (let j = 0; j < 8; j += 1) c = c & 1 ? 0xedb88320 ^ (c >>> 1) : c >>> 1;
+        table[i] = c >>> 0;
+      }
+      return table;
+    })();
+
+    function dosTime(date) {
+      return ((date.getHours() & 31) << 11) | ((date.getMinutes() & 63) << 5) | ((Math.floor(date.getSeconds() / 2)) & 31);
+    }
+
+    function dosDate(date) {
+      return (((date.getFullYear() - 1980) & 127) << 9) | (((date.getMonth() + 1) & 15) << 5) | (date.getDate() & 31);
+    }
+
+    function u16(value, out) {
+      out.push(value & 0xff, (value >>> 8) & 0xff);
+    }
+
+    function u32(value, out) {
+      out.push(value & 0xff, (value >>> 8) & 0xff, (value >>> 16) & 0xff, (value >>> 24) & 0xff);
+    }
+
+    function createZip(entries, mimeType = "application/zip") {
+      const encoder = new TextEncoder();
+      const fileParts = [];
+      const central = [];
+      let offset = 0;
+      const now = new Date();
+      const time = dosTime(now);
+      const date = dosDate(now);
+
+      entries.forEach(entry => {
+        const nameBytes = encoder.encode(entry.name);
+        const dataBytes = entry.data instanceof Uint8Array ? entry.data : encoder.encode(entry.data);
+        const crc = crc32(dataBytes);
+        const local = [];
+
+        u32(0x04034b50, local);
+        u16(20, local);
+        u16(0x0800, local);
+        u16(0, local);
+        u16(time, local);
+        u16(date, local);
+        u32(crc, local);
+        u32(dataBytes.length, local);
+        u32(dataBytes.length, local);
+        u16(nameBytes.length, local);
+        u16(0, local);
+
+        fileParts.push(new Uint8Array(local), nameBytes, dataBytes);
+
+        const centralEntry = [];
+        u32(0x02014b50, centralEntry);
+        u16(20, centralEntry);
+        u16(20, centralEntry);
+        u16(0x0800, centralEntry);
+        u16(0, centralEntry);
+        u16(time, centralEntry);
+        u16(date, centralEntry);
+        u32(crc, centralEntry);
+        u32(dataBytes.length, centralEntry);
+        u32(dataBytes.length, centralEntry);
+        u16(nameBytes.length, centralEntry);
+        u16(0, centralEntry);
+        u16(0, centralEntry);
+        u16(0, centralEntry);
+        u16(0, centralEntry);
+        u32(0, centralEntry);
+        u32(offset, centralEntry);
+        central.push(new Uint8Array(centralEntry), nameBytes);
+
+        offset += local.length + nameBytes.length + dataBytes.length;
+      });
+
+      const centralSize = central.reduce((sum, part) => sum + part.length, 0);
+      const centralOffset = offset;
+      const end = [];
+      u32(0x06054b50, end);
+      u16(0, end);
+      u16(0, end);
+      u16(entries.length, end);
+      u16(entries.length, end);
+      u32(centralSize, end);
+      u32(centralOffset, end);
+      u16(0, end);
+      return new Blob([...fileParts, ...central, new Uint8Array(end)], { type: mimeType });
+    }
+
+    function colName(index) {
+      let name = "";
+      while (index > 0) {
+        const mod = (index - 1) % 26;
+        name = String.fromCharCode(65 + mod) + name;
+        index = Math.floor((index - mod) / 26);
+      }
+      return name;
+    }
+
+    function xlsxCell(value, row, col, style = "") {
+      const ref = `${colName(col)}${row}`;
+      if (typeof value === "number" && Number.isFinite(value)) {
+        return `<c r="${ref}"${style ? ` s="${style}"` : ""}><v>${value}</v></c>`;
+      }
+      return `<c r="${ref}" t="inlineStr"${style ? ` s="${style}"` : ""}><is><t>${escapeXml(value)}</t></is></c>`;
+    }
+
+    function xlsxRow(values, rowIndex, style = "") {
+      return `<row r="${rowIndex}">${values.map((value, idx) => xlsxCell(value, rowIndex, idx + 1, style)).join("")}</row>`;
+    }
+
+    function buildXlsx() {
+      const model = calculateModel();
+      const sheetRows = [];
+      let r = 1;
+      sheetRows.push(xlsxRow(["UT Full-Suite Savings Calculator"], r++, "1"));
+      sheetRows.push(xlsxRow(["Prepared for", els.preparedFor.value, "Prepared by", els.preparedBy.value, "Scenario", els.scenarioName.value, "Date", els.presentationDate.value], r++));
+      sheetRows.push(xlsxRow([], r++));
+
+      sheetRows.push(xlsxRow(["Executive Summary"], r++, "1"));
+      sheetRows.push(xlsxRow(["Future annual value", model.totals.future, "Current baseline value", model.totals.current, "Net incremental value", model.totals.net], r++));
+      sheetRows.push(xlsxRow(["Hard savings", model.totals.hardFuture, "Soft savings", model.totals.softFuture, `${getTermYears()}-year YoY escalation benefit`, model.totals.yoyBenefit], r++));
+      sheetRows.push(xlsxRow([], r++));
+
+      sheetRows.push(xlsxRow(["Assumptions"], r++, "1"));
+      ASSUMPTION_FIELDS.forEach(([key, label]) => {
+        sheetRows.push(xlsxRow([label, assumptions[key]], r++));
+      });
+      sheetRows.push(xlsxRow([], r++));
+
+      sheetRows.push(xlsxRow(["Calculation Formulas"], r++, "1"));
+      sheetRows.push(xlsxRow(["Value Lever", "Future Full-Suite Formula", "Current Baseline Formula", "CSM Inputs"], r++, "2"));
+      FORMULA_ROWS.forEach(row => {
+        sheetRows.push(xlsxRow([row.lever, row.future, row.current, row.inputs], r++));
+      });
+      sheetRows.push(xlsxRow([], r++));
+
+      sheetRows.push(xlsxRow(["Savings by Module"], r++, "1"));
+      sheetRows.push(xlsxRow(["Module", "Type", "Future Annual Value", "Current Baseline Value", "Net Incremental Value"], r++, "2"));
+      model.modules.forEach(module => {
+        sheetRows.push(xlsxRow([module.name, module.type, module.future, module.current, module.net], r++));
+      });
+      sheetRows.push(xlsxRow([], r++));
+
+      sheetRows.push(xlsxRow(["Institution Detail"], r++, "1"));
+      sheetRows.push(xlsxRow([
+        "Institution",
+        "Core Suite",
+        "Consortium",
+        "Operating Budget",
+        "Future Annual Value",
+        "Current Baseline Value",
+        "Net Incremental Value",
+        "YoY Escalation Benefit",
+        "Future POs",
+        "Current POs",
+        "Future Invoices",
+        "Current Invoices",
+        "Future Sourcing Events",
+        "Current Sourcing Events",
+        "Future Contracts",
+        "Current Contracts",
+        "Future Consortium Spend",
+        "Current Consortium Spend"
+      ], r++, "2"));
+
+      model.detail
+        .slice()
+        .sort((a, b) => b.net - a.net)
+        .forEach(row => {
+          sheetRows.push(xlsxRow([
+            row.name,
+            row.core ? "Yes" : "No",
+            row.consortium ? "Yes" : "No",
+            row.budget,
+            row.future,
+            row.current,
+            row.net,
+            row.yoyBenefit,
+            row.futurePOs,
+            row.currentPOs,
+            row.futureInvoices,
+            row.currentInvoices,
+            row.futureSourcingEvents,
+            row.currentSourcingEvents,
+            row.futureContracts,
+            row.currentContracts,
+            row.futureConsortiumSpend,
+            row.currentConsortiumSpend
+          ], r++));
+        });
+
+      const sheetXml = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">
+  <cols>
+    <col min="1" max="1" width="34" customWidth="1"/>
+    <col min="2" max="18" width="18" customWidth="1"/>
+  </cols>
+  <sheetData>${sheetRows.join("")}</sheetData>
+</worksheet>`;
+
+      const entries = [
+        ["[Content_Types].xml", `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">
+  <Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/>
+  <Default Extension="xml" ContentType="application/xml"/>
+  <Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/>
+  <Override PartName="/xl/worksheets/sheet1.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/>
+  <Override PartName="/xl/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.styles+xml"/>
+  <Override PartName="/docProps/core.xml" ContentType="application/vnd.openxmlformats-package.core-properties+xml"/>
+  <Override PartName="/docProps/app.xml" ContentType="application/vnd.openxmlformats-officedocument.extended-properties+xml"/>
+</Types>`],
+        ["_rels/.rels", `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
+  <Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="xl/workbook.xml"/>
+  <Relationship Id="rId2" Type="http://schemas.openxmlformats.org/package/2006/relationships/metadata/core-properties" Target="docProps/core.xml"/>
+  <Relationship Id="rId3" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/extended-properties" Target="docProps/app.xml"/>
+</Relationships>`],
+        ["docProps/core.xml", coreProps("UT Full-Suite Savings Calculator")],
+        ["docProps/app.xml", `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Properties xmlns="http://schemas.openxmlformats.org/officeDocument/2006/extended-properties" xmlns:vt="http://schemas.openxmlformats.org/officeDocument/2006/docPropsVTypes">
+  <Application>UT Full-Suite Savings Tool</Application>
+</Properties>`],
+        ["xl/workbook.xml", `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">
+  <sheets><sheet name="Savings Model" sheetId="1" r:id="rId1"/></sheets>
+</workbook>`],
+        ["xl/_rels/workbook.xml.rels", `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
+  <Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet1.xml"/>
+  <Relationship Id="rId2" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/>
+</Relationships>`],
+        ["xl/styles.xml", `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">
+  <fonts count="2"><font><sz val="11"/><name val="Aptos"/></font><font><b/><sz val="11"/><name val="Aptos"/></font></fonts>
+  <fills count="3"><fill><patternFill patternType="none"/></fill><fill><patternFill patternType="gray125"/></fill><fill><patternFill patternType="solid"><fgColor rgb="FFE8F3EF"/><bgColor indexed="64"/></patternFill></fill></fills>
+  <borders count="1"><border><left/><right/><top/><bottom/><diagonal/></border></borders>
+  <cellStyleXfs count="1"><xf numFmtId="0" fontId="0" fillId="0" borderId="0"/></cellStyleXfs>
+  <cellXfs count="3"><xf numFmtId="0" fontId="0" fillId="0" borderId="0"/><xf numFmtId="0" fontId="1" fillId="0" borderId="0" applyFont="1"/><xf numFmtId="0" fontId="1" fillId="2" borderId="0" applyFont="1" applyFill="1"/></cellXfs>
+</styleSheet>`],
+        ["xl/worksheets/sheet1.xml", sheetXml]
+      ].map(([name, data]) => ({ name, data }));
+
+      return createZip(entries, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+    }
+
+    function coreProps(title) {
+      const now = new Date().toISOString();
+      return `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<cp:coreProperties xmlns:cp="http://schemas.openxmlformats.org/package/2006/metadata/core-properties" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:dcmitype="http://purl.org/dc/dcmitype/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <dc:title>${escapeXml(title)}</dc:title>
+  <dc:creator>${escapeXml(els.preparedBy.value)}</dc:creator>
+  <cp:lastModifiedBy>${escapeXml(els.preparedBy.value)}</cp:lastModifiedBy>
+  <dcterms:created xsi:type="dcterms:W3CDTF">${now}</dcterms:created>
+  <dcterms:modified xsi:type="dcterms:W3CDTF">${now}</dcterms:modified>
+</cp:coreProperties>`;
+    }
+
+    const PPT = {
+      width: 12192000,
+      height: 6858000,
+      margin: 540000,
+      ink: "17212B",
+      muted: "617080",
+      accent: "1F6F8B",
+      soft: "E8F3EF",
+      hard: "FFF1DC",
+      line: "D8E0E8",
+      panel: "FFFFFF"
+    };
+
+    function emu(inches) {
+      return Math.round(inches * 914400);
+    }
+
+    function pptRun(text, size = 1800, color = PPT.ink, bold = false) {
+      return `<a:r><a:rPr lang="en-US" sz="${size}"${bold ? ' b="1"' : ""}><a:solidFill><a:srgbClr val="${color}"/></a:solidFill></a:rPr><a:t>${escapeXml(text)}</a:t></a:r>`;
+    }
+
+    function pptText(id, name, x, y, w, h, lines, opts = {}) {
+      const fill = opts.fill ? `<a:solidFill><a:srgbClr val="${opts.fill}"/></a:solidFill>` : `<a:noFill/>`;
+      const line = opts.line ? `<a:ln w="9525"><a:solidFill><a:srgbClr val="${opts.line}"/></a:solidFill></a:ln>` : `<a:ln><a:noFill/></a:ln>`;
+      const paras = (Array.isArray(lines) ? lines : [lines]).map((lineText, idx) => {
+        const size = idx === 0 && opts.firstSize ? opts.firstSize : (opts.size || 1700);
+        const color = idx === 0 && opts.firstColor ? opts.firstColor : (opts.color || PPT.ink);
+        const bold = Boolean((idx === 0 && opts.firstBold) || opts.bold);
+        return `<a:p><a:pPr algn="${opts.align || "l"}" marL="0" marR="0"/>${pptRun(lineText, size, color, bold)}</a:p>`;
+      }).join("");
+
+      return `<p:sp>
+  <p:nvSpPr><p:cNvPr id="${id}" name="${escapeXml(name)}"/><p:cNvSpPr txBox="1"/><p:nvPr/></p:nvSpPr>
+  <p:spPr><a:xfrm><a:off x="${x}" y="${y}"/><a:ext cx="${w}" cy="${h}"/></a:xfrm><a:prstGeom prst="rect"><a:avLst/></a:prstGeom>${fill}${line}</p:spPr>
+  <p:txBody><a:bodyPr wrap="square" anchor="${opts.anchor || "t"}" lIns="${opts.pad || 91440}" tIns="${opts.pad || 91440}" rIns="${opts.pad || 91440}" bIns="${opts.pad || 91440}"/><a:lstStyle/>${paras}</p:txBody>
+</p:sp>`;
+    }
+
+    function pptSlide(shapes) {
+      return `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<p:sld xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships" xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main">
+  <p:cSld>
+    <p:bg><p:bgPr><a:solidFill><a:srgbClr val="F4F7F8"/></a:solidFill><a:effectLst/></p:bgPr></p:bg>
+    <p:spTree>
+      <p:nvGrpSpPr><p:cNvPr id="1" name=""/><p:cNvGrpSpPr/><p:nvPr/></p:nvGrpSpPr>
+      <p:grpSpPr><a:xfrm><a:off x="0" y="0"/><a:ext cx="0" cy="0"/><a:chOff x="0" y="0"/><a:chExt cx="0" cy="0"/></a:xfrm></p:grpSpPr>
+      ${shapes.join("")}
+    </p:spTree>
+  </p:cSld>
+  <p:clrMapOvr><a:masterClrMapping/></p:clrMapOvr>
+</p:sld>`;
+    }
+
+    function metricBox(id, x, y, title, value, subtitle, fill) {
+      return pptText(id, title, x, y, emu(2.28), emu(0.9), [title, value, subtitle], {
+        fill,
+        line: PPT.line,
+        firstSize: 1050,
+        firstColor: PPT.muted,
+        size: 1350,
+        pad: 91440
+      });
+    }
+
+    function titleShapes(slideTitle, subtitle = "") {
+      const shapes = [
+        pptText(2, "Title", emu(0.55), emu(0.32), emu(8.1), emu(0.55), slideTitle, {
+          size: 2500,
+          bold: true,
+          pad: 0
+        })
+      ];
+      if (subtitle) {
+        shapes.push(pptText(3, "Subtitle", emu(0.56), emu(0.86), emu(8.5), emu(0.3), subtitle, {
+          size: 1200,
+          color: PPT.muted,
+          pad: 0
+        }));
+      }
+      return shapes;
+    }
+
+    function tableShapes(startId, x, y, cols, rowsData, widths, rowH = 0.34) {
+      const shapes = [];
+      let id = startId;
+      const headerFill = "E8F3EF";
+      rowsData.forEach((row, rIndex) => {
+        let colX = x;
+        row.forEach((cell, cIndex) => {
+          shapes.push(pptText(id++, `Cell ${id}`, emu(colX), emu(y + rIndex * rowH), emu(widths[cIndex]), emu(rowH), String(cell), {
+            size: rIndex === 0 ? 950 : 900,
+            bold: rIndex === 0,
+            fill: rIndex === 0 ? headerFill : PPT.panel,
+            line: PPT.line,
+            pad: 45720,
+            align: cols[cIndex] === "r" ? "r" : "l"
+          }));
+          colX += widths[cIndex];
+        });
+      });
+      return shapes;
+    }
+
+    function buildPptx() {
+      const model = calculateModel();
+      const dateLabel = els.presentationDate.value || todayString();
+      const contextBullets = [
+        "System-wide master order form grants all members access to all products from day one.",
+        "Members can move waves or timing without changing the JAGGAER contract.",
+        "Model supports centralized system-wide support and managed services alignment.",
+        `YoY increase modeled at ${assumptions.masterYoyPct}% versus current ${assumptions.currentYoyPct}%.`
+      ];
+
+      const slides = [];
+
+      slides.push(pptSlide([
+        ...titleShapes(`${els.preparedFor.value} Savings Analysis`, `${els.scenarioName.value} | Prepared by ${els.preparedBy.value} | ${dateLabel}`),
+        metricBox(10, emu(0.55), emu(1.35), "Future Annual Value", fmtMoney(model.totals.future), "Full-suite operational run rate", "FFFFFF"),
+        metricBox(11, emu(2.95), emu(1.35), "Net Incremental Value", fmtMoney(model.totals.net), "Future less known current baseline", "E8F3EF"),
+        metricBox(12, emu(5.35), emu(1.35), "Hard Savings", fmtMoney(model.totals.hardFuture), "Contracts, sourcing, consortium", "FFF1DC"),
+        metricBox(13, emu(7.75), emu(1.35), "Soft Savings", fmtMoney(model.totals.softFuture), "Process and eSignature savings", "EAF4F8"),
+        metricBox(14, emu(10.15), emu(1.35), "YoY Benefit", fmtMoney(model.totals.yoyBenefit), `${getTermYears()}-year optional benefit`, "FFFFFF"),
+        ...tableShapes(20, 0.55, 2.65, ["l", "r", "r", "r"], [
+          ["Module", "Future", "Current", "Incremental"],
+          ...model.modules.map(m => [m.name, fmtMoney(m.future), fmtMoney(m.current), fmtMoney(m.net)])
+        ], [3.25, 1.45, 1.45, 1.55], 0.38),
+        pptText(80, "Source", emu(8.55), emu(2.75), emu(4.2), emu(2.6), [
+          "Model source notes",
+          "$33 per PO and $10 per invoice process savings.",
+          "Sourcing events estimated from 10% of operating budget divided by $154K average event size.",
+          "Contracts+ hard savings uses 25% addressable spend, 50% on-contract spend, and editable savings rate.",
+          "Consortium defaults to presentation assumption of 10% spend and 1% rebate."
+        ], { fill: "FFFFFF", line: PPT.line, firstBold: true, firstSize: 1300, size: 950 })
+      ]));
+
+      const assumptionRows = [
+        ["Input", "Default"],
+        ["PO savings", `$${assumptions.poSavings} per PO`],
+        ["Invoice savings", `$${assumptions.invoiceSavings} per invoice`],
+        ["Sourcing process", `${assumptions.sourcingHours} hrs x $${assumptions.hourlyRate}`],
+        ["Sourcing hard", `${assumptions.sourcingSavingsPct}% of event spend`],
+        ["Contracts+", `${assumptions.contractAddressablePct}% x ${assumptions.onContractPct}% x ${assumptions.contractSavingsPct}%`],
+        ["eSignature", `$${assumptions.eSignSavings} per contract`],
+        ["Consortium", `${assumptions.consortiumAddressablePct}% x ${assumptions.consortiumSpendPct}% x ${assumptions.consortiumRebatePct}%`],
+        ["YoY commercial", `${assumptions.currentYoyPct}% to ${assumptions.masterYoyPct}% over ${getTermYears()} years`]
+      ];
+      const csmRows = [
+        ["CSM input", "Required for"],
+        ["Institution and module scope", "Which campuses are included in each value lever"],
+        ["Operating budget", "Future estimates for all budget-based metrics"],
+        ["Current transaction baseline", "Incremental value over sandwich/current model"],
+        ["Future volume overrides", "Campus-specific PO, invoice, sourcing, contract, consortium estimates"],
+        ["Annual subscription", "Optional YoY escalation benefit"]
+      ];
+
+      slides.push(pptSlide([
+        ...titleShapes("CSM Inputs and Assumptions", "Inputs needed to calculate savings from sandwich model to full suite"),
+        ...tableShapes(10, 0.55, 1.35, ["l", "l"], csmRows, [3.7, 3.6], 0.48),
+        ...tableShapes(40, 7.65, 1.35, ["l", "l"], assumptionRows, [2.6, 2.55], 0.4)
+      ]));
+
+      const moduleRows = [
+        ["Module", "Type", "Future", "Current", "Incremental"],
+        ...model.modules.map(m => [m.name, m.type, fmtMoney(m.future), fmtMoney(m.current), fmtMoney(m.net)])
+      ];
+      slides.push(pptSlide([
+        ...titleShapes("Savings by Module", "Annual operational value by module"),
+        ...tableShapes(10, 0.55, 1.35, ["l", "l", "r", "r", "r"], moduleRows, [3.4, 1.1, 1.55, 1.55, 1.65], 0.46),
+        pptText(90, "Interpretation", emu(9.95), emu(1.35), emu(2.75), emu(2.05), [
+          "Interpretation",
+          "Future value represents the modeled full-suite run rate.",
+          "Current value is only as complete as the baseline fields provided by the CSM.",
+          "Incremental value subtracts current baseline from future full-suite value."
+        ], { fill: "FFFFFF", line: PPT.line, firstBold: true, firstSize: 1250, size: 950 })
+      ]));
+
+      const topInstitutionRows = [
+        ["Institution", "Future", "Current", "Incremental", "YoY"],
+        ...model.detail
+          .slice()
+          .sort((a, b) => b.net - a.net)
+          .slice(0, 10)
+          .map(row => [row.name, fmtMoney(row.future), fmtMoney(row.current), fmtMoney(row.net), fmtMoney(row.yoyBenefit)])
+      ];
+      slides.push(pptSlide([
+        ...titleShapes("Institution Detail", "Top institutions by net incremental value"),
+        ...tableShapes(10, 0.55, 1.35, ["l", "r", "r", "r", "r"], topInstitutionRows, [4.7, 1.35, 1.35, 1.45, 1.35], 0.42)
+      ]));
+
+      slides.push(pptSlide([
+        ...titleShapes("Contracting Model Context", "System-wide full-suite master order form"),
+        pptText(10, "Bullets", emu(0.7), emu(1.35), emu(7.35), emu(3.4), ["What changes", ...contextBullets.map(b => `- ${b}`)], {
+          fill: "FFFFFF",
+          line: PPT.line,
+          firstBold: true,
+          firstSize: 1450,
+          size: 1100
+        }),
+        pptText(30, "Value levers", emu(8.35), emu(1.35), emu(4.1), emu(3.4), [
+          "Value levers",
+          "Hard savings: contract compliance, sourcing event savings, consortium rebate.",
+          "Soft savings: eProcurement, invoice processing, sourcing labor, eSignature.",
+          "Commercial benefit: reduced annual escalation when subscription baseline is provided."
+        ], { fill: "FFFFFF", line: PPT.line, firstBold: true, firstSize: 1450, size: 1100 })
+      ]));
+
+      return packagePptx(slides);
+    }
+
+    function packagePptx(slides) {
+      const slideOverrides = slides.map((_, idx) => `<Override PartName="/ppt/slides/slide${idx + 1}.xml" ContentType="application/vnd.openxmlformats-officedocument.presentationml.slide+xml"/>`).join("");
+      const slideIds = slides.map((_, idx) => `<p:sldId id="${256 + idx}" r:id="rId${idx + 2}"/>`).join("");
+      const slideRels = slides.map((_, idx) => `<Relationship Id="rId${idx + 2}" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/slide" Target="slides/slide${idx + 1}.xml"/>`).join("");
+
+      const entries = [
+        ["[Content_Types].xml", `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">
+  <Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/>
+  <Default Extension="xml" ContentType="application/xml"/>
+  <Override PartName="/ppt/presentation.xml" ContentType="application/vnd.openxmlformats-officedocument.presentationml.presentation.main+xml"/>
+  <Override PartName="/ppt/slideMasters/slideMaster1.xml" ContentType="application/vnd.openxmlformats-officedocument.presentationml.slideMaster+xml"/>
+  <Override PartName="/ppt/slideLayouts/slideLayout1.xml" ContentType="application/vnd.openxmlformats-officedocument.presentationml.slideLayout+xml"/>
+  <Override PartName="/ppt/theme/theme1.xml" ContentType="application/vnd.openxmlformats-officedocument.theme+xml"/>
+  <Override PartName="/ppt/presProps.xml" ContentType="application/vnd.openxmlformats-officedocument.presentationml.presProps+xml"/>
+  <Override PartName="/ppt/viewProps.xml" ContentType="application/vnd.openxmlformats-officedocument.presentationml.viewProps+xml"/>
+  <Override PartName="/ppt/tableStyles.xml" ContentType="application/vnd.openxmlformats-officedocument.presentationml.tableStyles+xml"/>
+  ${slideOverrides}
+  <Override PartName="/docProps/core.xml" ContentType="application/vnd.openxmlformats-package.core-properties+xml"/>
+  <Override PartName="/docProps/app.xml" ContentType="application/vnd.openxmlformats-officedocument.extended-properties+xml"/>
+</Types>`],
+        ["_rels/.rels", `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
+  <Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="ppt/presentation.xml"/>
+  <Relationship Id="rId2" Type="http://schemas.openxmlformats.org/package/2006/relationships/metadata/core-properties" Target="docProps/core.xml"/>
+  <Relationship Id="rId3" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/extended-properties" Target="docProps/app.xml"/>
+</Relationships>`],
+        ["docProps/core.xml", coreProps("UT Full-Suite Savings Analysis")],
+        ["docProps/app.xml", `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Properties xmlns="http://schemas.openxmlformats.org/officeDocument/2006/extended-properties" xmlns:vt="http://schemas.openxmlformats.org/officeDocument/2006/docPropsVTypes">
+  <Application>UT Full-Suite Savings Tool</Application>
+  <Slides>${slides.length}</Slides>
+</Properties>`],
+        ["ppt/presentation.xml", `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<p:presentation xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships" xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main" saveSubsetFonts="1">
+  <p:sldMasterIdLst><p:sldMasterId id="2147483648" r:id="rId1"/></p:sldMasterIdLst>
+  <p:sldIdLst>${slideIds}</p:sldIdLst>
+  <p:sldSz cx="${PPT.width}" cy="${PPT.height}" type="wide"/>
+  <p:notesSz cx="6858000" cy="9144000"/>
+  <p:defaultTextStyle>
+    <a:defPPr><a:defRPr lang="en-US"/></a:defPPr>
+    <a:lvl1pPr marL="0" algn="l" defTabSz="914400" rtl="0" eaLnBrk="1" latinLnBrk="0" hangingPunct="1"><a:defRPr sz="1800" kern="1200"><a:solidFill><a:schemeClr val="tx1"/></a:solidFill><a:latin typeface="+mn-lt"/><a:ea typeface="+mn-ea"/><a:cs typeface="+mn-cs"/></a:defRPr></a:lvl1pPr>
+  </p:defaultTextStyle>
+</p:presentation>`],
+        ["ppt/_rels/presentation.xml.rels", `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
+  <Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/slideMaster" Target="slideMasters/slideMaster1.xml"/>
+  ${slideRels}
+  <Relationship Id="rId${slides.length + 2}" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/theme" Target="theme/theme1.xml"/>
+  <Relationship Id="rId${slides.length + 3}" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/presProps" Target="presProps.xml"/>
+  <Relationship Id="rId${slides.length + 4}" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/viewProps" Target="viewProps.xml"/>
+  <Relationship Id="rId${slides.length + 5}" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/tableStyles" Target="tableStyles.xml"/>
+</Relationships>`],
+        ["ppt/slideMasters/slideMaster1.xml", `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<p:sldMaster xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships" xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main">
+  <p:cSld><p:spTree><p:nvGrpSpPr><p:cNvPr id="1" name=""/><p:cNvGrpSpPr/><p:nvPr/></p:nvGrpSpPr><p:grpSpPr><a:xfrm><a:off x="0" y="0"/><a:ext cx="0" cy="0"/><a:chOff x="0" y="0"/><a:chExt cx="0" cy="0"/></a:xfrm></p:grpSpPr></p:spTree></p:cSld>
+  <p:clrMap bg1="lt1" tx1="dk1" bg2="lt2" tx2="dk2" accent1="accent1" accent2="accent2" accent3="accent3" accent4="accent4" accent5="accent5" accent6="accent6" hlink="hlink" folHlink="folHlink"/>
+  <p:sldLayoutIdLst><p:sldLayoutId id="2147483649" r:id="rId1"/></p:sldLayoutIdLst>
+  <p:txStyles>
+    <p:titleStyle><a:lvl1pPr algn="l"><a:defRPr sz="3200" kern="1200"><a:solidFill><a:schemeClr val="tx1"/></a:solidFill><a:latin typeface="Arial"/></a:defRPr></a:lvl1pPr></p:titleStyle>
+    <p:bodyStyle><a:lvl1pPr marL="0" indent="0" algn="l"><a:defRPr sz="1800" kern="1200"><a:solidFill><a:schemeClr val="tx1"/></a:solidFill><a:latin typeface="Arial"/></a:defRPr></a:lvl1pPr></p:bodyStyle>
+    <p:otherStyle><a:lvl1pPr marL="0" indent="0" algn="l"><a:defRPr sz="1800" kern="1200"><a:solidFill><a:schemeClr val="tx1"/></a:solidFill><a:latin typeface="Arial"/></a:defRPr></a:lvl1pPr></p:otherStyle>
+  </p:txStyles>
+</p:sldMaster>`],
+        ["ppt/slideMasters/_rels/slideMaster1.xml.rels", `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
+  <Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/slideLayout" Target="../slideLayouts/slideLayout1.xml"/>
+  <Relationship Id="rId2" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/theme" Target="../theme/theme1.xml"/>
+</Relationships>`],
+        ["ppt/slideLayouts/slideLayout1.xml", `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<p:sldLayout xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships" xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main" type="blank" preserve="1">
+  <p:cSld name="Blank"><p:spTree><p:nvGrpSpPr><p:cNvPr id="1" name=""/><p:cNvGrpSpPr/><p:nvPr/></p:nvGrpSpPr><p:grpSpPr><a:xfrm><a:off x="0" y="0"/><a:ext cx="0" cy="0"/><a:chOff x="0" y="0"/><a:chExt cx="0" cy="0"/></a:xfrm></p:grpSpPr></p:spTree></p:cSld>
+  <p:clrMapOvr><a:masterClrMapping/></p:clrMapOvr>
+</p:sldLayout>`],
+        ["ppt/slideLayouts/_rels/slideLayout1.xml.rels", `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
+  <Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/slideMaster" Target="../slideMasters/slideMaster1.xml"/>
+</Relationships>`],
+        ["ppt/presProps.xml", `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<p:presentationPr xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships" xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main"/>`],
+        ["ppt/viewProps.xml", `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<p:viewPr xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships" xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main"><p:normalViewPr><p:restoredLeft sz="15620"/><p:restoredTop sz="94660"/></p:normalViewPr><p:slideViewPr><p:cSldViewPr snapToGrid="0"><p:cViewPr varScale="1"><p:scale><a:sx n="82" d="100"/><a:sy n="82" d="100"/></p:scale><p:origin x="864" y="84"/></p:cViewPr><p:guideLst/></p:cSldViewPr></p:slideViewPr><p:notesTextViewPr><p:cViewPr><p:scale><a:sx n="1" d="1"/><a:sy n="1" d="1"/></p:scale><p:origin x="0" y="0"/></p:cViewPr></p:notesTextViewPr><p:gridSpacing cx="76200" cy="76200"/></p:viewPr>`],
+        ["ppt/tableStyles.xml", `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<a:tblStyleLst xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" def="{5C22544A-7EE6-4342-B048-85BDC9FD1C3A}"/>`],
+        ["ppt/theme/theme1.xml", `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<a:theme xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" name="UT Savings">
+  <a:themeElements>
+    <a:clrScheme name="Savings">
+      <a:dk1><a:srgbClr val="17212B"/></a:dk1>
+      <a:lt1><a:srgbClr val="FFFFFF"/></a:lt1>
+      <a:dk2><a:srgbClr val="40505F"/></a:dk2>
+      <a:lt2><a:srgbClr val="F4F7F8"/></a:lt2>
+      <a:accent1><a:srgbClr val="1F6F8B"/></a:accent1>
+      <a:accent2><a:srgbClr val="278064"/></a:accent2>
+      <a:accent3><a:srgbClr val="AD6C15"/></a:accent3>
+      <a:accent4><a:srgbClr val="874C62"/></a:accent4>
+      <a:accent5><a:srgbClr val="617080"/></a:accent5>
+      <a:accent6><a:srgbClr val="D8E0E8"/></a:accent6>
+      <a:hlink><a:srgbClr val="1F6F8B"/></a:hlink>
+      <a:folHlink><a:srgbClr val="874C62"/></a:folHlink>
+    </a:clrScheme>
+    <a:fontScheme name="Arial">
+      <a:majorFont><a:latin typeface="Arial"/><a:ea typeface=""/><a:cs typeface=""/></a:majorFont>
+      <a:minorFont><a:latin typeface="Arial"/><a:ea typeface=""/><a:cs typeface=""/></a:minorFont>
+    </a:fontScheme>
+    <a:fmtScheme name="Savings">
+      <a:fillStyleLst>
+        <a:solidFill><a:schemeClr val="phClr"/></a:solidFill>
+        <a:gradFill rotWithShape="1"><a:gsLst><a:gs pos="0"><a:schemeClr val="phClr"><a:lumMod val="110000"/><a:tint val="67000"/></a:schemeClr></a:gs><a:gs pos="100000"><a:schemeClr val="phClr"><a:lumMod val="105000"/><a:tint val="81000"/></a:schemeClr></a:gs></a:gsLst><a:lin ang="5400000" scaled="0"/></a:gradFill>
+        <a:gradFill rotWithShape="1"><a:gsLst><a:gs pos="0"><a:schemeClr val="phClr"><a:tint val="94000"/></a:schemeClr></a:gs><a:gs pos="100000"><a:schemeClr val="phClr"><a:shade val="78000"/></a:schemeClr></a:gs></a:gsLst><a:lin ang="5400000" scaled="0"/></a:gradFill>
+      </a:fillStyleLst>
+      <a:lnStyleLst>
+        <a:ln w="6350" cap="flat" cmpd="sng" algn="ctr"><a:solidFill><a:schemeClr val="phClr"/></a:solidFill><a:prstDash val="solid"/><a:miter lim="800000"/></a:ln>
+        <a:ln w="12700" cap="flat" cmpd="sng" algn="ctr"><a:solidFill><a:schemeClr val="phClr"/></a:solidFill><a:prstDash val="solid"/><a:miter lim="800000"/></a:ln>
+        <a:ln w="19050" cap="flat" cmpd="sng" algn="ctr"><a:solidFill><a:schemeClr val="phClr"/></a:solidFill><a:prstDash val="solid"/><a:miter lim="800000"/></a:ln>
+      </a:lnStyleLst>
+      <a:effectStyleLst>
+        <a:effectStyle><a:effectLst/></a:effectStyle>
+        <a:effectStyle><a:effectLst/></a:effectStyle>
+        <a:effectStyle><a:effectLst><a:outerShdw blurRad="57150" dist="19050" dir="5400000" algn="ctr" rotWithShape="0"><a:srgbClr val="000000"><a:alpha val="63000"/></a:srgbClr></a:outerShdw></a:effectLst></a:effectStyle>
+      </a:effectStyleLst>
+      <a:bgFillStyleLst>
+        <a:solidFill><a:schemeClr val="phClr"/></a:solidFill>
+        <a:solidFill><a:schemeClr val="phClr"><a:tint val="95000"/><a:satMod val="170000"/></a:schemeClr></a:solidFill>
+        <a:gradFill rotWithShape="1"><a:gsLst><a:gs pos="0"><a:schemeClr val="phClr"><a:tint val="93000"/><a:satMod val="150000"/></a:schemeClr></a:gs><a:gs pos="100000"><a:schemeClr val="phClr"><a:shade val="63000"/><a:satMod val="120000"/></a:schemeClr></a:gs></a:gsLst><a:lin ang="5400000" scaled="0"/></a:gradFill>
+      </a:bgFillStyleLst>
+    </a:fmtScheme>
+  </a:themeElements>
+  <a:objectDefaults/>
+  <a:extraClrSchemeLst/>
+</a:theme>`]
+      ];
+
+      slides.forEach((slide, idx) => {
+        entries.push([`ppt/slides/slide${idx + 1}.xml`, slide]);
+        entries.push([`ppt/slides/_rels/slide${idx + 1}.xml.rels`, `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
+  <Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/slideLayout" Target="../slideLayouts/slideLayout1.xml"/>
+</Relationships>`]);
+      });
+
+      return createZip(
+        entries.map(([name, data]) => ({ name, data })),
+        "application/vnd.openxmlformats-officedocument.presentationml.presentation"
+      );
+    }
+
+    document.querySelectorAll(".tab-button").forEach(button => {
+      button.addEventListener("click", () => setActiveTab(button.dataset.tab));
+    });
+    document.getElementById("addRow").addEventListener("click", addRow);
+    document.getElementById("showExample").addEventListener("click", showExampleData);
+    document.getElementById("resetData").addEventListener("click", resetData);
+    document.getElementById("recalculate").addEventListener("click", renderResults);
+    document.getElementById("downloadXlsx").addEventListener("click", () => downloadBlob(buildXlsx(), exportName("xlsx")));
+    document.getElementById("downloadPpt").addEventListener("click", () => downloadBlob(buildPptx(), exportName("pptx")));
+    document.getElementById("downloadBoth").addEventListener("click", () => {
+      downloadBlob(buildPptx(), exportName("pptx"));
+      setTimeout(() => downloadBlob(buildXlsx(), exportName("xlsx")), 400);
+    });
+
+    [els.preparedFor, els.preparedBy, els.scenarioName, els.presentationDate, els.termYears].forEach(el => {
+      el.addEventListener("input", renderResults);
+      el.addEventListener("keydown", calculateOnEnter);
+    });
+
+    renderAssumptions();
+    renderFormulaRows();
+    renderRows();
+    renderResults();
+  </script>
+</body>
+</html>

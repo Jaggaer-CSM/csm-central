@@ -1,0 +1,1069 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>CSM Support Case Analysis Tool</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #f3f6f9;
+      --card: #ffffff;
+      --line: #dbe3ec;
+      --ink: #162331;
+      --muted: #617283;
+      --blue: #0e5aa7;
+      --blue-soft: #eaf3ff;
+      --orange: #d97a1d;
+      --orange-soft: #fff1e1;
+      --teal: #0b8b7a;
+      --teal-soft: #e9faf7;
+      --rose: #ba4c5b;
+      --rose-soft: #fff0f3;
+      --shadow: 0 20px 45px rgba(20, 45, 73, 0.08);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: Manrope, "Segoe UI", sans-serif;
+      color: var(--ink);
+      background:
+        radial-gradient(1100px 520px at -10% -10%, #ffe8d6 0%, transparent 55%),
+        radial-gradient(900px 480px at 110% -10%, #dcecff 0%, transparent 55%),
+        linear-gradient(180deg, #f8fafc 0%, #eef3f7 100%);
+    }
+
+    .page {
+      width: min(1440px, calc(100% - 28px));
+      margin: 14px auto 24px;
+    }
+
+    .hero {
+      background: rgba(255, 255, 255, 0.88);
+      border: 1px solid rgba(255, 255, 255, 0.8);
+      border-radius: 30px;
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(14px);
+      padding: 20px 22px;
+    }
+
+    .hero-top {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .logo {
+      width: 54px;
+      height: 54px;
+      border-radius: 18px;
+      display: grid;
+      place-items: center;
+      color: #fff;
+      font-weight: 800;
+      font-size: 1.15rem;
+      background: linear-gradient(135deg, #0e5aa7 0%, #2d7fce 100%);
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(1.4rem, 2.3vw, 2.2rem);
+      line-height: 1.05;
+      letter-spacing: -0.04em;
+    }
+
+    .hero-note {
+      margin: 10px 0 0 68px;
+      color: var(--muted);
+      line-height: 1.55;
+      max-width: 980px;
+    }
+
+    .shell {
+      display: grid;
+      grid-template-columns: 330px 1fr;
+      gap: 18px;
+      margin-top: 18px;
+      align-items: start;
+    }
+
+    .stack {
+      display: grid;
+      gap: 14px;
+    }
+
+    .panel,
+    .section,
+    .metric {
+      background: rgba(255, 255, 255, 0.92);
+      border: 1px solid rgba(255, 255, 255, 0.85);
+      border-radius: 26px;
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(14px);
+    }
+
+    .panel,
+    .section {
+      padding: 18px;
+    }
+
+    .panel h2,
+    .section h2 {
+      margin: 0 0 14px;
+      font-size: 1rem;
+      letter-spacing: -0.02em;
+    }
+
+    .source-file {
+      font-size: 0.94rem;
+      color: var(--ink);
+      word-break: break-word;
+      line-height: 1.5;
+    }
+
+    .upload-box {
+      display: grid;
+      gap: 10px;
+    }
+
+    .file-input {
+      display: none;
+    }
+
+    .button,
+    .file-label {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      padding: 12px 14px;
+      font: inherit;
+      font-weight: 800;
+      cursor: pointer;
+      background: #fff;
+      color: var(--ink);
+      transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+      text-decoration: none;
+    }
+
+    .button:hover,
+    .file-label:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 10px 24px rgba(15, 46, 79, 0.09);
+      border-color: #c6d6e7;
+    }
+
+    .button.primary {
+      color: #fff;
+      border-color: var(--blue);
+      background: linear-gradient(135deg, #0e5aa7 0%, #2b78c4 100%);
+    }
+
+    .upload-status {
+      padding: 12px 13px;
+      border-radius: 18px;
+      border: 1px solid var(--line);
+      background: #f8fbfd;
+      color: var(--muted);
+      line-height: 1.5;
+      font-size: 0.9rem;
+    }
+
+    .subtle {
+      color: var(--muted);
+      font-size: 0.9rem;
+      line-height: 1.55;
+    }
+
+    .filters,
+    .columns,
+    .takeaways {
+      display: grid;
+      gap: 10px;
+    }
+
+    .filter-item,
+    .takeaway {
+      padding: 12px 13px;
+      border-radius: 18px;
+      border: 1px solid var(--line);
+      background: #f8fbfd;
+      line-height: 1.5;
+      white-space: normal;
+      overflow-wrap: anywhere;
+      word-break: break-word;
+    }
+
+    .columns {
+      max-height: 360px;
+      overflow: auto;
+    }
+
+    .chip {
+      display: inline-flex;
+      align-items: center;
+      padding: 8px 11px;
+      border-radius: 999px;
+      border: 1px solid #d9e4ef;
+      background: #f5f9fd;
+      color: #365269;
+      font-size: 0.82rem;
+      font-weight: 700;
+      line-height: 1;
+    }
+
+    .chip-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .metrics {
+      display: grid;
+      grid-template-columns: repeat(6, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    .metric {
+      padding: 18px;
+      min-height: 140px;
+      display: grid;
+      align-content: space-between;
+      gap: 10px;
+    }
+
+    .metric.blue { background: linear-gradient(180deg, #ffffff, var(--blue-soft)); }
+    .metric.orange { background: linear-gradient(180deg, #ffffff, var(--orange-soft)); }
+    .metric.teal { background: linear-gradient(180deg, #ffffff, var(--teal-soft)); }
+    .metric.rose { background: linear-gradient(180deg, #ffffff, var(--rose-soft)); }
+
+    .metric-label {
+      color: var(--muted);
+      font-size: 0.84rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+
+    .metric-value {
+      font-size: clamp(1.8rem, 2.4vw, 2.5rem);
+      font-weight: 800;
+      letter-spacing: -0.05em;
+      line-height: 1;
+    }
+
+    .metric-note {
+      color: var(--muted);
+      font-size: 0.9rem;
+      line-height: 1.45;
+    }
+
+    .layout-two {
+      display: grid;
+      grid-template-columns: 1.1fr 0.9fr;
+      gap: 18px;
+      margin-top: 18px;
+    }
+
+    .layout-split {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 18px;
+      margin-top: 18px;
+    }
+
+    .bars {
+      display: grid;
+      gap: 12px;
+    }
+
+    .bar-row {
+      display: grid;
+      grid-template-columns: 210px 1fr auto;
+      gap: 12px;
+      align-items: center;
+    }
+
+    .bar-label {
+      font-size: 0.92rem;
+      font-weight: 700;
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .bar-track {
+      height: 12px;
+      border-radius: 999px;
+      background: #ebf0f5;
+      overflow: hidden;
+    }
+
+    .bar-fill {
+      height: 100%;
+      border-radius: 999px;
+      background: linear-gradient(90deg, #0e5aa7, #66adff);
+    }
+
+    .bar-value {
+      min-width: 48px;
+      text-align: right;
+      color: var(--muted);
+      font-size: 0.88rem;
+      font-weight: 700;
+    }
+
+    .trend {
+      display: grid;
+      grid-template-columns: repeat(12, minmax(0, 1fr));
+      gap: 10px;
+      align-items: end;
+      min-height: 250px;
+    }
+
+    .trend-col {
+      display: grid;
+      gap: 8px;
+      justify-items: center;
+    }
+
+    .trend-wrap {
+      width: 100%;
+      height: 180px;
+      border-radius: 18px;
+      border: 1px solid #e2e8f0;
+      background: linear-gradient(180deg, #f4f7fb, #ffffff);
+      display: flex;
+      align-items: end;
+      padding: 8px;
+    }
+
+    .trend-bar {
+      width: 100%;
+      border-radius: 12px;
+      background: linear-gradient(180deg, #90c4ff, #0e5aa7);
+    }
+
+    .trend-label,
+    .trend-value {
+      font-size: 0.8rem;
+      text-align: center;
+    }
+
+    .trend-label { color: var(--muted); font-weight: 700; }
+    .trend-value { font-weight: 800; }
+
+    .recommendations {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    .recommendation {
+      padding: 16px;
+      border-radius: 22px;
+      border: 1px solid var(--line);
+      background: #fbfdff;
+      line-height: 1.55;
+    }
+
+    .recommendation strong {
+      display: block;
+      margin-bottom: 8px;
+      font-size: 0.98rem;
+    }
+
+    .table-wrap {
+      overflow: auto;
+      border: 1px solid var(--line);
+      border-radius: 20px;
+      background: #fff;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 980px;
+    }
+
+    th, td {
+      padding: 12px 14px;
+      text-align: left;
+      border-bottom: 1px solid #edf1f5;
+      vertical-align: top;
+      font-size: 0.9rem;
+    }
+
+    th {
+      position: sticky;
+      top: 0;
+      z-index: 1;
+      background: #f8fafc;
+      color: var(--muted);
+      font-size: 0.76rem;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      padding: 6px 10px;
+      border-radius: 999px;
+      font-size: 0.76rem;
+      font-weight: 800;
+      border: 1px solid transparent;
+      white-space: nowrap;
+    }
+
+    .pill.blue { background: #edf5ff; color: #0c58a3; border-color: #d7e7fb; }
+    .pill.orange { background: #fff3e5; color: #b4641c; border-color: #ffddbd; }
+    .pill.teal { background: #ebfaf7; color: #0c7b6d; border-color: #ccefe7; }
+    .pill.rose { background: #fff0f4; color: #a94558; border-color: #f2d0d8; }
+    .pill.gray { background: #f2f6fa; color: #526271; border-color: #d9e1e9; }
+
+    @media (max-width: 1280px) {
+      .metrics {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+      }
+    }
+
+    @media (max-width: 1080px) {
+      .shell,
+      .layout-two,
+      .layout-split,
+      .recommendations {
+        grid-template-columns: 1fr;
+      }
+
+      .trend {
+        grid-template-columns: repeat(6, minmax(0, 1fr));
+      }
+    }
+
+    @media (max-width: 760px) {
+      .page {
+        width: min(100% - 18px, 100%);
+      }
+
+      .hero-note {
+        margin-left: 0;
+      }
+
+      .metrics {
+        grid-template-columns: 1fr;
+      }
+
+      .bar-row {
+        grid-template-columns: 1fr;
+      }
+
+      .bar-value {
+        text-align: left;
+      }
+
+      .trend {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <header class="hero">
+      <div class="hero-top">
+        <div class="logo">CS</div>
+        <h1>CSM Support Case Analysis Tool</h1>
+      </div>
+      <p class="hero-note">
+        Product review dashboard built from the exported support case report. This version is centered on duplicate and multiple-behavior issues so a product team can see where the volume is, where the defect density is, and where investment is most likely to reduce case load.
+      </p>
+    </header>
+
+    <div class="shell">
+      <aside class="stack">
+        <section class="panel">
+          <h2>How to use this</h2>
+          <div class="takeaways">
+            <div class="takeaway">Open this link - https://jaggaer.lightning.force.com/lightning/r/Report/00OPs000006YdEnMAK/view</div>
+            <div class="takeaway">Filter the date and topic, check case record type</div>
+            <div class="takeaway">export to excel</div>
+            <div class="takeaway">upload to this tool</div>
+          </div>
+        </section>
+
+        <section class="panel">
+          <h2>Source File</h2>
+          <div id="sourceFile" class="source-file"></div>
+          <p class="subtle" id="headerRow"></p>
+        </section>
+
+        <section class="panel">
+          <h2>Refresh Dashboard</h2>
+          <div class="upload-box">
+            <label class="file-label" for="fileInput">Upload File</label>
+            <input id="fileInput" class="file-input" type="file" accept=".xlsx,.xls,.csv">
+            <button id="refreshButton" class="button primary" type="button">Refresh Dashboard</button>
+            <div id="uploadStatus" class="upload-status">Upload a file with the same report structure to replace the current dashboard data.</div>
+          </div>
+        </section>
+
+        <section class="panel">
+          <h2>Filter Context</h2>
+          <div id="filters" class="filters"></div>
+        </section>
+
+        <section class="panel">
+          <h2>Columns Used</h2>
+          <div id="columns" class="chip-list columns"></div>
+        </section>
+      </aside>
+
+      <main>
+        <section id="metrics" class="metrics"></section>
+
+        <div class="layout-two">
+          <section class="section">
+            <h2>Top Product Signals</h2>
+            <div id="themes" class="bars"></div>
+          </section>
+          <section class="section">
+            <h2>Case Type Mix</h2>
+            <div id="types" class="bars"></div>
+          </section>
+        </div>
+
+        <div class="layout-two">
+          <section class="section">
+            <h2>Severity Mix</h2>
+            <div id="severity" class="bars"></div>
+          </section>
+          <section class="section">
+            <h2>Monthly Trend</h2>
+            <div id="months" class="trend"></div>
+          </section>
+        </div>
+
+        <div class="layout-split">
+          <section class="section">
+            <h2>Top Accounts by Unique Cases</h2>
+            <div id="accounts" class="bars"></div>
+          </section>
+          <section class="section">
+            <h2>Top Owners by Unique Cases</h2>
+            <div id="owners" class="bars"></div>
+          </section>
+        </div>
+
+        <section class="section" style="margin-top:18px;">
+          <h2>Where JAGGAER Should Put Effort</h2>
+          <div id="recommendations" class="recommendations"></div>
+        </section>
+
+        <section class="section" style="margin-top:18px;">
+          <h2>High-Value Example Cases</h2>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Case</th>
+                  <th>Account</th>
+                  <th>Subject</th>
+                  <th>Theme</th>
+                  <th>Severity</th>
+                  <th>Jira</th>
+                  <th>Rows</th>
+                </tr>
+              </thead>
+              <tbody id="examples"></tbody>
+            </table>
+          </div>
+        </section>
+      </main>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+  <script>
+    const REPORT_DATA = {
+      sourceFile: "CSM Support Case Analysis Tool-2026-03-25-22-32-58.xlsx",
+      headerRow: 14,
+      filters: [
+        "Case Record Type equals JAGGAER Indirect Support",
+        "Sub-Category equals Duplicate Supplier",
+        "Subject contains duplicate,multiple,merge"
+      ],
+      columns: [
+        "Account Name",
+        "Case Owner",
+        "Subject",
+        "Type",
+        "Status",
+        "Date/Time Opened",
+        "Age",
+        "Case Number",
+        "Description",
+        "Resolution",
+        "Case Comments",
+        "Count of Case Emails",
+        "Severity Level",
+        "Jira Ticket",
+        "Escalated"
+      ],
+      summary: {
+        exportedRows: 2851,
+        uniqueCases: 1839,
+        repeatedCaseNumbers: 501,
+        additionalDuplicateRows: 1012,
+        devTicketCases: 199,
+        severity12Cases: 179,
+        openCases: 6
+      },
+      types: [
+        { label: "Supplier Support Request", value: 1288 },
+        { label: "Question", value: 475 },
+        { label: "Other", value: 21 },
+        { label: "Configuration Issue", value: 21 },
+        { label: "Software Defect", value: 17 },
+        { label: "Customer Support Request", value: 8 },
+        { label: "Digital Mailroom", value: 4 },
+        { label: "Site Outage", value: 3 }
+      ],
+      severity: [
+        { label: "Severity 4", value: 1481 },
+        { label: "Severity 3", value: 179 },
+        { label: "Severity 2", value: 172 },
+        { label: "Severity 1 (Emergency)", value: 7 }
+      ],
+      accounts: [
+        { label: "University of Pennsylvania", value: 130 },
+        { label: "Northeastern University", value: 112 },
+        { label: "Generic Supplier", value: 111 },
+        { label: "W. W. Grainger, Inc.", value: 79 },
+        { label: "The Texas A&M University System", value: 67 },
+        { label: "Princeton University", value: 63 },
+        { label: "Auburn University", value: 50 },
+        { label: "Clemson University", value: 50 },
+        { label: "University of Massachusetts System", value: 49 },
+        { label: "University of Connecticut", value: 46 },
+        { label: "State of Montana", value: 41 },
+        { label: "Harvard University", value: 35 }
+      ],
+      owners: [
+        { label: "Dragana Milenkovic", value: 131 },
+        { label: "Alen Djuricic", value: 110 },
+        { label: "Milos Danilovic", value: 90 },
+        { label: "Sumith Nayak Kethavath", value: 76 },
+        { label: "Milica Grubetic", value: 73 },
+        { label: "Sai Tharun Kumbarkar", value: 73 },
+        { label: "Kancharla Ashok", value: 72 },
+        { label: "Hema Sri Talari", value: 69 },
+        { label: "Stefan Piper", value: 66 },
+        { label: "Harika Mekala", value: 63 },
+        { label: "Jovana Jovic", value: 62 },
+        { label: "Danica Budrakovic", value: 50 }
+      ],
+      themes: [
+        { label: "Account merge and duplicate identity", value: 1710 },
+        { label: "Registration and access friction", value: 733 },
+        { label: "How-to and behavior clarity", value: 206 },
+        { label: "Duplicate notifications and approvals", value: 89 },
+        { label: "Duplicate transactions and document flow", value: 74 },
+        { label: "Other", value: 61 },
+        { label: "Integration and API duplication", value: 34 }
+      ],
+      months: [
+        { label: "2025-01", value: 185 },
+        { label: "2025-02", value: 143 },
+        { label: "2025-03", value: 157 },
+        { label: "2025-04", value: 134 },
+        { label: "2025-05", value: 132 },
+        { label: "2025-06", value: 107 },
+        { label: "2025-07", value: 182 },
+        { label: "2025-08", value: 169 },
+        { label: "2025-09", value: 192 },
+        { label: "2025-10", value: 206 },
+        { label: "2025-11", value: 129 },
+        { label: "2025-12", value: 103 }
+      ],
+      recommendations: [
+        {
+          title: "Invest in supplier identity and merge self-service",
+          detail: "Account merge and duplicate identity appears in 1,710 unique cases across 185 accounts. This is the dominant signal and points to supplier identity matching, duplicate prevention, and guided merge workflows as the largest payoff area."
+        },
+        {
+          title: "Harden registration and login deduplication",
+          detail: "Registration and access friction shows up in 733 unique cases and 130 dev-ticket-linked cases. That suggests login collisions, duplicate email and username handling, and registration recovery need product and platform attention."
+        },
+        {
+          title: "Prioritize notification dedupe defects",
+          detail: "Duplicate notifications and approvals is smaller in volume at 89 unique cases, but 68 of those cases are linked to dev tickets and 51 are Severity 1 or 2. This is a high-severity, high-defect-density theme."
+        },
+        {
+          title: "Reduce duplicate transaction behavior in integrations and document flow",
+          detail: "Duplicate PO, invoice, freight, ASN, and ERP export cases point to idempotency and event dedupe gaps. These are painful operational issues even when total volume is lower than identity-related cases."
+        }
+      ],
+      examples: [
+        { caseNumber: "03860117", account: "State of Montana", subject: "System Creating Duplicate Supplier Portals", theme: "Account merge and duplicate identity", severity: "Severity 2", jira: "Dev Ticket", rowCount: 39 },
+        { caseNumber: "03770593", account: "Georgia Institute of Technology (Georgia Tech)", subject: "Issues in uploading document for Project ID-2025-IFB-SERVS-0077", theme: "Account merge and duplicate identity", severity: "Severity 3", jira: "Dev Ticket", rowCount: 11 },
+        { caseNumber: "03835950", account: "West Virginia University", subject: "PORTAL MERGE", theme: "Account merge and duplicate identity", severity: "Severity 4", jira: "No Dev Ticket", rowCount: 10 },
+        { caseNumber: "03817087", account: "Stanford University", subject: "PO Error emails being received for duplicates", theme: "Account merge and duplicate identity", severity: "Severity 2", jira: "Dev Ticket", rowCount: 10 },
+        { caseNumber: "03830896", account: "Auburn University", subject: "PORTAL MERGE", theme: "Account merge and duplicate identity", severity: "Severity 4", jira: "No Dev Ticket", rowCount: 9 },
+        { caseNumber: "03829748", account: "Auburn University", subject: "portal merge - Account Deactivation Request", theme: "Account merge and duplicate identity", severity: "Severity 3", jira: "No Dev Ticket", rowCount: 9 },
+        { caseNumber: "03845840", account: "Northeastern University", subject: "MERGE REQUEST", theme: "Account merge and duplicate identity", severity: "Severity 4", jira: "No Dev Ticket", rowCount: 8 },
+        { caseNumber: "03873362", account: "Vulcan Materials Company", subject: "PORTAL MERGE", theme: "Account merge and duplicate identity", severity: "Severity 4", jira: "No Dev Ticket", rowCount: 8 },
+        { caseNumber: "03825902", account: "Ingersoll Rand Inc. (former GardnerDenver)", subject: "Suppliers cannot submit the bid", theme: "Account merge and duplicate identity", severity: "Severity 3", jira: "Dev Ticket", rowCount: 8 },
+        { caseNumber: "03759312", account: "AmSurg, LLC", subject: "Multiple Vendors experiencing issues with EDI connection (Olympus)", theme: "Account merge and duplicate identity", severity: "Severity 2", jira: "Dev Ticket", rowCount: 8 },
+        { caseNumber: "03723078", account: "Auburn University", subject: "duplicate email address/access issue", theme: "Account merge and duplicate identity", severity: "Severity 2", jira: "Dev Ticket", rowCount: 8 },
+        { caseNumber: "03679033", account: "State of Montana", subject: "Duplicate account access issue", theme: "Account merge and duplicate identity", severity: "Severity 2", jira: "Dev Ticket", rowCount: 8 }
+      ]
+    };
+
+    const fileInput = document.getElementById("fileInput");
+    const refreshButton = document.getElementById("refreshButton");
+    const uploadStatus = document.getElementById("uploadStatus");
+    let currentData = REPORT_DATA;
+
+    function escapeHtml(value) {
+      return String(value)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#39;");
+    }
+
+    function renderBars(targetId, items) {
+      const container = document.getElementById(targetId);
+      if (!items.length) {
+        container.innerHTML = '<div class="takeaway">No matching data</div>';
+        return;
+      }
+      const max = Math.max(...items.map((item) => item.value), 1);
+      container.innerHTML = items.map((item) => `
+        <div class="bar-row">
+          <div class="bar-label" title="${escapeHtml(item.label)}">${escapeHtml(item.label)}</div>
+          <div class="bar-track">
+            <div class="bar-fill" style="width:${(item.value / max) * 100}%"></div>
+          </div>
+          <div class="bar-value">${item.value.toLocaleString()}</div>
+        </div>
+      `).join("");
+    }
+
+    function renderTrend() {
+      const container = document.getElementById("months");
+      const max = Math.max(...currentData.months.map((item) => item.value), 1);
+      container.innerHTML = currentData.months.map((item) => {
+        const shortLabel = item.label.slice(5);
+        return `
+          <div class="trend-col">
+            <div class="trend-value">${item.value}</div>
+            <div class="trend-wrap">
+              <div class="trend-bar" style="height:${Math.max((item.value / max) * 100, 10)}%"></div>
+            </div>
+            <div class="trend-label">${shortLabel}</div>
+          </div>
+        `;
+      }).join("");
+    }
+
+    function pillFor(value) {
+      const text = String(value).toLowerCase();
+      if (text.includes("severity 1") || text.includes("severity 2") || text.includes("dev")) return "rose";
+      if (text.includes("severity 3")) return "orange";
+      if (text.includes("severity 4")) return "teal";
+      return "blue";
+    }
+
+    function renderDashboard(data) {
+      currentData = data;
+      const metricCards = [
+        {
+          label: "Unique Cases",
+          value: data.summary.uniqueCases.toLocaleString(),
+          note: `${data.summary.exportedRows.toLocaleString()} exported rows collapsed into case-level view`,
+          tone: "blue"
+        },
+        {
+          label: "Identity And Merge Cases",
+          value: (data.themes[0]?.value || 0).toLocaleString(),
+          note: `${Math.round(((data.themes[0]?.value || 0) / Math.max(data.summary.uniqueCases, 1)) * 100)}% of all unique cases`,
+          tone: "teal"
+        },
+        {
+          label: "Dev Ticket Cases",
+          value: data.summary.devTicketCases.toLocaleString(),
+          note: "Cases with a development ticket signal",
+          tone: "rose"
+        },
+        {
+          label: "Severity 1 Or 2",
+          value: data.summary.severity12Cases.toLocaleString(),
+          note: "Higher urgency product signals",
+          tone: "orange"
+        },
+        {
+          label: "Repeated Case Numbers",
+          value: data.summary.repeatedCaseNumbers.toLocaleString(),
+          note: `${data.summary.additionalDuplicateRows.toLocaleString()} additional rows tied to repeated case IDs`,
+          tone: "blue"
+        },
+        {
+          label: "Still Open",
+          value: data.summary.openCases.toLocaleString(),
+          note: "Most of this export is closed case history",
+          tone: "teal"
+        }
+      ];
+
+      document.getElementById("sourceFile").textContent = data.sourceFile;
+      document.getElementById("headerRow").textContent = `Detected table header row: ${data.headerRow}`;
+
+      document.getElementById("filters").innerHTML = data.filters.map((filter) => `
+        <div class="filter-item">${escapeHtml(filter)}</div>
+      `).join("");
+
+      document.getElementById("columns").innerHTML = data.columns.map((column) => `
+        <span class="chip">${escapeHtml(column)}</span>
+      `).join("");
+
+      document.getElementById("metrics").innerHTML = metricCards.map((card) => `
+        <article class="metric ${card.tone}">
+          <div class="metric-label">${escapeHtml(card.label)}</div>
+          <div class="metric-value">${escapeHtml(card.value)}</div>
+          <div class="metric-note">${escapeHtml(card.note)}</div>
+        </article>
+      `).join("");
+
+      renderBars("themes", data.themes);
+      renderBars("types", data.types);
+      renderBars("severity", data.severity);
+      renderBars("accounts", data.accounts);
+      renderBars("owners", data.owners);
+      renderTrend();
+
+      document.getElementById("recommendations").innerHTML = data.recommendations.map((item) => `
+        <div class="recommendation">
+          <strong>${escapeHtml(item.title)}</strong>
+          <div>${escapeHtml(item.detail)}</div>
+        </div>
+      `).join("");
+
+      document.getElementById("examples").innerHTML = data.examples.map((item) => `
+      <tr>
+        <td>${escapeHtml(item.caseNumber)}</td>
+        <td>${escapeHtml(item.account)}</td>
+        <td>${escapeHtml(item.subject)}</td>
+        <td><span class="pill blue">${escapeHtml(item.theme)}</span></td>
+        <td><span class="pill ${pillFor(item.severity)}">${escapeHtml(item.severity)}</span></td>
+        <td><span class="pill ${pillFor(item.jira)}">${escapeHtml(item.jira)}</span></td>
+        <td>${escapeHtml(String(item.rowCount))}</td>
+      </tr>
+      `).join("");
+    }
+
+    function countBy(items, key) {
+      const counts = new Map();
+      items.forEach((item) => {
+        const value = item[key] || "Unknown";
+        counts.set(value, (counts.get(value) || 0) + 1);
+      });
+      return [...counts.entries()]
+        .sort((a, b) => b[1] - a[1])
+        .map(([label, value]) => ({ label, value }));
+    }
+
+    function classifyThemes(text) {
+      const patterns = [
+        ["Account merge and duplicate identity", /duplicate|duplicates|multiple supplier|multiple profiles|multiple accounts|merge|portal merge|account deactivation|same email|same username|duplicate tax id|duplicate profile|duplicate account|multiple registration/i],
+        ["Registration and access friction", /log in|login|register|registration|accessing solicitations|reset my password|unable to access the portal|multiple registrations|invitation/i],
+        ["How-to and behavior clarity", /need to know|how to|meaning of status|is it possible|questions:|possibility to|help us understand|what is the/i],
+        ["Duplicate notifications and approvals", /duplicate e-?mail|multiple pending approval notifications|multiple approvals|multiple notifications|same notification|duplicate notification|duplicate email/i],
+        ["Duplicate transactions and document flow", /multiple po|multiple pos|duplicate po|duplicate order|duplicate freight|duplicate invoice|multiple asn|multiple exports/i],
+        ["Integration and API duplication", /api|erp|json|payload|export to erp|integration|oracle/i]
+      ];
+      const hits = patterns.filter(([, pattern]) => pattern.test(text)).map(([label]) => label);
+      return hits.length ? hits : ["Other"];
+    }
+
+    function parseWorkbookRows(file) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = (event) => {
+          try {
+            if (typeof XLSX === "undefined") throw new Error("XLSX library unavailable");
+            const workbook = XLSX.read(event.target.result, { type: "array", raw: false });
+            const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
+            const rows = XLSX.utils.sheet_to_json(firstSheet, { header: 1, defval: "" });
+            resolve(rows);
+          } catch (error) {
+            reject(error);
+          }
+        };
+        reader.onerror = reject;
+        reader.readAsArrayBuffer(file);
+      });
+    }
+
+    function buildDashboardData(rows, sourceFile) {
+      const headerRow = rows.findIndex((row) => {
+        const joined = row.map((cell) => String(cell || "")).join(" | ").toLowerCase();
+        return joined.includes("account name") && joined.includes("case number") && joined.includes("severity level");
+      });
+      if (headerRow === -1) throw new Error("Expected report columns were not found");
+
+      const header = rows[headerRow];
+      const columns = header.filter((value) => String(value || "").trim());
+      const columnIndexes = columns.map((column) => header.findIndex((cell) => String(cell || "").trim() === column));
+
+      const filters = rows
+        .slice(Math.max(0, headerRow - 5), headerRow)
+        .map((row) => row.map((cell) => String(cell || "").trim()).find((value) => value))
+        .filter((value) => value && (value.includes(" equals ") || value.includes(" contains ")));
+
+      const records = rows.slice(headerRow + 1).map((row) => {
+        const out = {};
+        columns.forEach((column, index) => {
+          out[column] = String(row[columnIndexes[index]] || "").trim();
+        });
+        return out;
+      }).filter((record) => record["Case Number"]);
+
+      const caseMap = new Map();
+      records.forEach((record) => {
+        const caseNumber = record["Case Number"];
+        if (!caseMap.has(caseNumber)) caseMap.set(caseNumber, []);
+        caseMap.get(caseNumber).push(record);
+      });
+
+      const caseData = [...caseMap.entries()].map(([caseNumber, caseRows]) => {
+        const first = caseRows[0];
+        const text = caseRows.map((row) => [
+          row["Subject"],
+          row["Description"],
+          row["Resolution"],
+          row["Case Comments"]
+        ].join(" ")).join(" ");
+        const themes = classifyThemes(text);
+        return {
+          caseNumber,
+          account: first["Account Name"] || "Unknown",
+          owner: first["Case Owner"] || "Unknown",
+          subject: first["Subject"] || "",
+          type: first["Type"] || "Unknown",
+          status: first["Status"] || "Unknown",
+          severity: first["Severity Level"] || "Unknown",
+          jira: first["Jira Ticket"] || "Unknown",
+          age: first["Age"] || "",
+          opened: first["Date/Time Opened"] || "",
+          rowCount: caseRows.length,
+          themes
+        };
+      });
+
+      const months = new Map();
+      caseData.forEach((item) => {
+        const match = item.opened.match(/^(\d{1,2})\/\d{1,2}\/(\d{4})/);
+        if (!match) return;
+        const month = String(match[1]).padStart(2, "0");
+        const label = `${match[2]}-${month}`;
+        months.set(label, (months.get(label) || 0) + 1);
+      });
+
+      const themeCounts = new Map();
+      caseData.forEach((item) => {
+        item.themes.forEach((theme) => themeCounts.set(theme, (themeCounts.get(theme) || 0) + 1));
+      });
+
+      const devTicketCases = caseData.filter((item) => item.jira.toLowerCase().includes("dev ticket") && !item.jira.toLowerCase().includes("no dev"));
+      const severity12Cases = caseData.filter((item) => /severity 1|severity 2/i.test(item.severity));
+      const repeatedCases = caseData.filter((item) => item.rowCount > 1);
+      const openCases = caseData.filter((item) => !item.status.toLowerCase().includes("closed"));
+      const topThemes = [...themeCounts.entries()].sort((a, b) => b[1] - a[1]).map(([label, value]) => ({ label, value }));
+
+      const themeLookup = Object.fromEntries(topThemes.map((item) => [item.label, item.value]));
+      const getThemeCount = (label) => themeLookup[label] || 0;
+
+      return {
+        sourceFile,
+        headerRow: headerRow + 1,
+        filters,
+        columns,
+        summary: {
+          exportedRows: records.length,
+          uniqueCases: caseData.length,
+          repeatedCaseNumbers: repeatedCases.length,
+          additionalDuplicateRows: records.length - caseData.length,
+          devTicketCases: devTicketCases.length,
+          severity12Cases: severity12Cases.length,
+          openCases: openCases.length
+        },
+        types: countBy(caseData, "type").slice(0, 8),
+        severity: countBy(caseData, "severity"),
+        accounts: countBy(caseData, "account").slice(0, 12),
+        owners: countBy(caseData, "owner").slice(0, 12),
+        themes: topThemes,
+        months: [...months.entries()].sort((a, b) => a[0].localeCompare(b[0])).map(([label, value]) => ({ label, value })),
+        recommendations: [
+          {
+            title: "Invest in supplier identity and merge self-service",
+            detail: `Account merge and duplicate identity appears in ${getThemeCount("Account merge and duplicate identity").toLocaleString()} unique cases. This is the dominant signal and points to supplier identity matching, duplicate prevention, and guided merge workflows as the largest payoff area.`
+          },
+          {
+            title: "Harden registration and login deduplication",
+            detail: `Registration and access friction shows up in ${getThemeCount("Registration and access friction").toLocaleString()} unique cases and ${devTicketCases.filter((item) => item.themes.includes("Registration and access friction")).length.toLocaleString()} dev-ticket-linked cases.`
+          },
+          {
+            title: "Prioritize notification dedupe defects",
+            detail: `Duplicate notifications and approvals shows ${getThemeCount("Duplicate notifications and approvals").toLocaleString()} unique cases, ${devTicketCases.filter((item) => item.themes.includes("Duplicate notifications and approvals")).length.toLocaleString()} dev-ticket cases, and ${severity12Cases.filter((item) => item.themes.includes("Duplicate notifications and approvals")).length.toLocaleString()} Severity 1 or 2 cases.`
+          },
+          {
+            title: "Reduce duplicate transaction behavior in integrations and document flow",
+            detail: `Duplicate transaction and integration themes combine for ${(getThemeCount("Duplicate transactions and document flow") + getThemeCount("Integration and API duplication")).toLocaleString()} unique cases and point to idempotency, event dedupe, and integration safeguards.`
+          }
+        ],
+        examples: caseData
+          .sort((a, b) => b.rowCount - a.rowCount || a.caseNumber.localeCompare(b.caseNumber))
+          .slice(0, 12)
+      };
+    }
+
+    async function refreshDashboardFromFile() {
+      const file = fileInput.files[0];
+      if (!file) {
+        uploadStatus.textContent = "Choose an export first.";
+        return;
+      }
+      uploadStatus.textContent = `Reading ${file.name}...`;
+      try {
+        const rows = await parseWorkbookRows(file);
+        const data = buildDashboardData(rows, file.name);
+        renderDashboard(data);
+        uploadStatus.textContent = `Dashboard refreshed from ${file.name}`;
+      } catch (error) {
+        console.error(error);
+        uploadStatus.textContent = `Unable to refresh from ${file.name}. Make sure it is an Excel export with the same report structure.`;
+      }
+    }
+
+    fileInput.addEventListener("change", () => {
+      if (fileInput.files[0]) {
+        uploadStatus.textContent = `Ready to refresh from ${fileInput.files[0].name}`;
+      }
+    });
+
+    refreshButton.addEventListener("click", refreshDashboardFromFile);
+
+    renderDashboard(REPORT_DATA);
+  </script>
+</body>
+</html>
