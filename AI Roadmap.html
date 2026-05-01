@@ -133,9 +133,9 @@
 
     .quick-stats {
       display: grid;
-      grid-template-columns: minmax(140px, 1fr);
+      grid-template-columns: repeat(2, minmax(130px, 1fr));
       gap: 8px;
-      min-width: 170px;
+      min-width: 300px;
     }
 
     .stat {
@@ -178,6 +178,24 @@
 
     .stat-gain strong {
       color: #17684c;
+    }
+
+    .stat-progress {
+      background: #eaf7fb;
+      border-color: #23819a;
+    }
+
+    .stat-progress strong {
+      color: #0e5f73;
+    }
+
+    .stat-rollout {
+      background: #f2f5f7;
+      border-color: #59636f;
+    }
+
+    .stat-rollout strong {
+      color: #374151;
     }
 
     .view-switch {
@@ -410,6 +428,35 @@
       grid-template-columns: repeat(4, minmax(280px, 1fr));
       gap: 18px;
       z-index: 2;
+    }
+
+    .digital-motion {
+      --stage-light: #e7f6f2;
+      --stage-dark: #28796b;
+      position: relative;
+      z-index: 2;
+      display: grid;
+      gap: 10px;
+      min-width: 1280px;
+      margin: 14px 0 0;
+      padding: 12px;
+      border: 2px solid var(--stage-dark);
+      border-radius: var(--radius);
+      background: rgba(231, 246, 242, 0.76);
+      box-shadow: 5px 6px 0 rgba(31, 41, 51, 0.08);
+    }
+
+    .digital-motion-head {
+      display: grid;
+      grid-template-columns: auto 1fr;
+      gap: 12px;
+      align-items: center;
+    }
+
+    .digital-motion-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(280px, 1fr));
+      gap: 8px;
     }
 
     .stage {
@@ -1228,6 +1275,11 @@
       --stage-dark: var(--stage-four-dark);
     }
 
+    .detail-panel[data-stage="digital"] {
+      --stage-light: #e7f6f2;
+      --stage-dark: #28796b;
+    }
+
     body.detail-open .detail-backdrop {
       display: block;
     }
@@ -1408,6 +1460,26 @@
       background: var(--stage-dark);
     }
 
+    .detail-doc-link {
+      display: inline-flex;
+      align-items: center;
+      min-height: 34px;
+      padding: 7px 10px;
+      border: 1.5px solid var(--stage-dark);
+      border-radius: var(--radius);
+      color: var(--stage-dark);
+      background: var(--stage-light);
+      font-size: 0.78rem;
+      font-weight: 850;
+      text-decoration: none;
+    }
+
+    .detail-doc-link:hover,
+    .detail-doc-link:focus-visible {
+      box-shadow: 3px 3px 0 rgba(31, 41, 51, 0.12);
+      outline: none;
+    }
+
     .sr-only {
       position: absolute;
       width: 1px;
@@ -1428,7 +1500,7 @@
 
       .quick-stats {
         min-width: 0;
-        width: min(100%, 180px);
+        width: min(100%, 380px);
       }
 
       .manager-feeder-grid {
@@ -1451,11 +1523,16 @@
       }
 
       .canvas,
-      .manager-canvas {
+      .manager-canvas,
+      .digital-motion {
         min-width: 0;
       }
 
       .flow-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .digital-motion-grid {
         grid-template-columns: 1fr;
       }
 
@@ -1554,7 +1631,8 @@
         <p class="lede">AI powered tools guiding CSMs from handoff to renewal readiness.</p>
       </div>
       <div class="quick-stats" aria-label="Roadmap summary">
-        <div class="stat"><strong>22</strong><span>Mapped Processes</span></div>
+        <div class="stat stat-progress"><strong id="automationStat">0%</strong><span>Automation Efficiency</span></div>
+        <div class="stat stat-rollout"><strong id="rolledOutStat">0</strong><span>Tools Rolled Out</span></div>
       </div>
     </header>
 
@@ -1577,6 +1655,16 @@
       <section class="canvas" aria-label="CSM roadmap flow chart">
         <div class="elevator-layer" id="elevatorLayer"></div>
         <div class="flow-grid" id="flowGrid"></div>
+      </section>
+      <section class="digital-motion" aria-label="Digital Motion tools">
+        <header class="digital-motion-head">
+          <span class="stage-number">D</span>
+          <div class="stage-title">
+            <h2>Digital Motion</h2>
+            <p>Structured AI support for scaled, digital-first customer engagement.</p>
+          </div>
+        </header>
+        <div class="digital-motion-grid" id="digitalMotionGrid"></div>
       </section>
     </main>
 
@@ -1607,6 +1695,26 @@
         </div>
       </section>
       <section class="roi-summary-grid" id="roiSummaryGrid" aria-label="ROI totals"></section>
+      <section class="roi-table-card efficiency-card" aria-label="Automation efficiency estimate table">
+        <h2>Automation Efficiency Estimate</h2>
+        <p>Current baseline is 100% manual. This view translates expected CSM time savings into per-CSM and total team efficiency lift.</p>
+        <div class="roi-table-wrap">
+          <table class="roi-table">
+            <thead>
+              <tr>
+                <th>Tool / Agent</th>
+                <th class="num">Hrs Saved / CSM / Month</th>
+                <th class="num">Efficiency Gain / CSM</th>
+                <th class="num">Team Hrs Saved / Month</th>
+                <th class="num">Team Efficiency Gain</th>
+                <th class="num">Manual Work Remaining</th>
+              </tr>
+            </thead>
+            <tbody id="efficiencyTableBody"></tbody>
+            <tfoot id="efficiencyTableFoot"></tfoot>
+          </table>
+        </div>
+      </section>
       <section class="roi-table-card" aria-label="ROI estimate table">
         <h2>Tool-Level Estimates</h2>
         <p>Each row shows the build effort, expected maintenance, and estimated CSM time savings by tool.</p>
@@ -1677,7 +1785,8 @@
           "Carries sales context into implementation and onboarding so the CSM does not start from a blank page.",
           "Best used as a structured bridge between presales notes, CRM context, customer goals, and the first CSM-facing account summary."
         ],
-        outputs: ["Presales context summary", "Known goals and stakeholders", "Early success-plan inputs"]
+        outputs: ["Presales context summary", "Known goals and stakeholders", "Early success-plan inputs"],
+        documentationUrl: "https://jaggaer.sharepoint.com/:f:/t/CustomerSuccess-Leadership/IgCmUHclbT11QYaQgxiHa8c0ASaOXWSP3kC75Weu40afgt8?e=xshvX8"
       },
       {
         id: "implementation-handoff-agent",
@@ -1703,7 +1812,8 @@
           "Collects project closure details, prepares the CSM intro call brief, checks whether steering committee participation is needed, and confirms goal and KPI alignment inputs.",
           "It should come early because it creates the structured account record that the rest of the lifecycle depends on."
         ],
-        outputs: ["CSM handoff summary", "Adoption readiness score", "Missing-data checklist", "First 30-day action plan"]
+        outputs: ["CSM handoff summary", "Adoption readiness score", "Missing-data checklist", "First 30-day action plan"],
+        documentationUrl: "https://jaggaer.sharepoint.com/:f:/t/CustomerSuccess-Leadership/IgBM_V801zNWQ5xyHl0hy0V8Ab5M6IS6Qi858aFuDKw5ofs?e=eJJ8Ou"
       },
       {
         id: "elevator",
@@ -2109,6 +2219,60 @@
         outputs: ["Renewal-ready summary", "Risk and value narrative", "Expansion opportunity summary"]
       },
       {
+        id: "digital-motion-adoption",
+        number: "D.1",
+        name: "Digital Motion 1 - Adoption",
+        stage: "Digital Motion",
+        action: "Proactive adoption outreach",
+        team: "CSM",
+        type: "Agent",
+        effort: "High",
+        value: "High",
+        priority: "High",
+        status: "Ideation",
+        goal: "Proactively reach out to customers to increase adoption and recommend action items.",
+        dependencies: "usage, contacts, success plan, engagement signals",
+        input: "Product usage, adoption gaps, customer contacts, success-plan milestones, meeting history",
+        hosting: "CRM, digital engagement platform, GPT workflow",
+        impact: "Scales adoption nudges and turns usage signals into recommended customer actions.",
+        goalDate: "TBD",
+        hours: 108,
+        source: "AI roadmap copied to wsl2.xlsx",
+        purpose: "Create a digital-first motion that keeps customers moving toward adoption goals between human touchpoints.",
+        details: [
+          "Monitors adoption signals and proactively drafts targeted customer outreach when usage, enablement, or milestone progress needs attention.",
+          "The agent should recommend the next best action for the CSM and create a repeatable digital adoption motion for lower-touch or scaled segments."
+        ],
+        outputs: ["Targeted adoption outreach", "Recommended action items", "Usage-gap summary", "CSM follow-up prompts"]
+      },
+      {
+        id: "digital-motion-renewal",
+        number: "D.2",
+        name: "Digital Motion 2 - Renewal",
+        stage: "Digital Motion",
+        action: "Renewal recommendation outreach",
+        team: "CSM",
+        type: "Agent",
+        effort: "High",
+        value: "High",
+        priority: "High",
+        status: "Ideation",
+        goal: "Reach out to AMs and CSMs with renewal recommendations.",
+        dependencies: "renewal date, health, usage, value, risks, stakeholder coverage",
+        input: "Contract timeline, health score, adoption trends, value proof points, open risks, stakeholder activity",
+        hosting: "CRM, renewal workflow, GPT",
+        impact: "Creates earlier renewal readiness prompts and keeps CSMs and AMs aligned on recommended actions.",
+        goalDate: "TBD",
+        hours: 96,
+        source: "AI roadmap copied to wsl2.xlsx",
+        purpose: "Use renewal signals to trigger timely recommendations before renewal preparation becomes reactive.",
+        details: [
+          "Combines renewal timing, customer health, usage, value evidence, and relationship risk into suggested CSM and AM actions.",
+          "This belongs in Digital Motion because it proactively pushes guidance to the internal team instead of waiting for a manual renewal review."
+        ],
+        outputs: ["Renewal action recommendation", "AM and CSM prompt", "Risk and value summary", "Renewal readiness cue"]
+      },
+      {
         id: "manager-assistant",
         number: "M.0",
         name: "Manager's Assistant",
@@ -2244,6 +2408,11 @@
       "manager-icp"
     ];
 
+    const digitalMotionToolIds = [
+      "digital-motion-adoption",
+      "digital-motion-renewal"
+    ];
+
     const lifecycleGroups = {
       "1": [
         { label: "Handoff", ids: ["implementation-summary", "implementation-handoff-agent"] }
@@ -2284,6 +2453,8 @@
       "success-stories": "Turn outcomes into success stories",
       "whitespace-analysis": "Identify expansion opportunities",
       "renewal-report-agent": "Draft renewal-ready summary",
+      "digital-motion-adoption": "Proactively guide adoption actions",
+      "digital-motion-renewal": "Prompt renewal recommendations",
       "manager-assistant": "Recommend 1:1 coaching actions",
       "manager-overview": "Support promotion and staffing decisions",
       "manager-capacity-portfolios": "Balance accounts and portfolios",
@@ -2291,19 +2462,15 @@
     };
 
     const toolById = new Map(tools.map((tool) => [tool.id, tool]));
-    const roiTotals = {
-      toolCount: 22,
-      buildHrs: 1171,
-      ideationHrs: 132,
-      specHrs: 197,
-      developmentHrs: 603,
-      testingHrs: 239,
-      maintenanceHrsMonth: 116,
-      firstYearMaintenanceHrs: 1392,
-      buildFte: 0.73,
-      maintenanceFte: 0.87,
-      savedHrsMonth: 96.5,
-      annualFteGain: 19.3
+    const roiAssumptions = {
+      teamSize: 30,
+      monthlyCsmHours: 160,
+      buildFteHoursYear: 1600,
+      savingsFteHoursYear: 1800
+    };
+    const rolloutProgress = {
+      automationEfficiencyPct: 0,
+      toolsRolledOut: 0
     };
     const roiOrder = [
       "implementation-summary",
@@ -2324,6 +2491,8 @@
       "renewal-report-agent",
       "escalation-management-agent",
       "elevator",
+      "digital-motion-adoption",
+      "digital-motion-renewal",
       "manager-assistant",
       "manager-overview",
       "manager-capacity-portfolios",
@@ -2348,6 +2517,8 @@
       "renewal-report-agent": { buildHrs: 60, ideationHrs: 6, specHrs: 9, developmentHrs: 33, testingHrs: 12, maintenanceHrsMonth: 7, firstYearMaintenanceHrs: 84, buildFte: 0.04, maintenanceFte: 0.05, savedHrsMonth: 4, annualFteGain: 0.8 },
       "escalation-management-agent": { buildHrs: 68, ideationHrs: 7, specHrs: 10, developmentHrs: 37, testingHrs: 14, maintenanceHrsMonth: 8, firstYearMaintenanceHrs: 96, buildFte: 0.04, maintenanceFte: 0.06, savedHrsMonth: 2, annualFteGain: 0.4 },
       "elevator": { buildHrs: 120, ideationHrs: 10, specHrs: 18, developmentHrs: 68, testingHrs: 24, maintenanceHrsMonth: 14, firstYearMaintenanceHrs: 168, buildFte: 0.08, maintenanceFte: 0.11, savedHrsMonth: 4, annualFteGain: 0.8 },
+      "digital-motion-adoption": { buildHrs: 108, ideationHrs: 10, specHrs: 18, developmentHrs: 60, testingHrs: 20, maintenanceHrsMonth: 12, firstYearMaintenanceHrs: 144, buildFte: 0.07, maintenanceFte: 0.09, savedHrsMonth: 8, annualFteGain: 1.6 },
+      "digital-motion-renewal": { buildHrs: 96, ideationHrs: 9, specHrs: 16, developmentHrs: 53, testingHrs: 18, maintenanceHrsMonth: 10, firstYearMaintenanceHrs: 120, buildFte: 0.06, maintenanceFte: 0.08, savedHrsMonth: 4, annualFteGain: 0.8 },
       "manager-assistant": { buildHrs: 48, ideationHrs: 7, specHrs: 10, developmentHrs: 21, testingHrs: 10, maintenanceHrsMonth: 3, firstYearMaintenanceHrs: 36, buildFte: 0.03, maintenanceFte: 0.02, savedHrsMonth: null, annualFteGain: 0 },
       "manager-overview": { buildHrs: 48, ideationHrs: 7, specHrs: 10, developmentHrs: 21, testingHrs: 10, maintenanceHrsMonth: 3, firstYearMaintenanceHrs: 36, buildFte: 0.03, maintenanceFte: 0.02, savedHrsMonth: null, annualFteGain: 0 },
       "manager-capacity-portfolios": { buildHrs: 48, ideationHrs: 7, specHrs: 10, developmentHrs: 21, testingHrs: 10, maintenanceHrsMonth: 3, firstYearMaintenanceHrs: 36, buildFte: 0.03, maintenanceFte: 0.02, savedHrsMonth: null, annualFteGain: 0 },
@@ -2358,14 +2529,62 @@
       Medium: { min: 8, max: 15 },
       Low: { min: 2, max: 8 }
     };
-    const monthlyFteHours = 160;
 
     function formatRoiNumber(value, digits = 0) {
       if (value === null || value === undefined || value === "") return "Not estimated";
-      return Number(value).toLocaleString(undefined, {
+      const number = Number(value);
+      if (!Number.isFinite(number)) return "Not estimated";
+      return number.toLocaleString(undefined, {
         minimumFractionDigits: digits,
         maximumFractionDigits: digits
       });
+    }
+
+    function formatPercent(value, digits = 1) {
+      const number = Number(value);
+      if (!Number.isFinite(number)) return "Not estimated";
+      return `${number.toLocaleString(undefined, {
+        minimumFractionDigits: digits,
+        maximumFractionDigits: digits
+      })}%`;
+    }
+
+    function numericValue(value) {
+      const number = Number(value);
+      return Number.isFinite(number) ? number : 0;
+    }
+
+    function getRoiRows() {
+      return roiOrder
+        .map((id) => ({ tool: toolById.get(id), estimate: roiEstimates[id] }))
+        .filter((row) => row.tool && row.estimate);
+    }
+
+    function calculateRoiTotals(rows) {
+      const totalFor = (key) => rows.reduce((total, row) => total + numericValue(row.estimate[key]), 0);
+      const buildHrs = totalFor("buildHrs");
+      const firstYearMaintenanceHrs = totalFor("firstYearMaintenanceHrs");
+      const savedHrsMonth = totalFor("savedHrsMonth");
+      return {
+        toolCount: rows.length,
+        buildHrs,
+        ideationHrs: totalFor("ideationHrs"),
+        specHrs: totalFor("specHrs"),
+        developmentHrs: totalFor("developmentHrs"),
+        testingHrs: totalFor("testingHrs"),
+        maintenanceHrsMonth: totalFor("maintenanceHrsMonth"),
+        firstYearMaintenanceHrs,
+        buildFte: buildHrs / roiAssumptions.buildFteHoursYear,
+        maintenanceFte: firstYearMaintenanceHrs / roiAssumptions.buildFteHoursYear,
+        savedHrsMonth,
+        annualFteGain: savedHrsMonth * roiAssumptions.teamSize * 12 / roiAssumptions.savingsFteHoursYear,
+        teamSavedHrsMonth: savedHrsMonth * roiAssumptions.teamSize,
+        efficiencyPct: savedHrsMonth / roiAssumptions.monthlyCsmHours * 100
+      };
+    }
+
+    function efficiencyForSavedHours(savedHrsMonth) {
+      return savedHrsMonth / roiAssumptions.monthlyCsmHours * 100;
     }
 
     function roiForTool(tool) {
@@ -2392,14 +2611,19 @@
       }
       const range = savingsRange(tool);
       if (!range.max) return "Not specified";
-      return `${(range.min / monthlyFteHours).toFixed(2)}-${(range.max / monthlyFteHours).toFixed(2)} FTE gained`;
+      return `${(range.min / roiAssumptions.monthlyCsmHours).toFixed(2)}-${(range.max / roiAssumptions.monthlyCsmHours).toFixed(2)} FTE gained`;
     }
 
     const flowGrid = document.getElementById("flowGrid");
     const elevatorLayer = document.getElementById("elevatorLayer");
+    const digitalMotionGrid = document.getElementById("digitalMotionGrid");
     const managerOverviewLayer = document.getElementById("managerOverviewLayer");
     const managerGrid = document.getElementById("managerGrid");
+    const automationStat = document.getElementById("automationStat");
+    const rolledOutStat = document.getElementById("rolledOutStat");
     const roiSummaryGrid = document.getElementById("roiSummaryGrid");
+    const efficiencyTableBody = document.getElementById("efficiencyTableBody");
+    const efficiencyTableFoot = document.getElementById("efficiencyTableFoot");
     const roiTableBody = document.getElementById("roiTableBody");
     const roiTableFoot = document.getElementById("roiTableFoot");
     const tabButtons = document.querySelectorAll(".view-tab");
@@ -2511,6 +2735,24 @@
       });
     }
 
+    function renderDigitalMotion() {
+      if (!digitalMotionGrid) return;
+      digitalMotionGrid.innerHTML = digitalMotionToolIds
+        .map((id) => toolById.get(id))
+        .filter(Boolean)
+        .map((tool) => renderToolButton(tool))
+        .join("");
+
+      digitalMotionGrid.querySelectorAll("[data-tool-id]").forEach((button) => {
+        button.addEventListener("click", () => openTool(button.dataset.toolId));
+      });
+    }
+
+    function renderProgressStats() {
+      if (automationStat) automationStat.textContent = formatPercent(rolloutProgress.automationEfficiencyPct, 0);
+      if (rolledOutStat) rolledOutStat.textContent = formatRoiNumber(rolloutProgress.toolsRolledOut);
+    }
+
     function renderManagerTools() {
       const overview = toolById.get("manager-overview");
       const feederIds = managerToolIds.filter((id) => id !== "manager-overview");
@@ -2549,7 +2791,10 @@
     }
 
     function renderRoi() {
-      if (!roiSummaryGrid || !roiTableBody || !roiTableFoot) return;
+      if (!roiSummaryGrid || !roiTableBody || !roiTableFoot || !efficiencyTableBody || !efficiencyTableFoot) return;
+
+      const rows = getRoiRows();
+      const roiTotals = calculateRoiTotals(rows);
 
       const summaryCards = [
         { value: `${formatRoiNumber(roiTotals.buildFte, 2)} FTE`, label: "Build capacity required", tone: "cost" },
@@ -2565,11 +2810,44 @@
         </article>
       `).join("");
 
-      const rows = roiOrder
-        .map((id) => ({ tool: toolById.get(id), estimate: roiEstimates[id] }))
-        .filter((row) => row.tool && row.estimate);
-
       const numberCell = (value, digits = 0) => `<td class="num">${escapeHtml(formatRoiNumber(value, digits))}</td>`;
+      const percentCell = (value, digits = 1) => `<td class="num">${escapeHtml(formatPercent(value, digits))}</td>`;
+
+      efficiencyTableBody.innerHTML = rows.map(({ tool, estimate }) => {
+        const savedHrsMonth = numericValue(estimate.savedHrsMonth);
+        const efficiencyPct = efficiencyForSavedHours(savedHrsMonth);
+        const teamHrsSavedMonth = savedHrsMonth * roiAssumptions.teamSize;
+        const manualRemainingPct = Math.max(0, 100 - efficiencyPct);
+        return `
+          <tr>
+            <td class="tool-name">${escapeHtml(tool.name)}</td>
+            ${numberCell(savedHrsMonth, savedHrsMonth % 1 ? 1 : 0)}
+            ${percentCell(efficiencyPct)}
+            ${numberCell(teamHrsSavedMonth, teamHrsSavedMonth % 1 ? 1 : 0)}
+            ${percentCell(efficiencyPct)}
+            ${percentCell(manualRemainingPct)}
+          </tr>
+        `;
+      }).join("");
+
+      efficiencyTableFoot.innerHTML = `
+        <tr>
+          <td class="tool-name">Current baseline</td>
+          ${numberCell(0)}
+          ${percentCell(0, 0)}
+          ${numberCell(0)}
+          ${percentCell(0, 0)}
+          ${percentCell(100, 0)}
+        </tr>
+        <tr>
+          <td class="tool-name">Planned total</td>
+          ${numberCell(roiTotals.savedHrsMonth, 1)}
+          ${percentCell(roiTotals.efficiencyPct)}
+          ${numberCell(roiTotals.teamSavedHrsMonth, 1)}
+          ${percentCell(roiTotals.efficiencyPct)}
+          ${percentCell(Math.max(0, 100 - roiTotals.efficiencyPct))}
+        </tr>
+      `;
 
       roiTableBody.innerHTML = rows.map(({ tool, estimate }) => `
         <tr>
@@ -2632,10 +2910,23 @@
       `;
     }
 
+    function documentationMarkup(tool) {
+      const documentationUrl = tool.documentationUrl || tool.documentationLink || tool.documentation;
+      if (!documentationUrl) return "";
+      return `
+        <section class="detail-section">
+          <h3>Full Documentation</h3>
+          <a class="detail-doc-link" href="${escapeHtml(documentationUrl)}" target="_blank" rel="noopener">Open full documentation</a>
+        </section>
+      `;
+    }
+
     function openTool(id) {
       const tool = toolById.get(id);
       if (!tool) return;
-      const detailStageTone = /^[1-4]\./.test(tool.number) ? tool.number.charAt(0) : "manager";
+      const detailStageTone = tool.stage === "Digital Motion" || /^D\./.test(tool.number)
+        ? "digital"
+        : /^[1-4]\./.test(tool.number) ? tool.number.charAt(0) : "manager";
       detailPanel.dataset.stage = detailStageTone;
 
       detailKicker.innerHTML = `
@@ -2686,6 +2977,7 @@
           <h3>Impact For CSMs</h3>
           <p>${escapeHtml(tool.impact || "Not specified")}</p>
         </section>
+        ${documentationMarkup(tool)}
       `;
 
       document.body.classList.add("detail-open");
@@ -2705,7 +2997,9 @@
       button.addEventListener("click", () => showTab(button.dataset.tabTarget));
     });
 
+    renderProgressStats();
     renderFlow();
+    renderDigitalMotion();
     renderManagerTools();
     renderRoi();
   </script>
