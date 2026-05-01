@@ -522,8 +522,9 @@
 
     .tool-card {
       display: grid;
+      grid-template-rows: auto minmax(42px, 1fr) auto auto;
       gap: 12px;
-      min-height: 202px;
+      height: 248px;
       padding: 14px;
       border: 1px solid var(--line);
       border-radius: var(--radius);
@@ -568,11 +569,16 @@
     }
 
     .card-title h3 {
+      display: -webkit-box;
       margin: 0;
+      min-height: 2.4em;
+      overflow: hidden;
       font-size: 1rem;
       line-height: 1.2;
       letter-spacing: 0;
       overflow-wrap: anywhere;
+      -webkit-box-orient: vertical;
+      -webkit-line-clamp: 2;
     }
 
     .card-title .file-name {
@@ -619,11 +625,14 @@
     }
 
     .description {
-      min-height: 42px;
+      display: -webkit-box;
       margin: 0;
+      overflow: hidden;
       color: var(--muted);
       font-size: 0.88rem;
       line-height: 1.45;
+      -webkit-box-orient: vertical;
+      -webkit-line-clamp: 2;
     }
 
     .card-meta {
