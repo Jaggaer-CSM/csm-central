@@ -852,8 +852,7 @@
         </div>
         <h1>CSM AI Tools</h1>
         <p class="subtitle">AI-powered tools across the customer lifecycle</p>
-        <a href="index.html" class="roadmap-btn">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="15" height="15" aria-hidden="true"><path d="M3 12h18M3 6h18M3 18h12"/></svg>
+        <a href="index.html" class="roadmap-btn" style="display:none">
           View Roadmap
         </a>
       </div>
@@ -1503,6 +1502,28 @@
       <iframe id="tool-frame" class="drawer-frame" src="" allow="clipboard-write" title="Tool panel"></iframe>
     </div>
   </div>
+
+  <!-- Floating Roadmap button -->
+  <a href="index.html" class="float-roadmap-btn">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16" aria-hidden="true">
+      <path d="M3 6h18M3 12h18M3 18h12"/>
+    </svg>
+    AI Roadmap
+  </a>
+
+  <style>
+    .float-roadmap-btn {
+      position: fixed; bottom: 28px; right: 28px; z-index: 999;
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 12px 20px; background: #246bfe; color: #fff;
+      font-family: "Aptos","Segoe UI",Arial,sans-serif;
+      font-size: 0.92rem; font-weight: 700;
+      border-radius: 999px; text-decoration: none;
+      box-shadow: 0 4px 20px rgba(36,107,254,0.45);
+      transition: box-shadow 0.15s, transform 0.15s;
+    }
+    .float-roadmap-btn:hover { box-shadow: 0 6px 28px rgba(36,107,254,0.55); transform: translateY(-2px); }
+  </style>
 
 </body>
 </html>
