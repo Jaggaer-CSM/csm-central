@@ -773,11 +773,6 @@
       --stage-ring: rgba(189, 63, 85, 0.14);
     }
 
-    [data-stage="Manager Tools"] {
-      --stage-color: var(--gray);
-      --stage-bg: #eef1f5;
-      --stage-ring: rgba(93, 104, 120, 0.14);
-    }
 
     @media (max-width: 1200px) {
       .quick-grid,
@@ -1003,11 +998,6 @@
         note: "Prepare the value story, risks, and expansion context.",
         icon: "icon-renew"
       },
-      {
-        title: "Manager Tools",
-        note: "Reference views and tools for leadership operating rhythms.",
-        icon: "icon-map"
-      }
     ];
 
     const htmlFiles = [
@@ -1060,7 +1050,6 @@
     };
 
     const keywordRules = [
-      { stage: "Manager Tools", words: ["manager", "roadmap", "overview", "capacity", "portfolio", "icp"] },
       { stage: "Renewal", words: ["renewal", "whitespace", "value", "calculator", "roi", "expansion", "savings"] },
       { stage: "Sustain Growth", words: ["health", "risk", "support", "case", "release", "escalation", "trend", "sustain"] },
       { stage: "Adoption", words: ["plan", "kpi", "adoption", "meeting", "intro", "success"] },
