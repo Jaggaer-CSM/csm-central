@@ -1,109 +1,172 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Elevator</title>
-    <link rel="stylesheet" href="./styles.css" />
-  </head>
-  <body>
-    <section class="resource-bar" data-tour-target="top-bar">
-      <div class="resource-list resource-list-top">
-        <span class="resource-pill">SFDC <strong>2 files</strong> <em>38 fields</em></span>
-        <span class="resource-pill">FinancialForce <strong>2 files</strong> <em>449 fields</em></span>
-        <span class="resource-pill">Teams <strong>3 files</strong> <em>3 meeting summaries</em></span>
-        <span class="resource-pill">Email <strong>1 file</strong> <em>612 emails scanned</em></span>
-        <span class="resource-pill">PROD Data <strong>1 file</strong> <em>69 fields</em></span>
-        <span class="resource-pill">CSM Notes <strong>3 files</strong> <em>3 fields</em></span>
-        <span class="resource-pill">JAGGAER Engage <strong>1 file</strong> <em>11 fields</em></span>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Elevator — Shared Account Memory</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: "Aptos", "Segoe UI", Arial, sans-serif; background: #f4f6fa; color: #1e293b; min-height: 100vh; }
+
+    .topbar { background: #fff; border-bottom: 1px solid #e2e8f0; padding: 16px 28px; display: flex; align-items: center; justify-content: space-between; }
+    .topbar-left { display: flex; align-items: center; gap: 12px; }
+    .tool-badge { background: #eef4ff; color: #246bfe; font-size: 0.72rem; font-weight: 700; letter-spacing: .06em; padding: 3px 10px; border-radius: 999px; text-transform: uppercase; }
+    .topbar h1 { font-size: 1.15rem; font-weight: 700; color: #0f172a; }
+    .topbar p { font-size: 0.85rem; color: #64748b; margin-top: 1px; }
+    .status-pill { font-size: 0.75rem; font-weight: 600; padding: 4px 12px; border-radius: 999px; background: #fff8e1; color: #92660a; border: 1px solid #f6d860; }
+
+    .sources-bar { background: #0f172a; padding: 10px 28px; display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+    .source-pill { display: inline-flex; align-items: center; gap: 6px; background: rgba(255,255,255,0.08); color: #e2e8f0; font-size: 0.76rem; padding: 5px 12px; border-radius: 999px; border: 1px solid rgba(255,255,255,0.12); }
+    .source-pill strong { color: #fff; }
+    .source-pill em { color: #94a3b8; font-style: normal; }
+    .sources-label { color: #64748b; font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: .06em; margin-right: 4px; }
+
+    .layout { display: grid; grid-template-columns: 260px 1fr; gap: 0; min-height: calc(100vh - 110px); }
+
+    .sidebar { background: #fff; border-right: 1px solid #e2e8f0; padding: 20px 16px; display: flex; flex-direction: column; gap: 20px; }
+    .sidebar-section h2 { font-size: 0.78rem; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; color: #94a3b8; margin-bottom: 10px; }
+
+    .stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    .stat-card { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 10px; }
+    .stat-card .val { font-size: 1.3rem; font-weight: 700; color: #0f172a; }
+    .stat-card .lbl { font-size: 0.72rem; color: #64748b; margin-top: 1px; }
+
+    .prompt-list { display: flex; flex-direction: column; gap: 6px; }
+    .prompt-pill { background: #f1f5f9; border: 1px solid #e2e8f0; border-radius: 8px; padding: 8px 11px; font-size: 0.8rem; color: #334155; cursor: pointer; transition: background 0.15s; }
+    .prompt-pill:hover { background: #eef4ff; border-color: #c7d9ff; color: #246bfe; }
+
+    .main { padding: 24px 28px; display: flex; flex-direction: column; gap: 20px; }
+
+    .hero-cards { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px; }
+    .hero-card { background: #fff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 18px; }
+    .hero-card h3 { font-size: 0.78rem; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; color: #94a3b8; margin-bottom: 10px; }
+    .account-name { font-size: 1.2rem; font-weight: 700; color: #0f172a; }
+    .account-meta { font-size: 0.82rem; color: #64748b; margin-top: 4px; }
+    .health-bar { height: 6px; background: #e2e8f0; border-radius: 999px; margin-top: 12px; overflow: hidden; }
+    .health-fill { height: 100%; border-radius: 999px; background: linear-gradient(90deg, #17845b, #22c55e); }
+    .health-label { font-size: 0.75rem; color: #64748b; margin-top: 5px; display: flex; justify-content: space-between; }
+    .tag-row { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 10px; }
+    .tag { font-size: 0.72rem; font-weight: 600; padding: 3px 9px; border-radius: 999px; background: #eef4ff; color: #246bfe; }
+    .tag.warn { background: #fff8e1; color: #92660a; }
+    .tag.ok { background: #eaf7f0; color: #17845b; }
+    .timeline-item { display: flex; gap: 10px; align-items: flex-start; padding: 8px 0; border-bottom: 1px solid #f1f5f9; font-size: 0.82rem; }
+    .timeline-item:last-child { border-bottom: none; }
+    .timeline-dot { width: 8px; height: 8px; border-radius: 50%; background: #246bfe; margin-top: 4px; flex-shrink: 0; }
+    .timeline-dot.warn { background: #f59e0b; }
+    .timeline-dot.ok { background: #17845b; }
+    .timeline-text { color: #334155; }
+    .timeline-date { color: #94a3b8; font-size: 0.75rem; margin-top: 2px; }
+
+    .search-bar { background: #fff; border: 1.5px solid #e2e8f0; border-radius: 10px; padding: 12px 16px; display: flex; align-items: center; gap: 10px; color: #94a3b8; font-size: 0.9rem; }
+    .search-bar svg { width: 16px; height: 16px; flex-shrink: 0; }
+
+    .mockup-note { background: #eef4ff; border: 1px solid #c7d9ff; border-radius: 10px; padding: 14px 18px; font-size: 0.83rem; color: #1e40af; display: flex; gap: 10px; align-items: flex-start; }
+    .mockup-note svg { width: 16px; height: 16px; flex-shrink: 0; margin-top: 1px; }
+  </style>
+</head>
+<body>
+
+  <div class="topbar">
+    <div class="topbar-left">
+      <div>
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:3px;">
+          <span class="tool-badge">1.2 · Orchestrating Layer</span>
+          <span class="status-pill">Ideation</span>
+        </div>
+        <h1>Elevator</h1>
+        <p>Shared account memory — one searchable record across all data sources</p>
       </div>
-    </section>
-    <a class="flow-shortcut" href="./flow-chart.html" aria-label="Show flow chart" title="Show flow chart">
-      <svg viewBox="0 0 24 24" aria-hidden="true">
-        <path d="M5 7h5v5H5zM14 4h5v5h-5zM14 15h5v5h-5z" />
-        <path d="M10 9.5h2.3c1.1 0 2-.9 2-2V6.5M10 9.5h2.3c1.1 0 2 .9 2 2v6" />
-      </svg>
-    </a>
-    <nav class="demo-jump-nav" aria-label="Demo navigation">
-      <a class="deck-jump-button" href="./flow-chart.html#impact" aria-label="Impact" title="Impact">I</a>
-    </nav>
-    <div class="shell">
-      <aside class="sidebar">
-        <div class="brand">
-          <p class="eyebrow eyebrow-top">POC - Confidential Data</p>
-          <p class="eyebrow">Elevator</p>
-          <p class="subtle">A local demo for one view for each account</p>
+    </div>
+  </div>
+
+  <div class="sources-bar">
+    <span class="sources-label">Connected Sources</span>
+    <span class="source-pill">SFDC <strong>2 files</strong> <em>38 fields</em></span>
+    <span class="source-pill">FinancialForce <strong>2 files</strong> <em>449 fields</em></span>
+    <span class="source-pill">Teams <strong>3 files</strong> <em>3 meeting summaries</em></span>
+    <span class="source-pill">Email <strong>1 file</strong> <em>612 emails scanned</em></span>
+    <span class="source-pill">PROD Data <strong>1 file</strong> <em>69 fields</em></span>
+    <span class="source-pill">CSM Notes <strong>3 files</strong> <em>3 fields</em></span>
+    <span class="source-pill">JAGGAER Engage <strong>1 file</strong> <em>11 fields</em></span>
+  </div>
+
+  <div class="layout">
+    <aside class="sidebar">
+      <div class="sidebar-section">
+        <h2>Account Snapshot</h2>
+        <div class="stat-grid">
+          <div class="stat-card"><div class="val">$1.2M</div><div class="lbl">ARR</div></div>
+          <div class="stat-card"><div class="val">74%</div><div class="lbl">Health Score</div></div>
+          <div class="stat-card"><div class="val">Oct 26</div><div class="lbl">Renewal</div></div>
+          <div class="stat-card"><div class="val">3</div><div class="lbl">Open Cases</div></div>
+        </div>
+      </div>
+
+      <div class="sidebar-section">
+        <h2>Suggested Prompts</h2>
+        <div class="prompt-list">
+          <div class="prompt-pill">What are the open risks for this account?</div>
+          <div class="prompt-pill">Summarize last 3 meetings</div>
+          <div class="prompt-pill">What milestones are overdue?</div>
+          <div class="prompt-pill">Draft renewal talking points</div>
+          <div class="prompt-pill">Who are the key stakeholders?</div>
+        </div>
+      </div>
+
+      <div class="sidebar-section">
+        <h2>Quick Create</h2>
+        <div class="prompt-list">
+          <div class="prompt-pill">+ Success Plan update</div>
+          <div class="prompt-pill">+ Meeting recap</div>
+          <div class="prompt-pill">+ Escalation summary</div>
+        </div>
+      </div>
+    </aside>
+
+    <main class="main">
+
+      <div class="mockup-note">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4m0 4h.01"/></svg>
+        <span>This is a visual mockup of the Elevator tool. The live version will connect to SFDC, FinancialForce, Teams, and product data to generate a real-time searchable account record. Goal date: September 2026.</span>
+      </div>
+
+      <div class="search-bar">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+        Search account data, meetings, cases, contacts…
+      </div>
+
+      <div class="hero-cards">
+        <div class="hero-card">
+          <h3>Account</h3>
+          <div class="account-name">Texas A&M University</div>
+          <div class="account-meta">Supplier Management · Enterprise · CSM: J. Rivera</div>
+          <div class="health-bar"><div class="health-fill" style="width:74%"></div></div>
+          <div class="health-label"><span>Health</span><span>74 / 100</span></div>
+          <div class="tag-row">
+            <span class="tag ok">Adopted</span>
+            <span class="tag warn">Renewal Risk</span>
+            <span class="tag">Expansion Ready</span>
+          </div>
         </div>
 
-        <div class="stat-grid" id="stat-grid"></div>
+        <div class="hero-card">
+          <h3>Recent Activity</h3>
+          <div class="timeline-item"><div class="timeline-dot"></div><div><div class="timeline-text">QBR completed — 3 action items created</div><div class="timeline-date">May 8, 2026</div></div></div>
+          <div class="timeline-item"><div class="timeline-dot warn"></div><div><div class="timeline-text">Support case escalated — Invoice processing delay</div><div class="timeline-date">May 5, 2026</div></div></div>
+          <div class="timeline-item"><div class="timeline-dot ok"></div><div><div class="timeline-text">Milestone achieved — Supplier enablement 80%</div><div class="timeline-date">Apr 29, 2026</div></div></div>
+          <div class="timeline-item"><div class="timeline-dot"></div><div><div class="timeline-text">Success plan reviewed with stakeholder</div><div class="timeline-date">Apr 21, 2026</div></div></div>
+        </div>
 
-        <section class="panel" data-tour-target="quick-links">
-          <div class="panel-head">
-            <h2>Suggested Prompts</h2>
-          </div>
-          <div class="pill-list" id="prompt-list"></div>
-        </section>
+        <div class="hero-card">
+          <h3>Key Contacts</h3>
+          <div class="timeline-item"><div class="timeline-dot ok"></div><div><div class="timeline-text">Sarah Mitchell — VP Procurement</div><div class="timeline-date">Executive sponsor · Active</div></div></div>
+          <div class="timeline-item"><div class="timeline-dot"></div><div><div class="timeline-text">David Chen — IT Director</div><div class="timeline-date">Technical lead · Active</div></div></div>
+          <div class="timeline-item"><div class="timeline-dot warn"></div><div><div class="timeline-text">Lisa Park — Finance Manager</div><div class="timeline-date">Champion · Disengaged 45d</div></div></div>
+        </div>
+      </div>
 
-        <section class="panel">
-          <div class="panel-head">
-            <h2>Quick Create</h2>
-          </div>
-          <div id="next-action" class="pill-list next-action"></div>
-        </section>
-      </aside>
+    </main>
+  </div>
 
-      <main class="main">
-        <section class="hero">
-          <div class="hero-card" id="hero-card"></div>
-          <div class="hero-meta-card" id="hero-meta-card"></div>
-          <div class="hero-assets-card" id="hero-assets-card"></div>
-        </section>
-
-        <form id="chat-form" class="chat-form chat-form-top" data-tour-target="search-bar">
-          <label class="chat-input-wrap" for="chat-input">
-            <span class="chat-input-icon" aria-hidden="true">⌕</span>
-            <input
-              id="chat-input"
-              type="text"
-              placeholder="Search TAMU account data"
-              autocomplete="off"
-            />
-          </label>
-          <button type="submit">Ask</button>
-        </form>
-
-        <section class="workspace">
-          <div class="main-column">
-            <div class="chat-panel panel">
-              <div class="panel-head">
-                <h2>Chat</h2>
-              </div>
-              <div id="chat-thread" class="chat-thread"></div>
-            </div>
-
-            <div class="contacts-panel panel">
-              <div class="panel-head">
-                <h2>Contacts</h2>
-              </div>
-              <div id="contact-list" class="stack contact-stack"></div>
-            </div>
-          </div>
-
-          <div class="answer-panel panel" data-tour-target="usage-data">
-            <div class="panel-head">
-              <h2 id="evidence-panel-title">Usage Data</h2>
-              <div class="panel-head-actions">
-                <span class="subtle" id="evidence-panel-subtitle">YoY trends from PROD Data</span>
-                <button id="export-answer" class="pill export-button" type="button" disabled>Export answer</button>
-              </div>
-            </div>
-            <div id="evidence-list" class="stack"></div>
-          </div>
-        </section>
-      </main>
-    </div>
-
-    <script src="./tamu-kb.js"></script>
-    <script src="./app.js" defer></script>
-  </body>
+</body>
 </html>
