@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Elevator</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <section class="resource-bar" data-tour-target="top-bar">
+      <div class="resource-list resource-list-top">
+        <span class="resource-pill">SFDC <strong>2 files</strong> <em>38 fields</em></span>
+        <span class="resource-pill">FinancialForce <strong>2 files</strong> <em>449 fields</em></span>
+        <span class="resource-pill">Teams <strong>3 files</strong> <em>3 meeting summaries</em></span>
+        <span class="resource-pill">Email <strong>1 file</strong> <em>612 emails scanned</em></span>
+        <span class="resource-pill">PROD Data <strong>1 file</strong> <em>69 fields</em></span>
+        <span class="resource-pill">CSM Notes <strong>3 files</strong> <em>3 fields</em></span>
+        <span class="resource-pill">JAGGAER Engage <strong>1 file</strong> <em>11 fields</em></span>
+      </div>
+    </section>
+    <a class="flow-shortcut" href="./flow-chart.html" aria-label="Show flow chart" title="Show flow chart">
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M5 7h5v5H5zM14 4h5v5h-5zM14 15h5v5h-5z" />
+        <path d="M10 9.5h2.3c1.1 0 2-.9 2-2V6.5M10 9.5h2.3c1.1 0 2 .9 2 2v6" />
+      </svg>
+    </a>
+    <nav class="demo-jump-nav" aria-label="Demo navigation">
+      <a class="deck-jump-button" href="./flow-chart.html#impact" aria-label="Impact" title="Impact">I</a>
+    </nav>
+    <div class="shell">
+      <aside class="sidebar">
+        <div class="brand">
+          <p class="eyebrow eyebrow-top">POC - Confidential Data</p>
+          <p class="eyebrow">Elevator</p>
+          <p class="subtle">A local demo for one view for each account</p>
+        </div>
+
+        <div class="stat-grid" id="stat-grid"></div>
+
+        <section class="panel" data-tour-target="quick-links">
+          <div class="panel-head">
+            <h2>Suggested Prompts</h2>
+          </div>
+          <div class="pill-list" id="prompt-list"></div>
+        </section>
+
+        <section class="panel">
+          <div class="panel-head">
+            <h2>Quick Create</h2>
+          </div>
+          <div id="next-action" class="pill-list next-action"></div>
+        </section>
+      </aside>
+
+      <main class="main">
+        <section class="hero">
+          <div class="hero-card" id="hero-card"></div>
+          <div class="hero-meta-card" id="hero-meta-card"></div>
+          <div class="hero-assets-card" id="hero-assets-card"></div>
+        </section>
+
+        <form id="chat-form" class="chat-form chat-form-top" data-tour-target="search-bar">
+          <label class="chat-input-wrap" for="chat-input">
+            <span class="chat-input-icon" aria-hidden="true">⌕</span>
+            <input
+              id="chat-input"
+              type="text"
+              placeholder="Search TAMU account data"
+              autocomplete="off"
+            />
+          </label>
+          <button type="submit">Ask</button>
+        </form>
+
+        <section class="workspace">
+          <div class="main-column">
+            <div class="chat-panel panel">
+              <div class="panel-head">
+                <h2>Chat</h2>
+              </div>
+              <div id="chat-thread" class="chat-thread"></div>
+            </div>
+
+            <div class="contacts-panel panel">
+              <div class="panel-head">
+                <h2>Contacts</h2>
+              </div>
+              <div id="contact-list" class="stack contact-stack"></div>
+            </div>
+          </div>
+
+          <div class="answer-panel panel" data-tour-target="usage-data">
+            <div class="panel-head">
+              <h2 id="evidence-panel-title">Usage Data</h2>
+              <div class="panel-head-actions">
+                <span class="subtle" id="evidence-panel-subtitle">YoY trends from PROD Data</span>
+                <button id="export-answer" class="pill export-button" type="button" disabled>Export answer</button>
+              </div>
+            </div>
+            <div id="evidence-list" class="stack"></div>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <script src="./tamu-kb.js"></script>
+    <script src="./app.js" defer></script>
+  </body>
+</html>

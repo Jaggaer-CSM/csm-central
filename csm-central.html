@@ -1,0 +1,1523 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CSM AI Tools</title>
+  <style>
+    :root {
+      --page: #f6f7f9;
+      --surface: #ffffff;
+      --surface-soft: #f9fafb;
+      --ink: #17202a;
+      --muted: #5e6977;
+      --subtle: #8a96a3;
+      --line: #d9dee5;
+      --line-strong: #bcc5d1;
+      --blue: #246bfe;
+      --green: #17845b;
+      --red: #bd3f55;
+      --gold: #9a6618;
+      --gray: #5d6878;
+      --shadow: 0 16px 40px rgba(23, 32, 42, 0.08);
+      --radius: 8px;
+      --font: "Aptos", "Segoe UI", Arial, sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      min-width: 320px;
+      background: var(--page);
+      color: var(--ink);
+      font-family: var(--font);
+    }
+
+    button,
+    input {
+      font: inherit;
+    }
+
+    button {
+      cursor: pointer;
+    }
+
+    a {
+      color: inherit;
+    }
+
+    .app-shell {
+      width: min(1480px, 100%);
+      margin: 0 auto;
+      padding: 20px;
+    }
+
+    .topbar {
+      display: grid;
+      grid-template-columns: minmax(260px, 1fr) minmax(280px, 520px);
+      gap: 18px;
+      align-items: end;
+      padding: 16px 0 18px;
+    }
+
+    .title-block {
+      min-width: 0;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      min-height: 28px;
+      margin-bottom: 10px;
+      padding: 5px 10px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: var(--surface);
+      color: var(--muted);
+      font-size: 0.72rem;
+      font-weight: 800;
+      letter-spacing: 0;
+      text-transform: uppercase;
+    }
+
+    .eyebrow svg {
+      width: 14px;
+      height: 14px;
+      color: var(--blue);
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(2rem, 4vw, 3.8rem);
+      line-height: 0.95;
+      letter-spacing: 0;
+    }
+
+    .subtitle {
+      margin: 10px 0 0;
+      color: var(--muted);
+      font-size: 1rem;
+      line-height: 1.45;
+    }
+
+    .search-panel {
+      display: grid;
+      gap: 10px;
+      min-width: 0;
+    }
+
+    .search-wrap {
+      position: relative;
+    }
+
+    .search-wrap svg {
+      position: absolute;
+      top: 50%;
+      left: 14px;
+      width: 18px;
+      height: 18px;
+      color: var(--subtle);
+      transform: translateY(-50%);
+      pointer-events: none;
+    }
+
+    .search-input {
+      width: 100%;
+      min-height: 48px;
+      padding: 0 42px 0 44px;
+      border: 1px solid var(--line-strong);
+      border-radius: var(--radius);
+      background: var(--surface);
+      color: var(--ink);
+      outline: none;
+      box-shadow: 0 1px 0 rgba(23, 32, 42, 0.02);
+    }
+
+    .search-input:focus {
+      border-color: var(--blue);
+      box-shadow: 0 0 0 4px rgba(36, 107, 254, 0.13);
+    }
+
+    .clear-search {
+      position: absolute;
+      top: 50%;
+      right: 8px;
+      display: none;
+      place-items: center;
+      width: 34px;
+      height: 34px;
+      border: 0;
+      border-radius: 50%;
+      background: transparent;
+      color: var(--muted);
+      transform: translateY(-50%);
+    }
+
+    .clear-search.is-visible {
+      display: grid;
+    }
+
+    .clear-search:hover,
+    .clear-search:focus-visible {
+      background: #eef1f5;
+      color: var(--ink);
+      outline: none;
+    }
+
+    .clear-search svg {
+      position: static;
+      width: 16px;
+      height: 16px;
+      transform: none;
+      pointer-events: auto;
+    }
+
+    .filter-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 7px;
+    }
+
+    .filter-chip {
+      min-height: 34px;
+      padding: 0 12px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: var(--surface);
+      color: var(--muted);
+      font-size: 0.82rem;
+      font-weight: 750;
+    }
+
+    .filter-chip:hover,
+    .filter-chip:focus-visible,
+    .filter-chip.is-active {
+      border-color: var(--ink);
+      color: var(--ink);
+      outline: none;
+    }
+
+    .filter-chip.is-active {
+      background: var(--ink);
+      color: #fff;
+    }
+
+    .overview-strip {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 10px;
+      margin-bottom: 18px;
+    }
+
+    .metric {
+      min-height: 74px;
+      padding: 14px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--surface);
+    }
+
+    .metric strong {
+      display: block;
+      font-size: 1.85rem;
+      line-height: 1;
+    }
+
+    .metric span {
+      display: block;
+      margin-top: 8px;
+      color: var(--muted);
+      font-size: 0.78rem;
+      font-weight: 850;
+      letter-spacing: 0;
+      text-transform: uppercase;
+    }
+
+    .quick-actions {
+      display: grid;
+      gap: 12px;
+      margin: 6px 0 24px;
+      padding: 16px 0;
+      border-top: 1px solid var(--line);
+      border-bottom: 1px solid var(--line);
+    }
+
+    .section-heading {
+      display: flex;
+      align-items: end;
+      justify-content: space-between;
+      gap: 16px;
+      min-width: 0;
+    }
+
+    .section-heading h2 {
+      margin: 0;
+      font-size: 1.08rem;
+      line-height: 1.2;
+      letter-spacing: 0;
+    }
+
+    .section-heading p {
+      margin: 4px 0 0;
+      color: var(--muted);
+      font-size: 0.88rem;
+      line-height: 1.35;
+    }
+
+    .roadmap-link {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      min-height: 38px;
+      padding: 0 13px;
+      border: 1px solid var(--line-strong);
+      border-radius: var(--radius);
+      background: var(--surface);
+      color: var(--ink);
+      font-size: 0.86rem;
+      font-weight: 800;
+      text-decoration: none;
+      white-space: nowrap;
+    }
+
+    .roadmap-link:hover,
+    .roadmap-link:focus-visible {
+      border-color: var(--blue);
+      box-shadow: 0 0 0 4px rgba(36, 107, 254, 0.1);
+      outline: none;
+    }
+
+    .roadmap-link svg {
+      width: 16px;
+      height: 16px;
+    }
+
+    .quick-grid {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .quick-action {
+      display: grid;
+      grid-template-columns: auto 1fr auto;
+      gap: 11px;
+      align-items: center;
+      min-height: 76px;
+      padding: 12px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--surface);
+      color: var(--ink);
+      text-align: left;
+      box-shadow: 0 1px 0 rgba(23, 32, 42, 0.02);
+    }
+
+    .quick-action:hover,
+    .quick-action:focus-visible {
+      border-color: var(--blue);
+      box-shadow: var(--shadow);
+      outline: none;
+      transform: translateY(-1px);
+    }
+
+    .quick-action .icon-frame {
+      display: grid;
+      place-items: center;
+      width: 38px;
+      height: 38px;
+      border-radius: var(--radius);
+      background: #eef4ff;
+      color: var(--blue);
+    }
+
+    .quick-action[data-intent="success-plan"] .icon-frame {
+      background: #eaf7f0;
+      color: var(--green);
+    }
+
+    .quick-action[data-intent="account-health"] .icon-frame {
+      background: #fff2e2;
+      color: var(--gold);
+    }
+
+    .quick-action[data-intent="renewal"] .icon-frame {
+      background: #fbeaf0;
+      color: var(--red);
+    }
+
+    .quick-action[data-intent="release"] .icon-frame {
+      background: #eef1f5;
+      color: var(--gray);
+    }
+
+    .quick-action svg {
+      width: 19px;
+      height: 19px;
+    }
+
+    .quick-action strong {
+      display: block;
+      line-height: 1.15;
+      font-size: 0.96rem;
+    }
+
+    .quick-action span {
+      display: block;
+      margin-top: 4px;
+      color: var(--muted);
+      font-size: 0.78rem;
+      line-height: 1.25;
+    }
+
+    .quick-action .chevron {
+      width: 17px;
+      height: 17px;
+      color: var(--subtle);
+    }
+
+    .utility-strip {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 18px;
+      margin-bottom: 22px;
+    }
+
+    .utility-section {
+      display: grid;
+      gap: 10px;
+      min-width: 0;
+      padding: 14px 0 0;
+      border-top: 1px solid var(--line);
+    }
+
+    .utility-title {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .utility-title h2 {
+      margin: 0;
+      font-size: 0.98rem;
+      letter-spacing: 0;
+    }
+
+    .mini-tools {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 8px;
+      min-height: 54px;
+    }
+
+    .mini-tool {
+      display: grid;
+      grid-template-columns: auto 1fr;
+      gap: 8px;
+      align-items: center;
+      min-height: 54px;
+      padding: 9px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--surface);
+      text-decoration: none;
+    }
+
+    .mini-tool:hover,
+    .mini-tool:focus-visible {
+      border-color: var(--blue);
+      outline: none;
+    }
+
+    .mini-tool svg {
+      width: 17px;
+      height: 17px;
+      color: var(--muted);
+    }
+
+    .mini-tool span {
+      min-width: 0;
+      overflow: hidden;
+      font-size: 0.84rem;
+      font-weight: 750;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .empty-mini {
+      display: grid;
+      place-items: center;
+      grid-column: 1 / -1;
+      min-height: 54px;
+      border: 1px dashed var(--line-strong);
+      border-radius: var(--radius);
+      color: var(--muted);
+      font-size: 0.84rem;
+    }
+
+    .lifecycle-grid {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(210px, 1fr));
+      gap: 14px;
+      align-items: start;
+    }
+
+    .stage-column {
+      min-width: 0;
+      border-top: 4px solid var(--stage-color);
+      background: transparent;
+    }
+
+    .stage-header {
+      display: grid;
+      gap: 6px;
+      min-height: 96px;
+      padding: 14px 2px 12px;
+    }
+
+    .stage-kicker {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--stage-color);
+      font-size: 0.75rem;
+      font-weight: 900;
+      letter-spacing: 0;
+      text-transform: uppercase;
+    }
+
+    .stage-kicker svg {
+      width: 15px;
+      height: 15px;
+    }
+
+    .stage-header h2 {
+      margin: 0;
+      font-size: 1.13rem;
+      line-height: 1.15;
+      letter-spacing: 0;
+    }
+
+    .stage-header p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 0.84rem;
+      line-height: 1.35;
+    }
+
+    .tool-list {
+      display: grid;
+      gap: 10px;
+    }
+
+    .tool-card {
+      display: grid;
+      grid-template-rows: auto minmax(42px, 1fr) auto auto;
+      gap: 12px;
+      height: 248px;
+      padding: 14px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--surface);
+      box-shadow: 0 1px 0 rgba(23, 32, 42, 0.02);
+      transition: border-color 160ms ease, box-shadow 160ms ease, transform 160ms ease;
+    }
+
+    .tool-card:hover,
+    .tool-card:focus-within {
+      border-color: var(--stage-color);
+      box-shadow: var(--shadow);
+      transform: translateY(-2px);
+    }
+
+    .card-top {
+      display: grid;
+      grid-template-columns: auto 1fr auto;
+      gap: 10px;
+      align-items: start;
+      min-width: 0;
+    }
+
+    .tool-icon {
+      display: grid;
+      place-items: center;
+      width: 38px;
+      height: 38px;
+      border-radius: var(--radius);
+      background: var(--stage-bg);
+      color: var(--stage-color);
+      flex: 0 0 auto;
+    }
+
+    .tool-icon svg {
+      width: 20px;
+      height: 20px;
+    }
+
+    .card-title {
+      min-width: 0;
+    }
+
+    .card-title h3 {
+      display: -webkit-box;
+      margin: 0;
+      min-height: 2.4em;
+      overflow: hidden;
+      font-size: 1rem;
+      line-height: 1.2;
+      letter-spacing: 0;
+      overflow-wrap: anywhere;
+      -webkit-box-orient: vertical;
+      -webkit-line-clamp: 2;
+    }
+
+    .card-title .file-name {
+      display: block;
+      margin-top: 5px;
+      color: var(--subtle);
+      font-size: 0.75rem;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .favorite-btn {
+      display: grid;
+      place-items: center;
+      width: 34px;
+      height: 34px;
+      border: 1px solid transparent;
+      border-radius: 50%;
+      background: transparent;
+      color: var(--subtle);
+    }
+
+    .favorite-btn:hover,
+    .favorite-btn:focus-visible {
+      border-color: var(--line);
+      background: var(--surface-soft);
+      color: var(--gold);
+      outline: none;
+    }
+
+    .favorite-btn.is-active {
+      color: var(--gold);
+    }
+
+    .favorite-btn svg {
+      width: 18px;
+      height: 18px;
+      fill: none;
+    }
+
+    .favorite-btn.is-active svg {
+      fill: currentColor;
+    }
+
+    .description {
+      display: -webkit-box;
+      margin: 0;
+      overflow: hidden;
+      color: var(--muted);
+      font-size: 0.88rem;
+      line-height: 1.45;
+      -webkit-box-orient: vertical;
+      -webkit-line-clamp: 2;
+    }
+
+    .card-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 7px;
+      align-items: center;
+      margin-top: auto;
+    }
+
+    .tag {
+      display: inline-flex;
+      align-items: center;
+      min-height: 25px;
+      padding: 0 8px;
+      border-radius: 999px;
+      background: var(--stage-bg);
+      color: var(--stage-color);
+      font-size: 0.73rem;
+      font-weight: 900;
+      letter-spacing: 0;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+
+    .tool-kind {
+      color: var(--subtle);
+      font-size: 0.75rem;
+      font-weight: 800;
+      letter-spacing: 0;
+      text-transform: uppercase;
+    }
+
+    .card-actions {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .open-tool {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      min-height: 40px;
+      padding: 0 12px;
+      border: 1px solid var(--stage-color);
+      border-radius: var(--radius);
+      background: var(--stage-color);
+      color: #fff;
+      font-size: 0.88rem;
+      font-weight: 850;
+      text-decoration: none;
+    }
+
+    .open-tool:hover,
+    .open-tool:focus-visible {
+      box-shadow: 0 0 0 4px var(--stage-ring);
+      outline: none;
+    }
+
+    .open-tool svg {
+      width: 16px;
+      height: 16px;
+    }
+
+    .copy-link {
+      display: grid;
+      place-items: center;
+      width: 40px;
+      height: 40px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--surface);
+      color: var(--muted);
+    }
+
+    .copy-link:hover,
+    .copy-link:focus-visible {
+      border-color: var(--stage-color);
+      color: var(--stage-color);
+      outline: none;
+    }
+
+    .copy-link svg {
+      width: 16px;
+      height: 16px;
+    }
+
+    .empty-state {
+      display: none;
+      min-height: 220px;
+      place-items: center;
+      margin-top: 20px;
+      border: 1px dashed var(--line-strong);
+      border-radius: var(--radius);
+      color: var(--muted);
+      text-align: center;
+    }
+
+    .empty-state.is-visible {
+      display: grid;
+    }
+
+    .empty-state strong {
+      display: block;
+      margin-bottom: 6px;
+      color: var(--ink);
+      font-size: 1rem;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    [data-stage="Implementation"] {
+      --stage-color: var(--green);
+      --stage-bg: #eaf7f0;
+      --stage-ring: rgba(23, 132, 91, 0.14);
+    }
+
+    [data-stage="Adoption"] {
+      --stage-color: var(--blue);
+      --stage-bg: #eef4ff;
+      --stage-ring: rgba(36, 107, 254, 0.14);
+    }
+
+    [data-stage="Sustain Growth"] {
+      --stage-color: var(--gold);
+      --stage-bg: #fff2e2;
+      --stage-ring: rgba(154, 102, 24, 0.14);
+    }
+
+    [data-stage="Renewal"] {
+      --stage-color: var(--red);
+      --stage-bg: #fbeaf0;
+      --stage-ring: rgba(189, 63, 85, 0.14);
+    }
+
+    [data-stage="Manager Tools"] {
+      --stage-color: var(--gray);
+      --stage-bg: #eef1f5;
+      --stage-ring: rgba(93, 104, 120, 0.14);
+    }
+
+    @media (max-width: 1200px) {
+      .quick-grid,
+      .lifecycle-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+      }
+    }
+
+    @media (max-width: 880px) {
+      .app-shell {
+        padding: 16px;
+      }
+
+      .topbar {
+        grid-template-columns: 1fr;
+      }
+
+      .overview-strip,
+      .utility-strip {
+        grid-template-columns: 1fr 1fr;
+      }
+
+      .quick-grid,
+      .lifecycle-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+
+    @media (max-width: 620px) {
+      .app-shell {
+        padding: 14px;
+      }
+
+      h1 {
+        font-size: 2.25rem;
+      }
+
+      .overview-strip,
+      .quick-grid,
+      .utility-strip,
+      .mini-tools,
+      .lifecycle-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .section-heading {
+        display: grid;
+        align-items: start;
+      }
+
+      .roadmap-link {
+        width: 100%;
+      }
+
+      .stage-header {
+        min-height: auto;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app-shell">
+    <header class="topbar">
+      <div class="title-block">
+        <div class="eyebrow">
+          <svg aria-hidden="true"><use href="#icon-spark"></use></svg>
+          Customer Success
+        </div>
+        <h1>CSM AI Tools</h1>
+        <p class="subtitle">AI-powered tools across the customer lifecycle</p>
+      </div>
+
+      <div class="search-panel" role="search">
+        <label class="search-wrap">
+          <span class="hidden">Search tools</span>
+          <svg aria-hidden="true"><use href="#icon-search"></use></svg>
+          <input class="search-input" id="searchInput" type="search" placeholder="Search by tool, file, lifecycle, or intent">
+          <button class="clear-search" id="clearSearch" type="button" aria-label="Clear search">
+            <svg aria-hidden="true"><use href="#icon-x"></use></svg>
+          </button>
+        </label>
+        <nav class="filter-row" id="stageFilters" aria-label="Lifecycle filters"></nav>
+      </div>
+    </header>
+
+    <section class="overview-strip" aria-label="Tool summary">
+      <div class="metric">
+        <strong id="totalTools">0</strong>
+        <span>Tools</span>
+      </div>
+      <div class="metric">
+        <strong id="visibleTools">0</strong>
+        <span>Showing</span>
+      </div>
+      <div class="metric">
+        <strong id="favoriteCount">0</strong>
+        <span>Favorites</span>
+      </div>
+      <div class="metric">
+        <strong>5</strong>
+        <span>Lifecycle Areas</span>
+      </div>
+    </section>
+
+    <section class="quick-actions" aria-labelledby="quickActionsTitle">
+      <div class="section-heading">
+        <div>
+          <h2 id="quickActionsTitle">Quick Actions</h2>
+          <p>Jump into the most common CSM workflows.</p>
+        </div>
+      </div>
+      <div class="quick-grid" id="quickActionsGrid"></div>
+    </section>
+
+    <section class="utility-strip" aria-label="Saved tools">
+      <div class="utility-section">
+        <div class="utility-title">
+          <h2>Favorites</h2>
+        </div>
+        <div class="mini-tools" id="favoriteTools"></div>
+      </div>
+      <div class="utility-section">
+        <div class="utility-title">
+          <h2>Recently Used</h2>
+        </div>
+        <div class="mini-tools" id="recentTools"></div>
+      </div>
+    </section>
+
+    <main>
+      <section class="lifecycle-grid" id="lifecycleGrid" aria-label="CSM lifecycle tools"></section>
+      <div class="empty-state" id="emptyState">
+        <div>
+          <strong>No tools match this view</strong>
+          <span>No matching lifecycle tools.</span>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <svg aria-hidden="true" width="0" height="0" style="position:absolute">
+    <defs>
+      <symbol id="icon-spark" viewBox="0 0 24 24">
+        <path d="M13 2 9.7 9.7 2 13l7.7 3.3L13 24l3.3-7.7L24 13l-7.7-3.3L13 2Z" fill="currentColor"/>
+      </symbol>
+      <symbol id="icon-search" viewBox="0 0 24 24">
+        <path d="m21 21-4.35-4.35M10.8 18.2a7.4 7.4 0 1 1 0-14.8 7.4 7.4 0 0 1 0 14.8Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+      </symbol>
+      <symbol id="icon-x" viewBox="0 0 24 24">
+        <path d="m6 6 12 12M18 6 6 18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+      </symbol>
+      <symbol id="icon-arrow" viewBox="0 0 24 24">
+        <path d="M7 17 17 7M9 7h8v8" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      </symbol>
+      <symbol id="icon-chevron" viewBox="0 0 24 24">
+        <path d="m9 18 6-6-6-6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      </symbol>
+      <symbol id="icon-star" viewBox="0 0 24 24">
+        <path d="m12 2.7 2.9 5.9 6.5.9-4.7 4.6 1.1 6.5-5.8-3.1-5.8 3.1 1.1-6.5-4.7-4.6 6.5-.9L12 2.7Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
+      </symbol>
+      <symbol id="icon-link" viewBox="0 0 24 24">
+        <path d="M10 13a5 5 0 0 0 7.1 0l2-2a5 5 0 0 0-7.1-7.1l-1.1 1.1M14 11a5 5 0 0 0-7.1 0l-2 2A5 5 0 0 0 12 20.1l1.1-1.1" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+      </symbol>
+      <symbol id="icon-map" viewBox="0 0 24 24">
+        <path d="m9 18-6 3V6l6-3 6 3 6-3v15l-6 3-6-3Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+        <path d="M9 3v15M15 6v15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+      </symbol>
+      <symbol id="icon-briefcase" viewBox="0 0 24 24">
+        <path d="M9 7V5a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2M4 7h16v12H4V7Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+        <path d="M4 12h16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+      </symbol>
+      <symbol id="icon-plan" viewBox="0 0 24 24">
+        <path d="M7 4h10a2 2 0 0 1 2 2v14H5V6a2 2 0 0 1 2-2Z" fill="none" stroke="currentColor" stroke-width="2"/>
+        <path d="M8 9h8M8 13h8M8 17h5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+      </symbol>
+      <symbol id="icon-pulse" viewBox="0 0 24 24">
+        <path d="M3 12h4l2-7 4 14 2-7h6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      </symbol>
+      <symbol id="icon-renew" viewBox="0 0 24 24">
+        <path d="M20 6v5h-5M4 18v-5h5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M19 11a7 7 0 0 0-12.1-4.7L4 9M5 13a7 7 0 0 0 12.1 4.7L20 15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+      </symbol>
+      <symbol id="icon-release" viewBox="0 0 24 24">
+        <path d="M12 3 3 7.5 12 12l9-4.5L12 3ZM3 12l9 4.5 9-4.5M3 16.5 12 21l9-4.5" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+      </symbol>
+      <symbol id="icon-workflow" viewBox="0 0 24 24">
+        <path d="M6 7a3 3 0 1 0 0-6 3 3 0 0 0 0 6ZM18 23a3 3 0 1 0 0-6 3 3 0 0 0 0 6ZM18 7a3 3 0 1 0 0-6 3 3 0 0 0 0 6ZM6 4h7M15 6l-3 6 3 6M9 18h4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      </symbol>
+      <symbol id="icon-calculator" viewBox="0 0 24 24">
+        <path d="M7 3h10a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2Z" fill="none" stroke="currentColor" stroke-width="2"/>
+        <path d="M8 7h8M8 11h.01M12 11h.01M16 11h.01M8 15h.01M12 15h.01M16 15h.01M8 19h.01M12 19h.01M16 19h.01" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/>
+      </symbol>
+      <symbol id="icon-chat" viewBox="0 0 24 24">
+        <path d="M4 5h16v11H8l-4 4V5Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+        <path d="M8 9h8M8 13h5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+      </symbol>
+      <symbol id="icon-shield" viewBox="0 0 24 24">
+        <path d="M12 3 5 6v5c0 4.5 2.9 8.6 7 10 4.1-1.4 7-5.5 7-10V6l-7-3Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+        <path d="m9 12 2 2 4-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      </symbol>
+    </defs>
+  </svg>
+
+  <script>
+    const lifecycleStages = [
+      {
+        title: "Implementation",
+        note: "Carry context from presales and setup into the CSM motion.",
+        icon: "icon-briefcase"
+      },
+      {
+        title: "Adoption",
+        note: "Build plans, reinforce usage, and keep goals visible.",
+        icon: "icon-plan"
+      },
+      {
+        title: "Sustain Growth",
+        note: "Monitor health, releases, support signals, and account friction.",
+        icon: "icon-pulse"
+      },
+      {
+        title: "Renewal",
+        note: "Prepare the value story, risks, and expansion context.",
+        icon: "icon-renew"
+      },
+      {
+        title: "Manager Tools",
+        note: "Reference views and tools for leadership operating rhythms.",
+        icon: "icon-map"
+      }
+    ];
+
+    const htmlFiles = [
+      "ai-roadmap.html",
+      "elevator.html",
+      "Full-suite-savings-tool.html",
+      "mockup-release-assistant.html",
+      "new-value-calculator.html",
+      "success-plan.html",
+      "support-case-analysis.html",
+      "workflow-analyzer.html"
+    ];
+
+    const quickActions = [
+      {
+        id: "meeting",
+        label: "Prepare for customer meeting",
+        keywords: ["meeting", "success", "support", "release", "value", "roadmap", "elevator"],
+        icon: "icon-chat"
+      },
+      {
+        id: "success-plan",
+        label: "Build success plan",
+        keywords: ["success", "plan", "kpi", "value", "workflow"],
+        icon: "icon-plan"
+      },
+      {
+        id: "account-health",
+        label: "Analyze account health",
+        keywords: ["health", "risk", "support", "case", "workflow", "analysis"],
+        icon: "icon-pulse"
+      },
+      {
+        id: "renewal",
+        label: "Prepare renewal",
+        keywords: ["renewal", "whitespace", "value", "calculator", "support", "roadmap"],
+        icon: "icon-renew"
+      },
+      {
+        id: "release",
+        label: "Explain product updates",
+        keywords: ["release", "mockup", "assistant"],
+        icon: "icon-release"
+      }
+    ];
+
+    const storageKeys = {
+      favorites: "csmToolsHub.favorites",
+      recent: "csmToolsHub.recent"
+    };
+
+    const keywordRules = [
+      { stage: "Manager Tools", words: ["manager", "roadmap", "overview", "capacity", "portfolio", "icp"] },
+      { stage: "Renewal", words: ["renewal", "whitespace", "value", "calculator", "roi", "expansion", "savings"] },
+      { stage: "Sustain Growth", words: ["health", "risk", "support", "case", "release", "escalation", "trend", "sustain"] },
+      { stage: "Adoption", words: ["plan", "kpi", "adoption", "meeting", "intro", "success"] },
+      { stage: "Implementation", words: ["handoff", "implementation", "workflow", "elevator"] }
+    ];
+
+    const descriptionRules = [
+      { words: ["roadmap"], text: "Lifecycle reference for AI tool strategy, priorities, and stage structure." },
+      { words: ["success", "plan"], text: "Create and maintain customer goals, milestones, KPIs, and ownership." },
+      { words: ["support", "case"], text: "Analyze support cases to surface trends, risks, and meeting context." },
+      { words: ["release"], text: "Turn release information into customer-ready summaries and materials." },
+      { words: ["value", "calculator", "savings"], text: "Estimate business value, savings, and ROI for customer outcomes and renewals." },
+      { words: ["workflow"], text: "Review workflow configuration details and summarize operational signals." },
+      { words: ["elevator"], text: "Capture shared account context and turn it into quick CSM prompts." }
+    ];
+
+    const iconRules = [
+      { words: ["roadmap"], icon: "icon-map" },
+      { words: ["release"], icon: "icon-release" },
+      { words: ["value", "calculator", "savings"], icon: "icon-calculator" },
+      { words: ["support", "case", "health", "risk"], icon: "icon-shield" },
+      { words: ["workflow"], icon: "icon-workflow" },
+      { words: ["success", "plan"], icon: "icon-plan" },
+      { words: ["elevator"], icon: "icon-chat" }
+    ];
+
+    let activeStage = "All";
+    let searchTerm = "";
+    let favorites = readStorage(storageKeys.favorites, []);
+    let recentTools = readStorage(storageKeys.recent, []);
+
+    const tools = htmlFiles
+      .filter((file) => file.toLowerCase() !== "index.html" && file.toLowerCase().endsWith(".html"))
+      .map(createToolFromFile);
+
+    favorites = favorites.filter((id) => tools.some((tool) => tool.id === id));
+    recentTools = recentTools.filter((id) => tools.some((tool) => tool.id === id));
+
+    const elements = {
+      search: document.getElementById("searchInput"),
+      clearSearch: document.getElementById("clearSearch"),
+      filters: document.getElementById("stageFilters"),
+      grid: document.getElementById("lifecycleGrid"),
+      quick: document.getElementById("quickActionsGrid"),
+      favorites: document.getElementById("favoriteTools"),
+      recent: document.getElementById("recentTools"),
+      empty: document.getElementById("emptyState"),
+      total: document.getElementById("totalTools"),
+      visible: document.getElementById("visibleTools"),
+      favoriteCount: document.getElementById("favoriteCount")
+    };
+
+    init();
+
+    function init() {
+      elements.total.textContent = tools.length;
+      renderFilters();
+      renderQuickActions();
+      renderUtilities();
+      renderTools();
+
+      elements.search.addEventListener("input", (event) => {
+        searchTerm = event.target.value.trim().toLowerCase();
+        elements.clearSearch.classList.toggle("is-visible", searchTerm.length > 0);
+        renderTools();
+      });
+
+      elements.clearSearch.addEventListener("click", () => {
+        elements.search.value = "";
+        searchTerm = "";
+        elements.clearSearch.classList.remove("is-visible");
+        elements.search.focus();
+        renderTools();
+      });
+
+      [elements.favorites, elements.recent].forEach((container) => {
+        container.addEventListener("click", (event) => {
+          const link = event.target.closest("[data-mini-open]");
+          if (link) {
+            markRecentlyUsed(link.dataset.miniOpen);
+          }
+        });
+      });
+    }
+
+    function createToolFromFile(file) {
+      const baseName = decodeURIComponent(file)
+        .replace(/\.html$/i, "")
+        .replace(/[-_]+/g, " ")
+        .replace(/\s+/g, " ")
+        .trim();
+      const name = toTitleCase(baseName);
+      const haystack = `${file} ${baseName}`.toLowerCase();
+      const category = inferStage(haystack);
+      const description = inferDescription(haystack, name);
+      const icon = inferIcon(haystack);
+      const id = slugify(baseName);
+
+      return {
+        id,
+        file,
+        name,
+        url: encodeURI(file),
+        category,
+        description,
+        icon,
+        kind: file.toLowerCase().includes("roadmap") ? "Reference" : "Interactive Tool",
+        searchable: `${name} ${file} ${category} ${description}`.toLowerCase()
+      };
+    }
+
+    function inferStage(haystack) {
+      const rule = keywordRules.find((item) => item.words.some((word) => haystack.includes(word)));
+      return rule ? rule.stage : "Adoption";
+    }
+
+    function inferDescription(haystack, name) {
+      const rule = descriptionRules.find((item) => item.words.some((word) => haystack.includes(word)));
+      return rule ? rule.text : `Open ${name} for CSM workflow support.`;
+    }
+
+    function inferIcon(haystack) {
+      const rule = iconRules.find((item) => item.words.some((word) => haystack.includes(word)));
+      return rule ? rule.icon : "icon-briefcase";
+    }
+
+    function renderFilters() {
+      const filters = ["All", ...lifecycleStages.map((stage) => stage.title), "Favorites"];
+      elements.filters.innerHTML = filters.map((filter) => `
+        <button class="filter-chip${filter === activeStage ? " is-active" : ""}" type="button" data-stage-filter="${escapeAttribute(filter)}">
+          ${escapeHtml(filter)}
+        </button>
+      `).join("");
+
+      elements.filters.querySelectorAll("[data-stage-filter]").forEach((button) => {
+        button.addEventListener("click", () => {
+          activeStage = button.dataset.stageFilter;
+          renderFilters();
+          renderTools();
+        });
+      });
+    }
+
+    function renderQuickActions() {
+      elements.quick.innerHTML = quickActions.map((action) => {
+        const count = matchingQuickActionTools(action).length;
+        return `
+          <button class="quick-action" type="button" data-quick-action="${escapeAttribute(action.id)}" data-intent="${escapeAttribute(action.id)}">
+            <span class="icon-frame"><svg aria-hidden="true"><use href="#${action.icon}"></use></svg></span>
+            <span>
+              <strong>${escapeHtml(action.label)}</strong>
+              <span>${count} matching ${count === 1 ? "tool" : "tools"}</span>
+            </span>
+            <svg class="chevron" aria-hidden="true"><use href="#icon-chevron"></use></svg>
+          </button>
+        `;
+      }).join("");
+
+      elements.quick.querySelectorAll("[data-quick-action]").forEach((button) => {
+        button.addEventListener("click", () => {
+          const action = quickActions.find((item) => item.id === button.dataset.quickAction);
+          searchTerm = action.keywords.join(" ");
+          activeStage = "All";
+          elements.search.value = action.label;
+          elements.clearSearch.classList.add("is-visible");
+          renderFilters();
+          renderTools(action);
+          document.getElementById("lifecycleGrid").scrollIntoView({ behavior: "smooth", block: "start" });
+        });
+      });
+    }
+
+    function renderTools(quickAction = null) {
+      const visibleTools = getVisibleTools(quickAction);
+      let visibleCount = 0;
+
+      elements.grid.innerHTML = lifecycleStages.map((stage, index) => {
+        const stageTools = visibleTools.filter((tool) => tool.category === stage.title);
+        visibleCount += stageTools.length;
+        return `
+          <section class="stage-column${stageTools.length ? "" : " hidden"}" data-stage="${escapeAttribute(stage.title)}" aria-labelledby="stage-${index}">
+            <header class="stage-header">
+              <span class="stage-kicker">
+                <svg aria-hidden="true"><use href="#${stage.icon}"></use></svg>
+                ${String(index + 1).padStart(2, "0")}
+              </span>
+              <h2 id="stage-${index}">${escapeHtml(stage.title)}</h2>
+              <p>${escapeHtml(stage.note)}</p>
+            </header>
+            <div class="tool-list">
+              ${stageTools.map(renderToolCard).join("")}
+            </div>
+          </section>
+        `;
+      }).join("");
+
+      elements.visible.textContent = visibleCount;
+      elements.favoriteCount.textContent = favorites.length;
+      elements.empty.classList.toggle("is-visible", visibleCount === 0);
+      bindToolActions();
+    }
+
+    function getVisibleTools(quickAction) {
+      return tools.filter((tool) => {
+        const matchesStage = activeStage === "All" ||
+          (activeStage === "Favorites" && favorites.includes(tool.id)) ||
+          tool.category === activeStage;
+        const matchesSearch = !searchTerm ||
+          tool.searchable.includes(searchTerm) ||
+          searchTerm.split(/\s+/).some((term) => term && tool.searchable.includes(term));
+        const matchesQuickAction = !quickAction || matchingQuickActionTools(quickAction).some((match) => match.id === tool.id);
+        return matchesStage && matchesSearch && matchesQuickAction;
+      });
+    }
+
+    function matchingQuickActionTools(action) {
+      return tools.filter((tool) => action.keywords.some((keyword) => tool.searchable.includes(keyword)));
+    }
+
+    function renderToolCard(tool) {
+      const isFavorite = favorites.includes(tool.id);
+      return `
+        <article class="tool-card" data-stage="${escapeAttribute(tool.category)}" data-tool-id="${escapeAttribute(tool.id)}">
+          <div class="card-top">
+            <span class="tool-icon"><svg aria-hidden="true"><use href="#${tool.icon}"></use></svg></span>
+            <div class="card-title">
+              <h3>${escapeHtml(tool.name)}</h3>
+              <span class="file-name">${escapeHtml(tool.file)}</span>
+            </div>
+            <button class="favorite-btn${isFavorite ? " is-active" : ""}" type="button" data-favorite="${escapeAttribute(tool.id)}" aria-label="${isFavorite ? "Remove from favorites" : "Add to favorites"}">
+              <svg aria-hidden="true"><use href="#icon-star"></use></svg>
+            </button>
+          </div>
+          <p class="description">${escapeHtml(tool.description)}</p>
+          <div class="card-meta">
+            <span class="tag">${escapeHtml(tool.category)}</span>
+            <span class="tool-kind">${escapeHtml(tool.kind)}</span>
+          </div>
+          <div class="card-actions">
+            <a class="open-tool" href="${escapeAttribute(tool.url)}" data-open-tool="${escapeAttribute(tool.id)}" data-drawer-url="${escapeAttribute(tool.url)}" data-drawer-title="${escapeAttribute(tool.name)}">
+              Open Tool
+              <svg aria-hidden="true"><use href="#icon-arrow"></use></svg>
+            </a>
+            <button class="copy-link" type="button" data-copy-link="${escapeAttribute(tool.id)}" aria-label="Copy link">
+              <svg aria-hidden="true"><use href="#icon-link"></use></svg>
+            </button>
+          </div>
+        </article>
+      `;
+    }
+
+    function bindToolActions() {
+      elements.grid.querySelectorAll("[data-favorite]").forEach((button) => {
+        button.addEventListener("click", () => {
+          toggleFavorite(button.dataset.favorite);
+        });
+      });
+
+      elements.grid.querySelectorAll("[data-open-tool]").forEach((link) => {
+        link.addEventListener("click", (e) => {
+          e.preventDefault();
+          markRecentlyUsed(link.dataset.openTool);
+          openDrawer(link.dataset.drawerUrl, link.dataset.drawerTitle);
+        });
+      });
+
+      elements.grid.querySelectorAll("[data-copy-link]").forEach((button) => {
+        button.addEventListener("click", async () => {
+          const tool = tools.find((item) => item.id === button.dataset.copyLink);
+          const url = new URL(tool.url, window.location.href).href;
+          await copyText(url);
+          button.setAttribute("aria-label", "Copied");
+          setTimeout(() => button.setAttribute("aria-label", "Copy link"), 1200);
+        });
+      });
+    }
+
+    function toggleFavorite(toolId) {
+      favorites = favorites.includes(toolId)
+        ? favorites.filter((id) => id !== toolId)
+        : [...favorites, toolId];
+      writeStorage(storageKeys.favorites, favorites);
+      renderUtilities();
+      renderTools();
+    }
+
+    function markRecentlyUsed(toolId) {
+      recentTools = [toolId, ...recentTools.filter((id) => id !== toolId)].slice(0, 6);
+      writeStorage(storageKeys.recent, recentTools);
+      renderUtilities();
+    }
+
+    function renderUtilities() {
+      const favoriteItems = favorites.map(findTool).filter(Boolean).slice(0, 3);
+      const recentItems = recentTools.map(findTool).filter(Boolean).slice(0, 3);
+      elements.favorites.innerHTML = renderMiniTools(favoriteItems, "No favorites yet");
+      elements.recent.innerHTML = renderMiniTools(recentItems, "No recent tools yet");
+    }
+
+    function renderMiniTools(items, emptyLabel) {
+      if (!items.length) {
+        return `<div class="empty-mini">${escapeHtml(emptyLabel)}</div>`;
+      }
+      return items.map((tool) => `
+        <a class="mini-tool" href="${escapeAttribute(tool.url)}" data-mini-open="${escapeAttribute(tool.id)}" data-stage="${escapeAttribute(tool.category)}" data-drawer-url="${escapeAttribute(tool.url)}" data-drawer-title="${escapeAttribute(tool.name)}">
+          <svg aria-hidden="true"><use href="#${tool.icon}"></use></svg>
+          <span>${escapeHtml(tool.name)}</span>
+        </a>
+      `).join("");
+    }
+
+    function findTool(toolId) {
+      return tools.find((tool) => tool.id === toolId);
+    }
+
+    async function copyText(text) {
+      if (navigator.clipboard && window.isSecureContext) {
+        try {
+          await navigator.clipboard.writeText(text);
+          return;
+        } catch (error) {
+          // Fall through to the textarea copy path for stricter browser contexts.
+        }
+      }
+
+      const textarea = document.createElement("textarea");
+      textarea.value = text;
+      textarea.setAttribute("readonly", "");
+      textarea.style.position = "fixed";
+      textarea.style.opacity = "0";
+      document.body.appendChild(textarea);
+      textarea.select();
+      document.execCommand("copy");
+      textarea.remove();
+    }
+
+    function readStorage(key, fallback) {
+      try {
+        return JSON.parse(localStorage.getItem(key)) || fallback;
+      } catch (error) {
+        return fallback;
+      }
+    }
+
+    function writeStorage(key, value) {
+      try {
+        localStorage.setItem(key, JSON.stringify(value));
+      } catch (error) {
+        return;
+      }
+    }
+
+    function toTitleCase(text) {
+      const alwaysUpper = new Set(["AI", "CSM", "ROI", "KPI"]);
+      return text
+        .split(" ")
+        .filter(Boolean)
+        .map((word) => {
+          const upper = word.toUpperCase();
+          if (alwaysUpper.has(upper)) return upper;
+          return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
+        })
+        .join(" ");
+    }
+
+    function slugify(text) {
+      return text
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, "-")
+        .replace(/^-+|-+$/g, "");
+    }
+
+    function escapeHtml(value) {
+      return String(value).replace(/[&<>"']/g, (char) => ({
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        "\"": "&quot;",
+        "'": "&#39;"
+      })[char]);
+    }
+
+    function escapeAttribute(value) {
+      return escapeHtml(value);
+    }
+
+    function openDrawer(url, title) {
+      const drawer = document.getElementById("tool-drawer");
+      const iframe  = document.getElementById("tool-frame");
+      const titleEl = document.getElementById("drawer-title");
+      titleEl.textContent = title || "Tool";
+      iframe.src = url;
+      drawer.classList.add("is-open");
+      document.body.style.overflow = "hidden";
+    }
+
+    function closeDrawer() {
+      const drawer = document.getElementById("tool-drawer");
+      const iframe  = document.getElementById("tool-frame");
+      drawer.classList.remove("is-open");
+      document.body.style.overflow = "";
+      setTimeout(() => { iframe.src = ""; }, 300);
+    }
+
+    document.addEventListener("click", (e) => {
+      const link = e.target.closest("[data-drawer-url]");
+      if (!link) return;
+      e.preventDefault();
+      const id = link.dataset.openTool || link.dataset.miniOpen;
+      if (id) markRecentlyUsed(id);
+      openDrawer(link.dataset.drawerUrl, link.dataset.drawerTitle);
+    });
+
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape") closeDrawer();
+    });
+
+  </script>
+
+  <style>
+    .tool-drawer { display: none; position: fixed; inset: 0; z-index: 1000; }
+    .tool-drawer.is-open { display: flex; }
+    .drawer-overlay { flex: 1; background: rgba(23,32,42,0.45); cursor: pointer; }
+    .drawer-panel {
+      width: min(82vw, 1200px); height: 100%;
+      background: var(--surface); display: flex; flex-direction: column;
+      box-shadow: -8px 0 48px rgba(23,32,42,0.18);
+      animation: drawerSlideIn 0.28s cubic-bezier(0.4,0,0.2,1);
+    }
+    @keyframes drawerSlideIn { from { transform: translateX(100%); } to { transform: translateX(0); } }
+    .drawer-header {
+      display: flex; align-items: center; justify-content: space-between;
+      gap: 12px; padding: 14px 18px; border-bottom: 1px solid var(--line); flex-shrink: 0;
+    }
+    .drawer-title { font-size: 1rem; font-weight: 700; color: var(--ink); }
+    .drawer-close {
+      display: flex; align-items: center; justify-content: center;
+      width: 36px; height: 36px; border: 1px solid var(--line);
+      border-radius: var(--radius); background: var(--surface); color: var(--muted); cursor: pointer;
+    }
+    .drawer-close:hover { background: var(--surface-soft); color: var(--ink); }
+    .drawer-close svg { width: 16px; height: 16px; stroke: currentColor; fill: none; stroke-width: 2; }
+    .drawer-frame { flex: 1; border: none; width: 100%; background: var(--page); }
+  </style>
+
+  <div id="tool-drawer" class="tool-drawer" role="dialog" aria-modal="true">
+    <div class="drawer-overlay" onclick="closeDrawer()"></div>
+    <div class="drawer-panel">
+      <div class="drawer-header">
+        <span id="drawer-title" class="drawer-title"></span>
+        <button class="drawer-close" onclick="closeDrawer()" aria-label="Close panel">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18 6L6 18M6 6l12 12"/></svg>
+        </button>
+      </div>
+      <iframe id="tool-frame" class="drawer-frame" src="" allow="clipboard-write" title="Tool panel"></iframe>
+    </div>
+  </div>
+
+</body>
+</html>

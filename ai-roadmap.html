@@ -133,22 +133,49 @@
 
     .quick-stats {
       display: grid;
-      grid-template-columns: repeat(2, minmax(130px, 1fr));
-      gap: 8px;
-      min-width: 300px;
+      grid-template-columns: repeat(3, minmax(150px, 1fr));
+      gap: 0;
+      min-width: 560px;
+      padding: 8px 0;
+      border-top: 1px solid rgba(31, 41, 51, 0.2);
+      border-bottom: 1px solid rgba(31, 41, 51, 0.2);
     }
 
     .stat {
-      padding: 9px 11px;
-      border: 1.5px solid var(--line);
-      border-radius: var(--radius);
-      background: rgba(255, 255, 255, 0.82);
-      box-shadow: 5px 5px 0 rgba(31, 41, 51, 0.08);
+      display: block;
+      padding: 0 18px;
+      border: 0;
+      border-radius: 0;
+      background: transparent;
+      box-shadow: none;
+      color: inherit;
+      text-decoration: none;
+    }
+
+    .stat + .stat {
+      border-left: 1px solid rgba(31, 41, 51, 0.16);
+    }
+
+    a.stat {
+      cursor: pointer;
+    }
+
+    a.stat:hover strong,
+    a.stat:focus-visible strong {
+      text-decoration: underline;
+      text-decoration-thickness: 2px;
+      text-underline-offset: 4px;
+    }
+
+    a.stat:focus-visible {
+      outline: 2px solid rgba(31, 41, 51, 0.42);
+      outline-offset: 5px;
     }
 
     .stat strong {
       display: block;
-      font-size: 1.25rem;
+      color: var(--ink);
+      font-size: 1.42rem;
       line-height: 1;
     }
 
@@ -156,46 +183,10 @@
       display: block;
       margin-top: 4px;
       color: var(--muted);
-      font-size: 0.78rem;
-      font-weight: 800;
+      font-size: 0.66rem;
+      font-weight: 900;
       letter-spacing: 0.04em;
       text-transform: uppercase;
-    }
-
-    .stat-cost {
-      background: #fff3e3;
-      border-color: #c98931;
-    }
-
-    .stat-cost strong {
-      color: #8a5017;
-    }
-
-    .stat-gain {
-      background: #e8f5ed;
-      border-color: #2f8f55;
-    }
-
-    .stat-gain strong {
-      color: #17684c;
-    }
-
-    .stat-progress {
-      background: #eaf7fb;
-      border-color: #23819a;
-    }
-
-    .stat-progress strong {
-      color: #0e5f73;
-    }
-
-    .stat-rollout {
-      background: #f2f5f7;
-      border-color: #59636f;
-    }
-
-    .stat-rollout strong {
-      color: #374151;
     }
 
     .view-switch {
@@ -1064,8 +1055,192 @@
       padding: 6px 4px 10px;
     }
 
-    .roi-view[hidden] {
+    .roi-view[hidden],
+    .accelerator-view[hidden] {
       display: none;
+    }
+
+    .accelerator-view {
+      display: grid;
+      gap: 12px;
+      padding: 6px 4px 10px;
+    }
+
+    .accelerator-hero,
+    .accelerator-rule,
+    .accelerator-table-card {
+      border: 2px solid rgba(71, 85, 105, 0.42);
+      border-radius: 18px;
+      background: rgba(255, 255, 255, 0.76);
+      box-shadow: var(--shadow);
+    }
+
+    .accelerator-hero {
+      display: grid;
+      grid-template-columns: minmax(280px, 1fr) minmax(240px, 360px);
+      gap: 16px;
+      align-items: start;
+      padding: 16px;
+    }
+
+    .accelerator-hero h2,
+    .accelerator-table-card h2 {
+      margin: 0;
+      font-size: clamp(1.25rem, 2vw, 1.75rem);
+      line-height: 1.04;
+      letter-spacing: 0;
+    }
+
+    .accelerator-hero p,
+    .accelerator-rule p,
+    .accelerator-table-card p {
+      margin: 6px 0 0;
+      color: var(--muted);
+      font-size: 0.9rem;
+      line-height: 1.36;
+    }
+
+    .accelerator-score {
+      display: grid;
+      gap: 7px;
+    }
+
+    .accelerator-score-item {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 8px 10px;
+      border: 1.3px solid rgba(31, 41, 51, 0.28);
+      border-radius: var(--radius);
+      background: #fbfaf7;
+      font-size: 0.78rem;
+      font-weight: 800;
+    }
+
+    .accelerator-score-item span {
+      color: var(--muted);
+      font-size: 0.66rem;
+      font-weight: 900;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+
+    .accelerator-rules {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .accelerator-rule {
+      display: grid;
+      gap: 8px;
+      min-height: 150px;
+      padding: 13px;
+    }
+
+    .accelerator-rule strong {
+      display: inline-flex;
+      align-items: center;
+      width: max-content;
+      max-width: 100%;
+      min-height: 28px;
+      padding: 4px 8px;
+      border: 1.5px solid var(--manager-dark);
+      border-radius: 999px;
+      color: var(--manager-dark);
+      background: var(--manager-light);
+      font-size: 0.74rem;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    .accelerator-table-card {
+      padding: 14px;
+    }
+
+    .accelerator-table-wrap {
+      overflow-x: auto;
+      margin-top: 12px;
+      border: 1.5px solid rgba(31, 41, 51, 0.28);
+      border-radius: var(--radius);
+      background: #fff;
+    }
+
+    .accelerator-table {
+      width: 100%;
+      min-width: 1380px;
+      border-collapse: collapse;
+      font-size: 0.78rem;
+    }
+
+    .accelerator-table th,
+    .accelerator-table td {
+      padding: 8px 9px;
+      border-bottom: 1px solid rgba(31, 41, 51, 0.12);
+      text-align: left;
+      vertical-align: top;
+    }
+
+    .accelerator-table th {
+      background: var(--manager-light);
+      color: var(--ink);
+      font-size: 0.64rem;
+      font-weight: 950;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+
+    .accelerator-table td.num,
+    .accelerator-table th.num {
+      text-align: right;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .accelerator-table .tool-name {
+      min-width: 220px;
+      font-weight: 850;
+    }
+
+    .accelerator-link {
+      color: var(--ink);
+      text-decoration: none;
+    }
+
+    .accelerator-link:hover,
+    .accelerator-link:focus-visible {
+      text-decoration: underline;
+      text-decoration-thickness: 2px;
+      text-underline-offset: 3px;
+      outline: none;
+    }
+
+    .drop-status {
+      display: inline-flex;
+      align-items: center;
+      min-height: 22px;
+      padding: 3px 7px;
+      border: 1.3px solid rgba(31, 41, 51, 0.42);
+      border-radius: 999px;
+      background: #fff;
+      color: var(--ink);
+      font-size: 0.66rem;
+      font-weight: 900;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+
+    .drop-status.shipped {
+      border-color: #2f8f55;
+      color: #17684c;
+      background: #e8f5ed;
+    }
+
+    .drop-status.backlog {
+      border-color: #59636f;
+      color: #374151;
+      background: #f2f5f7;
     }
 
     .roi-hero,
@@ -1103,6 +1278,11 @@
     .roi-assumptions {
       display: grid;
       gap: 7px;
+    }
+
+    .metric-calculation {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      margin-top: 12px;
     }
 
     .roi-assumption {
@@ -1500,7 +1680,8 @@
 
       .quick-stats {
         min-width: 0;
-        width: min(100%, 380px);
+        width: min(100%, 520px);
+        grid-template-columns: repeat(3, minmax(130px, 1fr));
       }
 
       .manager-feeder-grid {
@@ -1508,7 +1689,13 @@
       }
 
       .roi-hero,
-      .roi-summary-grid {
+      .roi-summary-grid,
+      .accelerator-hero,
+      .accelerator-rules {
+        grid-template-columns: 1fr;
+      }
+
+      .metric-calculation {
         grid-template-columns: 1fr;
       }
     }
@@ -1522,6 +1709,15 @@
         grid-template-columns: 1fr;
       }
 
+      .stat {
+        padding: 9px 0;
+      }
+
+      .stat + .stat {
+        border-top: 1px solid rgba(31, 41, 51, 0.16);
+        border-left: 0;
+      }
+
       .canvas,
       .manager-canvas,
       .digital-motion {
@@ -1533,6 +1729,10 @@
       }
 
       .digital-motion-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .accelerator-rules {
         grid-template-columns: 1fr;
       }
 
@@ -1625,20 +1825,28 @@
       <div class="title-block">
         <div class="source-row">
           <span class="eyebrow">JAGGAER CSM / 2026</span>
-          <a class="source-link" href="AI%20roadmap%20copied%20to%20wsl2.xlsx">Excel Source</a>
+          <a class="source-link" href="AI%20Roadmap%202026/AI%20roadmap%20copied%20to%20wsl2.xlsx">Excel Source</a>
         </div>
         <h1>AI-Powered Customer Success Lifecycle</h1>
         <p class="lede">AI powered tools guiding CSMs from handoff to renewal readiness.</p>
       </div>
       <div class="quick-stats" aria-label="Roadmap summary">
-        <div class="stat stat-progress"><strong id="automationStat">0%</strong><span>Automation Efficiency</span></div>
-        <div class="stat stat-rollout"><strong id="rolledOutStat">0</strong><span>Tools Rolled Out</span></div>
+        <a class="stat" href="#aiProductivityCalculation" data-view-target="roiView" data-scroll-target="aiProductivityCalculation">
+          <strong id="aiProductivityStat">1%</strong><span>AI Productivity Gain</span>
+        </a>
+        <a class="stat" href="#acceleratorDropsList" data-view-target="acceleratorView" data-scroll-target="acceleratorDropsList">
+          <strong id="automationStat">0 hrs</strong><span>Accelerator Savings</span>
+        </a>
+        <a class="stat" href="#toolMappingList" data-view-target="roiView" data-scroll-target="toolMappingList">
+          <strong id="roadmapMappedStat">0</strong><span>Roadmap Tools Mapped</span>
+        </a>
       </div>
     </header>
 
     <nav class="view-switch" role="tablist" aria-label="Roadmap views">
       <button class="view-tab is-active" id="tab-lifecycleView" type="button" role="tab" aria-selected="true" aria-controls="lifecycleView" data-tab-target="lifecycleView">CSM Lifecycle</button>
-      <button class="view-tab" id="tab-managerView" type="button" role="tab" aria-selected="false" aria-controls="managerView" data-tab-target="managerView">Manager Tools</button>
+      <button class="view-tab" id="tab-managerView" type="button" role="tab" aria-selected="false" aria-controls="managerView" data-tab-target="managerView">Internal Tools</button>
+      <button class="view-tab" id="tab-acceleratorView" type="button" role="tab" aria-selected="false" aria-controls="acceleratorView" data-tab-target="acceleratorView">Workflow Accelerators</button>
       <button class="view-tab" id="tab-roiView" type="button" role="tab" aria-selected="false" aria-controls="roiView" data-tab-target="roiView">ROI</button>
     </nav>
 
@@ -1669,17 +1877,51 @@
     </main>
 
     <section class="view-panel manager-view" id="managerView" role="tabpanel" aria-labelledby="tab-managerView" hidden>
-      <section class="legend" aria-label="Manager tools legend">
-        <span class="legend-label">Manager Legend</span>
+      <section class="legend" aria-label="Internal tools legend">
+        <span class="legend-label">Internal Tools Legend</span>
         <span class="legend-item"><span class="legend-shape overview"><svg aria-hidden="true"><use href="#icon-layer"></use></svg></span>Manager overview</span>
-        <span class="legend-item"><span class="legend-shape supporting"><svg aria-hidden="true"><use href="#icon-tool"></use></svg></span>Supporting manager tool</span>
+        <span class="legend-item"><span class="legend-shape supporting"><svg aria-hidden="true"><use href="#icon-tool"></use></svg></span>Supporting internal tool</span>
         <span class="legend-item"><span class="legend-shape feeds-up">↑</span>Feeds the overview</span>
         <span class="legend-item"><span class="legend-prototype">Prototype</span> Prototype status</span>
       </section>
-      <div class="manager-canvas" aria-label="Manager tools">
+      <div class="manager-canvas" aria-label="Internal tools">
         <div class="elevator-layer manager-overview-layer" id="managerOverviewLayer"></div>
         <div class="manager-grid" id="managerGrid"></div>
       </div>
+    </section>
+
+    <section class="view-panel accelerator-view" id="acceleratorView" role="tabpanel" aria-labelledby="tab-acceleratorView" hidden>
+      <section class="accelerator-hero" aria-label="Workflow accelerator summary">
+        <div>
+          <h2>CSM Workflow Accelerators</h2>
+          <p>Small automations, templates, and GPT-assisted helpers stay here as accelerator drops. They add to accelerator savings, but they do not count as roadmap tools unless promoted into the formal lifecycle map.</p>
+        </div>
+        <div class="accelerator-score" id="acceleratorSummaryGrid" aria-label="Workflow accelerator scorecard"></div>
+      </section>
+      <section class="accelerator-rules" id="acceleratorRules" aria-label="Workflow accelerator roadmap rules"></section>
+      <section class="accelerator-table-card" id="acceleratorDropsList" aria-label="Workflow accelerator drops">
+        <h2>Accelerator Drops</h2>
+        <p>Each entry captures the practical value without adding another full roadmap lane.</p>
+        <div class="accelerator-table-wrap">
+          <table class="accelerator-table">
+            <thead>
+              <tr>
+                <th>Accelerator / Automation</th>
+                <th>Description</th>
+                <th>Status</th>
+                <th>Creator</th>
+                <th>Audience</th>
+                <th class="num">Time To Create</th>
+                <th class="num">Estimated Saving / CSM</th>
+                <th class="num">Estimated Team Saving</th>
+                <th>Roadmap Treatment</th>
+                <th>Next Step</th>
+              </tr>
+            </thead>
+            <tbody id="acceleratorTableBody"></tbody>
+          </table>
+        </div>
+      </section>
     </section>
 
     <section class="view-panel roi-view" id="roiView" role="tabpanel" aria-labelledby="tab-roiView" hidden>
@@ -1695,9 +1937,14 @@
         </div>
       </section>
       <section class="roi-summary-grid" id="roiSummaryGrid" aria-label="ROI totals"></section>
-      <section class="roi-table-card efficiency-card" aria-label="Automation efficiency estimate table">
-        <h2>Automation Efficiency Estimate</h2>
-        <p>Current baseline is 100% manual. This view translates expected CSM time savings into per-CSM and total team efficiency lift.</p>
+      <section class="roi-table-card efficiency-card" id="aiProductivityCalculation" aria-label="Automation efficiency estimate table">
+        <h2>AI Productivity Calculation</h2>
+        <p>Current baseline is 100% manual. This view separates current accelerator impact from mapped roadmap-tool assumptions and translates expected CSM time savings into productivity gain.</p>
+        <div class="roi-assumptions metric-calculation" aria-label="AI productivity calculation inputs">
+          <div class="roi-assumption"><span>Executive estimate</span><strong id="aiProductivityCalcStat">1%</strong></div>
+          <div class="roi-assumption"><span>Accelerator savings</span><strong id="acceleratorCalcStat">0 hrs / cycle</strong></div>
+          <div class="roi-assumption"><span>Mapped roadmap tools</span><strong id="roadmapCalcStat">0</strong></div>
+        </div>
         <div class="roi-table-wrap">
           <table class="roi-table">
             <thead>
@@ -1715,9 +1962,9 @@
           </table>
         </div>
       </section>
-      <section class="roi-table-card" aria-label="ROI estimate table">
-        <h2>Tool-Level Estimates</h2>
-        <p>Each row shows the build effort, expected maintenance, and estimated CSM time savings by tool.</p>
+      <section class="roi-table-card" id="toolMappingList" aria-label="ROI estimate table">
+        <h2>Tool Mapping List</h2>
+        <p>Each mapped roadmap tool shows build effort, expected maintenance, and estimated CSM time savings.</p>
         <div class="roi-table-wrap">
           <table class="roi-table">
             <thead>
@@ -1759,6 +2006,48 @@
     </div>
     <div class="detail-body" id="detailBody"></div>
   </aside>
+
+  <!-- Tool drawer -->
+  <div class="tool-drawer-overlay" id="toolDrawerOverlay" onclick="closeDocDrawer()"></div>
+  <div class="tool-drawer-panel" id="toolDrawerPanel">
+    <div class="tool-drawer-head">
+      <span class="tool-drawer-title" id="toolDrawerTitle"></span>
+      <button class="tool-drawer-close" onclick="closeDocDrawer()" aria-label="Close">✕</button>
+    </div>
+    <iframe class="tool-drawer-frame" id="toolDrawerFrame" src="" title="Tool"></iframe>
+  </div>
+
+  <style>
+    .tool-drawer-overlay {
+      display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.35); z-index: 1100;
+    }
+    .tool-drawer-panel {
+      position: fixed; top: 0; right: 0; width: min(820px, 95vw); height: 100vh;
+      background: #fff; z-index: 1101; display: flex; flex-direction: column;
+      box-shadow: -4px 0 32px rgba(0,0,0,0.18);
+      transform: translateX(100%); transition: transform 0.28s cubic-bezier(.4,0,.2,1);
+    }
+    .tool-drawer-panel.is-open { transform: translateX(0); }
+    .tool-drawer-overlay.is-open { display: block; }
+    .tool-drawer-head {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 14px 18px; border-bottom: 1px solid #e5e7eb; flex-shrink: 0;
+    }
+    .tool-drawer-title { font-weight: 600; font-size: 0.95rem; color: #1e293b; }
+    .tool-drawer-close {
+      background: none; border: none; font-size: 1.1rem; cursor: pointer;
+      color: #64748b; padding: 4px 8px; border-radius: 6px;
+    }
+    .tool-drawer-close:hover { background: #f1f5f9; color: #1e293b; }
+    .tool-drawer-frame { flex: 1; border: none; width: 100%; }
+    .detail-open-tool-btn {
+      display: inline-block; margin-top: 10px; padding: 9px 18px;
+      background: #246bfe; color: #fff; border: none; border-radius: 8px;
+      font-size: 0.9rem; font-weight: 600; cursor: pointer;
+      text-decoration: none;
+    }
+    .detail-open-tool-btn:hover { background: #1a56d6; }
+  </style>
 
   <script>
     const tools = [
@@ -1838,7 +2127,8 @@
           "Acts as the shared context layer for the lifecycle so agents can retrieve account history, risks, usage patterns, and renewal context from a common memory.",
           "This is marked as implementation foundation because the later agents become more useful once account data is searchable and connected."
         ],
-        outputs: ["Central account context", "Searchable customer record", "Shared orchestration layer"]
+        outputs: ["Central account context", "Searchable customer record", "Shared orchestration layer"],
+        documentationUrl: "elevator.html"
       },
       {
         id: "csm-intro-prep",
@@ -1889,7 +2179,8 @@
           "Maps customer goals to JAGGAER capabilities, tracks milestones, confirms ownership, and recommends next-best enablement actions.",
           "The roadmap calls this one of the fastest ROI areas because adoption, utilization, rollout, and training are central to CSM operations."
         ],
-        outputs: ["Success plan", "Milestone status", "Recommended enablement actions", "Plan drift alerts"]
+        outputs: ["Success plan", "Milestone status", "Recommended enablement actions", "Plan drift alerts"],
+        documentationUrl: "success-plan.html"
       },
       {
         id: "kpi-analyzer",
@@ -1942,6 +2233,35 @@
         outputs: ["Meeting agenda", "Customer recap", "Owner action list"]
       },
       {
+        id: "supplier-enablement-opportunity",
+        number: "2.4",
+        name: "Supplier Enablement Opportunity Tool",
+        stage: "Adoption",
+        action: "Core Related Tools",
+        team: "CSM / Core JI",
+        type: "Static HTML Tool",
+        effort: "Low",
+        value: "High",
+        priority: "High",
+        status: "Prototype",
+        goal: "Identify supplier enablement opportunities for Core JI customers by combining activity exports, current enablement state, and supplier reference data.",
+        dependencies: "Cross Org Supplier Enablement reports, supplier reference list, current enablement export",
+        input: "PO spend, invoice spend, requisition activity, current supplier enablement export, optional supplier reference list",
+        hosting: "Static HTML, browser uploads, SheetJS",
+        impact: "Ranks recommended supplier enablements, impacted document volume, and savings opportunity for adoption conversations.",
+        goalDate: "TBD",
+        hours: 56,
+        source: "AI roadmap copied to wsl2.xlsx",
+        purpose: "Give CSMs a Core JI adoption tool that turns supplier activity and current enablement data into prioritized enablement recommendations.",
+        details: [
+          "Requires the three Cross Org activity exports plus the current customer enablement export before recommendations run.",
+          "Merges supplier-level PO, invoice, and requisition activity with reference-list matches and the customer's current enabled, requested, in-process, or not-enabled state.",
+          "Produces recommendation and savings views so the CSM can focus adoption conversations on the suppliers and enablement types with the clearest value."
+        ],
+        outputs: ["Merged customer supplier view", "Enabled-today summary", "Recommended enablements", "Savings calculations"],
+        documentationUrl: "supplier-enablement-tool.html"
+      },
+      {
         id: "release-search-library",
         number: "3.0",
         name: "Release Search Library",
@@ -1989,7 +2309,8 @@
           "Summarizes product changes in customer language and highlights why a release matters for a specific account.",
           "Works best when paired with the searchable release library."
         ],
-        outputs: ["Customer-ready release summary", "Module-specific talking points", "Follow-up prompts"]
+        outputs: ["Customer-ready release summary", "Module-specific talking points", "Follow-up prompts"],
+        documentationUrl: "mockup-release-assistant.html"
       },
       {
         id: "operational-performance-reviews",
@@ -2065,7 +2386,8 @@
           "Converts support history into trends that can inform CSM meetings, operational reviews, and escalation prevention.",
           "Useful for finding repeated friction areas before they turn into renewal risk."
         ],
-        outputs: ["Support trend summary", "Root issue patterns", "Meeting prep context"]
+        outputs: ["Support trend summary", "Root issue patterns", "Meeting prep context"],
+        documentationUrl: "support-case-analysis.html"
       },
       {
         id: "escalation-management-agent",
@@ -2276,7 +2598,7 @@
         id: "manager-assistant",
         number: "M.0",
         name: "Manager's Assistant",
-        stage: "Manager Tools",
+        stage: "Internal Tools",
         action: "Managers 1:1",
         team: "CSM",
         type: "Managers 1:1",
@@ -2302,7 +2624,7 @@
         id: "manager-overview",
         number: "M.1",
         name: "Manager's Overview",
-        stage: "Manager Tools",
+        stage: "Internal Tools",
         action: "Managers promotion",
         team: "CSM",
         type: "Managers promotion",
@@ -2328,7 +2650,7 @@
         id: "manager-capacity-portfolios",
         number: "M.2",
         name: "Manager Capacity and Portfolios",
-        stage: "Manager Tools",
+        stage: "Internal Tools",
         action: "Managers account assignments",
         team: "CSM",
         type: "Managers account assignments",
@@ -2354,7 +2676,7 @@
         id: "manager-icp",
         number: "M.3",
         name: "Manager ICP",
-        stage: "Manager Tools",
+        stage: "Internal Tools",
         action: "Managers ICP",
         team: "CSM",
         type: "Managers ICP",
@@ -2375,6 +2697,35 @@
           "The updated workbook does not yet specify dependencies, data inputs, hosting, impact, or goal date for this tool."
         ],
         outputs: ["ICP calculation support", "Planning assumptions", "Manager review inputs"]
+      },
+      {
+        id: "onboarding-gpt",
+        number: "I.4",
+        name: "Onboarding GPT",
+        stage: "Internal Tools",
+        action: "CSM onboarding readiness",
+        team: "CSM Enablement",
+        type: "Custom GPT",
+        effort: "Medium",
+        value: "High",
+        priority: "High",
+        status: "Prototype",
+        goal: "Onboard JAGGAER CSMs into real job readiness through structured coaching, diagnosis practice, cross-module thinking, and safe customer communication.",
+        dependencies: "JAGGAER product handbooks, onboarding curriculum, CSM playbooks, internal role context",
+        input: "Supplier Management, Contracts+, Invoicing, and eProcurement handbooks; Level 1-3 onboarding flows; CSM operating context; learner role, customer exposure, and background strengths",
+        hosting: "Custom GPT, onboarding knowledge base",
+        impact: "Accelerates CSM readiness while improving diagnosis quality, risk awareness, and defensible customer communication.",
+        goalDate: "TBD",
+        hours: 48,
+        source: "AI roadmap copied to wsl2.xlsx",
+        purpose: "Train CSMs to operate like high-performing JAGGAER CSMs instead of only memorizing product facts.",
+        details: [
+          "Runs a Level 1-3 onboarding system: platform and issue diagnosis in the first 30 days, ownership of lifecycle and renewal risk, then executive conversations and renewal defense.",
+          "Uses real JAGGAER product knowledge across Supplier Management, Contracts+, Invoicing, and eProcurement so CSMs learn ecosystem dependencies instead of isolated features.",
+          "Asks questions first, challenges weak assumptions, and blocks unsafe actions such as overpromising or skipping foundational steps.",
+          "Adapts the starting level based on the learner's role, customer exposure, and background strengths."
+        ],
+        outputs: ["Starting-level placement", "Guided onboarding module", "Diagnosis practice", "Risk and communication coaching"]
       }
     ];
 
@@ -2405,12 +2756,65 @@
       "manager-assistant",
       "manager-overview",
       "manager-capacity-portfolios",
-      "manager-icp"
+      "manager-icp",
+      "onboarding-gpt"
     ];
 
     const digitalMotionToolIds = [
       "digital-motion-adoption",
       "digital-motion-renewal"
+    ];
+
+    const acceleratorDrops = [
+      {
+        id: "nps-response-templates",
+        name: "NPS Response Templates",
+        status: "Shipped",
+        creator: "Yaara Shvadron",
+        audience: "Initial CSM rollout; EU expansion next",
+        impactedCsms: 12,
+        buildMinutes: 20,
+        savedMinutesPerCsm: 30,
+        cadence: "Per NPS cycle",
+        rolloutStage: "EU expansion next",
+        description: "Converted a large file of approximately 300 NPS emails that CSMs needed to send into customer-specific email templates organized per CSM.",
+        roadmapTreatment: "Count as accelerator savings, not as a roadmap tool",
+        nextStep: "Track reuse and collect feedback from CSMs."
+      },
+      {
+        id: "jai-assist-csm-dashboard",
+        name: "JAI Assist CSM Dashboard",
+        status: "Prototype",
+        creator: "Yaara Shvadron",
+        audience: "CSMs and CSM leadership",
+        impactedCsms: null,
+        buildMinutes: null,
+        savedMinutesPerCsm: null,
+        cadence: "Per JAI Assist usage review",
+        rolloutStage: "Prototype",
+        description: "Browser-based dashboard that analyzes JAI Assist CSV exports and turns usage, answer quality, topic patterns, value achieved, and example conversations into a CSM-ready review view.",
+        roadmapTreatment: "Track as accelerator candidate; estimated saving is TBD",
+        nextStep: "Validate with additional customer exports and estimate repeatable CSM review time saved.",
+        linkUrl: "file://wsl.localhost/Ubuntu/home/yshvadro/older%20projects/csm_success_stories/JAI%20Assist%20CSM%20Dashboard.html"
+      }
+    ];
+
+    const acceleratorRules = [
+      {
+        label: "Track",
+        threshold: "Any automation that saves time, improves consistency, or removes manual formatting.",
+        treatment: "Add to the Accelerator Drops table."
+      },
+      {
+        label: "Mention",
+        threshold: "5+ team-hours saved, 3+ CSMs impacted, or visible manager/customer-facing value.",
+        treatment: "Include in the monthly roadmap update as accelerator savings."
+      },
+      {
+        label: "Promote",
+        threshold: "Recurring workflow, cross-team dependency, productized data flow, or meaningful build effort.",
+        treatment: "Move into the formal roadmap; then count it as a roadmap tool."
+      }
     ];
 
     const lifecycleGroups = {
@@ -2420,7 +2824,8 @@
       "2": [
         { label: "Intro", ids: ["csm-intro-prep"] },
         { label: "Plan", ids: ["success-plan-creation", "kpi-analyzer"] },
-        { label: "Cadence", ids: ["meeting-prep-follow-up"] }
+        { label: "Cadence", ids: ["meeting-prep-follow-up"] },
+        { label: "Core Related Tools", ids: ["supplier-enablement-opportunity"] }
       ],
       "3": [
         { label: "Release", ids: ["release-search-library", "release-assistant"] },
@@ -2442,6 +2847,7 @@
       "success-plan-creation": "Create and maintain success plan",
       "kpi-analyzer": "Review usage and recommend next steps",
       "meeting-prep-follow-up": "Draft agendas and follow-ups",
+      "supplier-enablement-opportunity": "Prioritize Core JI supplier enablement",
       "release-search-library": "Search releases by account impact",
       "release-assistant": "Turn releases into talking points",
       "operational-performance-reviews": "Draft operational review decks",
@@ -2458,7 +2864,8 @@
       "manager-assistant": "Recommend 1:1 coaching actions",
       "manager-overview": "Support promotion and staffing decisions",
       "manager-capacity-portfolios": "Balance accounts and portfolios",
-      "manager-icp": "Assist ICP calculations"
+      "manager-icp": "Assist ICP calculations",
+      "onboarding-gpt": "Coach CSM onboarding readiness"
     };
 
     const toolById = new Map(tools.map((tool) => [tool.id, tool]));
@@ -2468,10 +2875,7 @@
       buildFteHoursYear: 1600,
       savingsFteHoursYear: 1800
     };
-    const rolloutProgress = {
-      automationEfficiencyPct: 0,
-      toolsRolledOut: 0
-    };
+    const aiProductivityGainPct = 1;
     const roiOrder = [
       "implementation-summary",
       "implementation-handoff-agent",
@@ -2480,6 +2884,7 @@
       "success-plan-creation",
       "kpi-analyzer",
       "meeting-prep-follow-up",
+      "supplier-enablement-opportunity",
       "release-assistant",
       "support-trends",
       "operational-performance-reviews",
@@ -2496,7 +2901,8 @@
       "manager-assistant",
       "manager-overview",
       "manager-capacity-portfolios",
-      "manager-icp"
+      "manager-icp",
+      "onboarding-gpt"
     ];
     const roiEstimates = {
       "implementation-summary": { buildHrs: 45, ideationHrs: 5, specHrs: 7, developmentHrs: 24, testingHrs: 9, maintenanceHrsMonth: 5, firstYearMaintenanceHrs: 60, buildFte: 0.03, maintenanceFte: 0.04, savedHrsMonth: 2, annualFteGain: 0.4 },
@@ -2506,6 +2912,7 @@
       "success-plan-creation": { buildHrs: 72, ideationHrs: 7, specHrs: 11, developmentHrs: 40, testingHrs: 14, maintenanceHrsMonth: 7, firstYearMaintenanceHrs: 84, buildFte: 0.05, maintenanceFte: 0.05, savedHrsMonth: 12, annualFteGain: 2.4 },
       "kpi-analyzer": { buildHrs: 40, ideationHrs: 6, specHrs: 8, developmentHrs: 18, testingHrs: 8, maintenanceHrsMonth: 2, firstYearMaintenanceHrs: 24, buildFte: 0.03, maintenanceFte: 0.02, savedHrsMonth: 12, annualFteGain: 2.4 },
       "meeting-prep-follow-up": { buildHrs: 70, ideationHrs: 7, specHrs: 11, developmentHrs: 38, testingHrs: 14, maintenanceHrsMonth: 8, firstYearMaintenanceHrs: 96, buildFte: 0.04, maintenanceFte: 0.06, savedHrsMonth: 12, annualFteGain: 2.4 },
+      "supplier-enablement-opportunity": { buildHrs: 56, ideationHrs: 6, specHrs: 8, developmentHrs: 31, testingHrs: 11, maintenanceHrsMonth: 4, firstYearMaintenanceHrs: 48, buildFte: 0.04, maintenanceFte: 0.03, savedHrsMonth: 8, annualFteGain: 1.6 },
       "release-assistant": { buildHrs: 24, ideationHrs: 4, specHrs: 5, developmentHrs: 10, testingHrs: 5, maintenanceHrsMonth: 2, firstYearMaintenanceHrs: 24, buildFte: 0.02, maintenanceFte: 0.02, savedHrsMonth: 6, annualFteGain: 1.2 },
       "support-trends": { buildHrs: 44, ideationHrs: 4, specHrs: 7, developmentHrs: 24, testingHrs: 9, maintenanceHrsMonth: 4, firstYearMaintenanceHrs: 48, buildFte: 0.03, maintenanceFte: 0.03, savedHrsMonth: 2, annualFteGain: 0.4 },
       "operational-performance-reviews": { buildHrs: 30, ideationHrs: 3, specHrs: 6, developmentHrs: 13, testingHrs: 8, maintenanceHrsMonth: 3, firstYearMaintenanceHrs: 36, buildFte: 0.02, maintenanceFte: 0.02, savedHrsMonth: 12, annualFteGain: 2.4 },
@@ -2522,7 +2929,8 @@
       "manager-assistant": { buildHrs: 48, ideationHrs: 7, specHrs: 10, developmentHrs: 21, testingHrs: 10, maintenanceHrsMonth: 3, firstYearMaintenanceHrs: 36, buildFte: 0.03, maintenanceFte: 0.02, savedHrsMonth: null, annualFteGain: 0 },
       "manager-overview": { buildHrs: 48, ideationHrs: 7, specHrs: 10, developmentHrs: 21, testingHrs: 10, maintenanceHrsMonth: 3, firstYearMaintenanceHrs: 36, buildFte: 0.03, maintenanceFte: 0.02, savedHrsMonth: null, annualFteGain: 0 },
       "manager-capacity-portfolios": { buildHrs: 48, ideationHrs: 7, specHrs: 10, developmentHrs: 21, testingHrs: 10, maintenanceHrsMonth: 3, firstYearMaintenanceHrs: 36, buildFte: 0.03, maintenanceFte: 0.02, savedHrsMonth: null, annualFteGain: 0 },
-      "manager-icp": { buildHrs: 48, ideationHrs: 7, specHrs: 10, developmentHrs: 21, testingHrs: 10, maintenanceHrsMonth: 3, firstYearMaintenanceHrs: 36, buildFte: 0.03, maintenanceFte: 0.02, savedHrsMonth: null, annualFteGain: 0 }
+      "manager-icp": { buildHrs: 48, ideationHrs: 7, specHrs: 10, developmentHrs: 21, testingHrs: 10, maintenanceHrsMonth: 3, firstYearMaintenanceHrs: 36, buildFte: 0.03, maintenanceFte: 0.02, savedHrsMonth: null, annualFteGain: 0 },
+      "onboarding-gpt": { buildHrs: 48, ideationHrs: 7, specHrs: 10, developmentHrs: 21, testingHrs: 10, maintenanceHrsMonth: 3, firstYearMaintenanceHrs: 36, buildFte: 0.03, maintenanceFte: 0.02, savedHrsMonth: null, annualFteGain: 0 }
     };
     const savingsByValue = {
       High: { min: 15, max: 25 },
@@ -2619,14 +3027,22 @@
     const digitalMotionGrid = document.getElementById("digitalMotionGrid");
     const managerOverviewLayer = document.getElementById("managerOverviewLayer");
     const managerGrid = document.getElementById("managerGrid");
+    const aiProductivityStat = document.getElementById("aiProductivityStat");
     const automationStat = document.getElementById("automationStat");
-    const rolledOutStat = document.getElementById("rolledOutStat");
+    const roadmapMappedStat = document.getElementById("roadmapMappedStat");
+    const aiProductivityCalcStat = document.getElementById("aiProductivityCalcStat");
+    const acceleratorCalcStat = document.getElementById("acceleratorCalcStat");
+    const roadmapCalcStat = document.getElementById("roadmapCalcStat");
+    const acceleratorSummaryGrid = document.getElementById("acceleratorSummaryGrid");
+    const acceleratorRulesGrid = document.getElementById("acceleratorRules");
+    const acceleratorTableBody = document.getElementById("acceleratorTableBody");
     const roiSummaryGrid = document.getElementById("roiSummaryGrid");
     const efficiencyTableBody = document.getElementById("efficiencyTableBody");
     const efficiencyTableFoot = document.getElementById("efficiencyTableFoot");
     const roiTableBody = document.getElementById("roiTableBody");
     const roiTableFoot = document.getElementById("roiTableFoot");
     const tabButtons = document.querySelectorAll(".view-tab");
+    const metricLinks = document.querySelectorAll(".quick-stats .stat[data-view-target]");
     const viewPanels = document.querySelectorAll(".view-panel");
     const detailBackdrop = document.getElementById("detailBackdrop");
     const detailPanel = document.getElementById("detailPanel");
@@ -2748,9 +3164,96 @@
       });
     }
 
+    function totalHoursForDrop(drop) {
+      if (!drop || !drop.impactedCsms || !drop.savedMinutesPerCsm) return null;
+      return drop.impactedCsms * drop.savedMinutesPerCsm / 60;
+    }
+
+    function formatMinutes(value) {
+      if (value === null || value === undefined || value === "") return "TBD";
+      return `${formatRoiNumber(value)} min`;
+    }
+
+    function formatDropHours(value) {
+      if (value === null || value === undefined) return "TBD";
+      return `${formatRoiNumber(value, value % 1 ? 1 : 0)} hrs`;
+    }
+
+    function acceleratorTotals() {
+      const shippedDrops = acceleratorDrops.filter((drop) => drop.status === "Shipped");
+      const savedHours = shippedDrops.reduce((total, drop) => total + numericValue(totalHoursForDrop(drop)), 0);
+      const impactedCsms = shippedDrops.reduce((total, drop) => total + numericValue(drop.impactedCsms), 0);
+      const buildMinutes = shippedDrops.reduce((total, drop) => total + numericValue(drop.buildMinutes), 0);
+      return {
+        shippedCount: shippedDrops.length,
+        candidateCount: acceleratorDrops.length - shippedDrops.length,
+        savedHours,
+        impactedCsms,
+        buildMinutes
+      };
+    }
+
+    function renderAccelerators() {
+      if (!acceleratorSummaryGrid || !acceleratorRulesGrid || !acceleratorTableBody) return;
+
+      const totals = acceleratorTotals();
+      const shippedDrops = acceleratorDrops.filter((drop) => drop.status === "Shipped");
+      const rolloutStage = shippedDrops[0]?.rolloutStage || "Tracked";
+      const scoreItems = [
+        { label: "Drops shipped", value: formatRoiNumber(totals.shippedCount) },
+        { label: "Saved per cycle", value: formatDropHours(totals.savedHours) },
+        { label: "Time invested", value: formatMinutes(totals.buildMinutes) },
+        { label: "Rollout stage", value: rolloutStage }
+      ];
+
+      acceleratorSummaryGrid.innerHTML = scoreItems.map((item) => `
+        <div class="accelerator-score-item">
+          <span>${escapeHtml(item.label)}</span>
+          <strong>${escapeHtml(item.value)}</strong>
+        </div>
+      `).join("");
+
+      acceleratorRulesGrid.innerHTML = acceleratorRules.map((rule) => `
+        <article class="accelerator-rule">
+          <strong>${escapeHtml(rule.label)}</strong>
+          <p>${escapeHtml(rule.threshold)}</p>
+          <p>${escapeHtml(rule.treatment)}</p>
+        </article>
+      `).join("");
+
+      acceleratorTableBody.innerHTML = acceleratorDrops.map((drop) => {
+        const teamHours = totalHoursForDrop(drop);
+        const dropName = drop.linkUrl
+          ? `<a class="accelerator-link" href="${escapeHtml(drop.linkUrl)}" target="_blank" rel="noopener">${escapeHtml(drop.name)}</a>`
+          : escapeHtml(drop.name);
+        return `
+          <tr>
+            <td class="tool-name">${dropName}<br><span>${escapeHtml(drop.cadence)}</span></td>
+            <td>${escapeHtml(drop.description)}</td>
+            <td><span class="drop-status ${escapeHtml(drop.status.toLowerCase())}">${escapeHtml(drop.status)}</span></td>
+            <td>${escapeHtml(drop.creator)}</td>
+            <td>${escapeHtml(drop.audience)}</td>
+            <td class="num">${escapeHtml(formatMinutes(drop.buildMinutes))}</td>
+            <td class="num">${escapeHtml(formatMinutes(drop.savedMinutesPerCsm))}</td>
+            <td class="num">${escapeHtml(formatDropHours(teamHours))}</td>
+            <td>${escapeHtml(drop.roadmapTreatment)}</td>
+            <td>${escapeHtml(drop.nextStep)}</td>
+          </tr>
+        `;
+      }).join("");
+    }
+
     function renderProgressStats() {
-      if (automationStat) automationStat.textContent = formatPercent(rolloutProgress.automationEfficiencyPct, 0);
-      if (rolledOutStat) rolledOutStat.textContent = formatRoiNumber(rolloutProgress.toolsRolledOut);
+      const totals = acceleratorTotals();
+      const productivityGain = formatPercent(aiProductivityGainPct, 0);
+      const acceleratorSavings = formatDropHours(totals.savedHours);
+      const roadmapMapped = formatRoiNumber(getRoiRows().length);
+      if (aiProductivityStat) aiProductivityStat.textContent = productivityGain;
+      if (automationStat) automationStat.textContent = formatDropHours(totals.savedHours);
+      if (roadmapMappedStat) roadmapMappedStat.textContent = roadmapMapped;
+      if (aiProductivityCalcStat) aiProductivityCalcStat.textContent = productivityGain;
+      if (acceleratorCalcStat) acceleratorCalcStat.textContent = `${acceleratorSavings} / cycle`;
+      if (roadmapCalcStat) roadmapCalcStat.textContent = roadmapMapped;
     }
 
     function renderManagerTools() {
@@ -2896,6 +3399,16 @@
       });
     }
 
+    function jumpToMetricTarget(viewId, elementId) {
+      showTab(viewId);
+      window.requestAnimationFrame(() => {
+        const target = document.getElementById(elementId);
+        if (!target) return;
+        target.scrollIntoView({ behavior: "smooth", block: "start" });
+        history.replaceState(null, "", `#${elementId}`);
+      });
+    }
+
     function listMarkup(items) {
       if (!items || !items.length) return "";
       return `<ul class="detail-list">${items.map((item) => `<li>${escapeHtml(item)}</li>`).join("")}</ul>`;
@@ -2913,10 +3426,14 @@
     function documentationMarkup(tool) {
       const documentationUrl = tool.documentationUrl || tool.documentationLink || tool.documentation;
       if (!documentationUrl) return "";
+      const isLocal = !documentationUrl.startsWith("http");
+      const linkOrBtn = isLocal
+        ? `<button class="detail-open-tool-btn" onclick="openDocDrawer('${documentationUrl.replace(/'/g,"\\'")}','${(tool.name||"Tool").replace(/'/g,"\\'")}')">Open Tool</button>`
+        : `<a class="detail-doc-link" href="${escapeHtml(documentationUrl)}" target="_blank" rel="noopener">Open full documentation</a>`;
       return `
         <section class="detail-section">
           <h3>Full Documentation</h3>
-          <a class="detail-doc-link" href="${escapeHtml(documentationUrl)}" target="_blank" rel="noopener">Open full documentation</a>
+          ${linkOrBtn}
         </section>
       `;
     }
@@ -2996,12 +3513,36 @@
     tabButtons.forEach((button) => {
       button.addEventListener("click", () => showTab(button.dataset.tabTarget));
     });
+    metricLinks.forEach((link) => {
+      link.addEventListener("click", (event) => {
+        event.preventDefault();
+        jumpToMetricTarget(link.dataset.viewTarget, link.dataset.scrollTarget);
+      });
+    });
 
     renderProgressStats();
     renderFlow();
     renderDigitalMotion();
     renderManagerTools();
+    renderAccelerators();
     renderRoi();
+
+    function openDocDrawer(url, title) {
+      document.getElementById("toolDrawerTitle").textContent = title || "Tool";
+      document.getElementById("toolDrawerFrame").src = url;
+      document.getElementById("toolDrawerPanel").classList.add("is-open");
+      document.getElementById("toolDrawerOverlay").classList.add("is-open");
+      document.body.style.overflow = "hidden";
+    }
+    function closeDocDrawer() {
+      document.getElementById("toolDrawerPanel").classList.remove("is-open");
+      document.getElementById("toolDrawerOverlay").classList.remove("is-open");
+      document.body.style.overflow = "";
+      setTimeout(() => { document.getElementById("toolDrawerFrame").src = ""; }, 300);
+    }
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape") closeDocDrawer();
+    });
   </script>
 </body>
 </html>
