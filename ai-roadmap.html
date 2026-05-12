@@ -1825,7 +1825,7 @@
       <div class="title-block">
         <div class="source-row">
           <span class="eyebrow">JAGGAER CSM / 2026</span>
-          <a class="source-link" href="AI%20Roadmap%202026/AI%20roadmap%20copied%20to%20wsl2.xlsx">Excel Source</a>
+          <a class="source-link" href="AI%20roadmap%20copied%20to%20wsl2.xlsx">Excel Source</a>
         </div>
         <h1>AI-Powered Customer Success Lifecycle</h1>
         <p class="lede">AI powered tools guiding CSMs from handoff to renewal readiness.</p>
@@ -1835,7 +1835,7 @@
           <strong id="aiProductivityStat">1%</strong><span>AI Productivity Gain</span>
         </a>
         <a class="stat" href="#acceleratorDropsList" data-view-target="acceleratorView" data-scroll-target="acceleratorDropsList">
-          <strong id="automationStat">0 hrs</strong><span>Accelerator Savings</span>
+          <strong id="automationStat">0 hrs</strong><span>Time Saved</span>
         </a>
         <a class="stat" href="#toolMappingList" data-view-target="roiView" data-scroll-target="toolMappingList">
           <strong id="roadmapMappedStat">0</strong><span>Roadmap Tools Mapped</span>
@@ -1846,7 +1846,7 @@
     <nav class="view-switch" role="tablist" aria-label="Roadmap views">
       <button class="view-tab is-active" id="tab-lifecycleView" type="button" role="tab" aria-selected="true" aria-controls="lifecycleView" data-tab-target="lifecycleView">CSM Lifecycle</button>
       <button class="view-tab" id="tab-managerView" type="button" role="tab" aria-selected="false" aria-controls="managerView" data-tab-target="managerView">Internal Tools</button>
-      <button class="view-tab" id="tab-acceleratorView" type="button" role="tab" aria-selected="false" aria-controls="acceleratorView" data-tab-target="acceleratorView">Workflow Accelerators</button>
+      <button class="view-tab" id="tab-acceleratorView" type="button" role="tab" aria-selected="false" aria-controls="acceleratorView" data-tab-target="acceleratorView">Quick Tools</button>
       <button class="view-tab" id="tab-roiView" type="button" role="tab" aria-selected="false" aria-controls="roiView" data-tab-target="roiView">ROI</button>
     </nav>
 
@@ -1893,20 +1893,20 @@
     <section class="view-panel accelerator-view" id="acceleratorView" role="tabpanel" aria-labelledby="tab-acceleratorView" hidden>
       <section class="accelerator-hero" aria-label="Workflow accelerator summary">
         <div>
-          <h2>CSM Workflow Accelerators</h2>
-          <p>Small automations, templates, and GPT-assisted helpers stay here as accelerator drops. They add to accelerator savings, but they do not count as roadmap tools unless promoted into the formal lifecycle map.</p>
+          <h2>CSM Quick Tools</h2>
+          <p>Small automations, templates, and GPT-assisted helpers stay here as quick tools. They add to time saved, but they do not count as roadmap tools unless promoted into the formal lifecycle map.</p>
         </div>
         <div class="accelerator-score" id="acceleratorSummaryGrid" aria-label="Workflow accelerator scorecard"></div>
       </section>
       <section class="accelerator-rules" id="acceleratorRules" aria-label="Workflow accelerator roadmap rules"></section>
-      <section class="accelerator-table-card" id="acceleratorDropsList" aria-label="Workflow accelerator drops">
-        <h2>Accelerator Drops</h2>
+      <section class="accelerator-table-card" id="acceleratorDropsList" aria-label="Workflow quick tools">
+        <h2>Quick Tools</h2>
         <p>Each entry captures the practical value without adding another full roadmap lane.</p>
         <div class="accelerator-table-wrap">
           <table class="accelerator-table">
             <thead>
               <tr>
-                <th>Accelerator / Automation</th>
+                <th>Quick Tool / Automation</th>
                 <th>Description</th>
                 <th>Status</th>
                 <th>Creator</th>
@@ -2778,7 +2778,7 @@
         cadence: "Per NPS cycle",
         rolloutStage: "EU expansion next",
         description: "Converted a large file of approximately 300 NPS emails that CSMs needed to send into customer-specific email templates organized per CSM.",
-        roadmapTreatment: "Count as accelerator savings, not as a roadmap tool",
+        roadmapTreatment: "Count as time saved, not as a roadmap tool",
         nextStep: "Track reuse and collect feedback from CSMs."
       },
       {
@@ -2793,7 +2793,7 @@
         cadence: "Per JAI Assist usage review",
         rolloutStage: "Prototype",
         description: "Browser-based dashboard that analyzes JAI Assist CSV exports and turns usage, answer quality, topic patterns, value achieved, and example conversations into a CSM-ready review view.",
-        roadmapTreatment: "Track as accelerator candidate; estimated saving is TBD",
+        roadmapTreatment: "Track as quick tool candidate; estimated saving is TBD",
         nextStep: "Validate with additional customer exports and estimate repeatable CSM review time saved.",
         linkUrl: "file://wsl.localhost/Ubuntu/home/yshvadro/older%20projects/csm_success_stories/JAI%20Assist%20CSM%20Dashboard.html"
       }
@@ -2803,12 +2803,12 @@
       {
         label: "Track",
         threshold: "Any automation that saves time, improves consistency, or removes manual formatting.",
-        treatment: "Add to the Accelerator Drops table."
+        treatment: "Add to the Quick Tools table."
       },
       {
         label: "Mention",
         threshold: "5+ team-hours saved, 3+ CSMs impacted, or visible manager/customer-facing value.",
-        treatment: "Include in the monthly roadmap update as accelerator savings."
+        treatment: "Include in the monthly roadmap update as time saved."
       },
       {
         label: "Promote",
