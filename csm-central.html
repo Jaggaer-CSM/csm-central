@@ -1092,6 +1092,10 @@
       visible: document.getElementById("visibleTools"),
       favoriteCount: document.getElementById("favoriteCount")
     };
+    // Guard: null-safe wrappers for removed elements
+    if (!elements.total) elements.total = { textContent: "" };
+    if (!elements.visible) elements.visible = { textContent: "" };
+    if (!elements.favoriteCount) elements.favoriteCount = { textContent: "" };
 
     init();
 
@@ -1168,6 +1172,7 @@
     }
 
     function renderFilters() {
+      if (!elements.filters) return;
       const filters = ["All", ...lifecycleStages.map((stage) => stage.title), "Favorites"];
       elements.filters.innerHTML = filters.map((filter) => `
         <button class="filter-chip${filter === activeStage ? " is-active" : ""}" type="button" data-stage-filter="${escapeAttribute(filter)}">
