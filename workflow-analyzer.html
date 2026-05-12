@@ -1,0 +1,1888 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Workflow Analyzer</title>
+  <style>
+    :root {
+      --bg: #eef2f6;
+      --sheet: #ffffff;
+      --sheet-alt: #f8fafc;
+      --ink: #1f2937;
+      --muted: #64748b;
+      --accent: #2563eb;
+      --accent-strong: #1d4ed8;
+      --line: #cbd5e1;
+      --line-strong: #94a3b8;
+      --good: #166534;
+      --warn: #b45309;
+      --header: #dbeafe;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: "Aptos", "Segoe UI", Tahoma, sans-serif;
+      background:
+        linear-gradient(180deg, rgba(37, 99, 235, 0.06), transparent 180px),
+        linear-gradient(90deg, rgba(148, 163, 184, 0.08) 1px, transparent 1px),
+        linear-gradient(rgba(148, 163, 184, 0.08) 1px, transparent 1px),
+        var(--bg);
+      background-size: auto, 28px 28px, 28px 28px, auto;
+      color: var(--ink);
+    }
+
+    .shell {
+      max-width: 1480px;
+      margin: 0 auto;
+      padding: 24px 18px 48px;
+    }
+
+    .hero {
+      display: grid;
+      grid-template-columns: 1.4fr 0.9fr;
+      gap: 14px;
+      align-items: stretch;
+      margin-bottom: 20px;
+    }
+
+    .hero > .card {
+      height: 100%;
+    }
+
+    .card {
+      background: rgba(255, 255, 255, 0.97);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 20px;
+      box-shadow: 0 8px 24px rgba(15, 23, 42, 0.06);
+    }
+
+    h1, h2, h3 {
+      margin: 0 0 10px;
+      line-height: 1.1;
+    }
+
+    h1 {
+      font-size: clamp(1.8rem, 3.5vw, 3rem);
+      letter-spacing: -0.02em;
+    }
+
+    h2 {
+      font-size: 1.1rem;
+    }
+
+    h3 {
+      font-size: 0.9rem;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    p {
+      margin: 0 0 12px;
+      color: var(--muted);
+      line-height: 1.55;
+    }
+
+    .upload-box {
+      border: 1px dashed var(--line-strong);
+      border-radius: 8px;
+      padding: 18px;
+      background: var(--sheet-alt);
+    }
+
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 14px;
+    }
+
+    button,
+    .button-like,
+    input[type="file"]::file-selector-button {
+      border: 0;
+      border-radius: 6px;
+      min-height: 42px;
+      padding: 10px 14px;
+      background: var(--accent);
+      color: #fff;
+      cursor: pointer;
+      font: inherit;
+      font-size: 0.95rem;
+      line-height: 1.2;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      vertical-align: middle;
+      transition: transform 120ms ease, opacity 120ms ease;
+    }
+
+    button:hover,
+    .button-like:hover,
+    input[type="file"]::file-selector-button:hover {
+      transform: translateY(-1px);
+      opacity: 0.95;
+    }
+
+    button.secondary {
+      background: #e2e8f0;
+      color: var(--ink);
+    }
+
+    button.ghost {
+      background: #f8fafc;
+      color: var(--ink);
+      border: 1px solid var(--line);
+    }
+
+    .file-line {
+      font-size: 0.95rem;
+      color: var(--ink);
+      margin-top: 10px;
+      min-height: 1.2em;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 14px;
+    }
+
+    .span-4,
+    .span-6,
+    .span-8,
+    .span-12 {
+      grid-column: span 1;
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 8px;
+    }
+
+    .stat {
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      padding: 12px;
+      background: var(--sheet);
+    }
+
+    .stat .label {
+      font-size: 0.85rem;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+
+    .stat .value {
+      font-size: 1.7rem;
+      margin-top: 6px;
+    }
+
+    pre {
+      margin: 0;
+      overflow: auto;
+      white-space: pre-wrap;
+      word-break: break-word;
+      background: #0f172a;
+      color: #e2e8f0;
+      border-radius: 8px;
+      padding: 16px;
+      line-height: 1.45;
+      font-size: 0.92rem;
+    }
+
+    .note {
+      color: var(--warn);
+      font-style: italic;
+    }
+
+    .report-toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: center;
+      margin-bottom: 14px;
+    }
+
+    .report-toolbar p {
+      margin: 0;
+    }
+
+    .toolbar-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .report-title p {
+      margin-top: 4px;
+    }
+
+    .tab-strip {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 14px;
+    }
+
+    .tab-button {
+      border: 1px solid var(--line);
+      background: #fff;
+      color: var(--ink);
+      border-radius: 6px;
+      min-height: 42px;
+      padding: 10px 14px;
+      font-size: 0.95rem;
+      line-height: 1.2;
+    }
+
+    .tab-button.active {
+      background: var(--accent);
+      color: #fff;
+      border-color: var(--accent);
+    }
+
+    .summary-strip {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 14px;
+      margin-top: 18px;
+    }
+
+    .summary-card {
+      background: linear-gradient(180deg, #ffffff, #f8fbff);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 18px;
+      box-shadow: 0 8px 20px rgba(15, 23, 42, 0.05);
+    }
+
+    .summary-card h2 {
+      margin-bottom: 8px;
+    }
+
+    .summary-card p:last-child {
+      margin-bottom: 0;
+    }
+
+    .summary-list {
+      margin: 0;
+      padding-left: 18px;
+      color: var(--ink);
+    }
+
+    .summary-list li {
+      margin-bottom: 8px;
+      line-height: 1.45;
+    }
+
+    .summary-card-header,
+    .section-head {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: flex-start;
+    }
+
+    .summary-card-header {
+      margin-bottom: 12px;
+    }
+
+    .summary-card-title,
+    .section-head h2,
+    .section-head h3 {
+      flex: 1 1 220px;
+      min-width: 0;
+    }
+
+    .summary-card h3,
+    .summary-card h2 {
+      margin: 0;
+    }
+
+    .summary-card-body,
+    .sheet-section-body {
+      overflow: hidden;
+    }
+
+    .is-collapsed .summary-card-body,
+    .is-collapsed .sheet-section-body {
+      display: none;
+    }
+
+    .collapse-toggle {
+      display: inline-flex;
+      align-items: center;
+      align-self: center;
+      flex: 0 0 auto;
+      justify-content: center;
+      width: 34px;
+      height: 34px;
+      padding: 0;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: #fff;
+      color: var(--ink);
+      cursor: pointer;
+      font: inherit;
+      line-height: 1;
+    }
+
+    .collapse-toggle:hover {
+      transform: translateY(-1px);
+    }
+
+    .collapse-arrow {
+      display: inline-block;
+      font-size: 0.95rem;
+      transition: transform 140ms ease;
+    }
+
+    .collapse-toggle[aria-expanded="true"] .collapse-arrow {
+      transform: rotate(90deg);
+    }
+
+    .sheet-section {
+      padding: 0;
+      overflow: hidden;
+    }
+
+    .section-head {
+      padding: 14px 16px;
+      border-bottom: 1px solid var(--line);
+      background: linear-gradient(180deg, #f8fbff, #eef4ff);
+    }
+
+    .sheet-section.is-collapsed .section-head,
+    .summary-card.is-collapsed .summary-card-header {
+      margin-bottom: 0;
+      border-bottom-color: transparent;
+    }
+
+    .filter-box {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      flex: 1 1 320px;
+      gap: 8px;
+    }
+
+    .filter-box input {
+      width: min(280px, 100%);
+      padding: 8px 10px;
+      border-radius: 6px;
+      border: 1px solid var(--line-strong);
+      font: inherit;
+      color: var(--ink);
+      background: #fff;
+    }
+
+    .sheet-scroll {
+      overflow: auto;
+    }
+
+    table.sheet-table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 520px;
+    }
+
+    table.activity-table {
+      min-width: 1320px;
+    }
+
+    .sheet-table th,
+    .sheet-table td {
+      border: 1px solid var(--line);
+      padding: 10px 12px;
+      text-align: left;
+      vertical-align: top;
+      line-height: 1.4;
+    }
+
+    .sheet-table th {
+      position: sticky;
+      top: 0;
+      background: var(--header);
+      font-size: 0.84rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: #1e3a8a;
+      z-index: 1;
+    }
+
+    .sheet-table tbody tr:nth-child(even) td {
+      background: var(--sheet-alt);
+    }
+
+    .activity-table th:first-child,
+    .activity-table td:first-child {
+      min-width: 240px;
+      width: 18%;
+      white-space: normal;
+      overflow-wrap: anywhere;
+      word-break: break-word;
+    }
+
+    .activity-table th:nth-child(7),
+    .activity-table td:nth-child(7),
+    .activity-table th:nth-child(8),
+    .activity-table td:nth-child(8) {
+      min-width: 220px;
+      white-space: normal;
+      overflow-wrap: anywhere;
+      word-break: break-word;
+    }
+
+    .mono {
+      font-family: "Consolas", "SFMono-Regular", monospace;
+      font-size: 0.9rem;
+    }
+
+    .status-chip {
+      display: inline-block;
+      padding: 4px 8px;
+      border-radius: 999px;
+      border: 1px solid var(--line);
+      background: #eff6ff;
+      font-size: 0.82rem;
+      white-space: nowrap;
+    }
+
+    .status-chip.available {
+      background: #ecfdf3;
+      border-color: #86efac;
+      color: #166534;
+    }
+
+    .status-chip.missing {
+      background: #fff7ed;
+      border-color: #fdba74;
+      color: #9a3412;
+    }
+
+    .status-chip.unavailable {
+      background: #f8fafc;
+      border-color: var(--line);
+      color: var(--muted);
+    }
+
+    .muted-cell {
+      color: var(--muted);
+    }
+
+    .empty-row td {
+      color: var(--muted);
+      text-align: center;
+      font-style: italic;
+      padding: 18px 12px;
+      background: #fff;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    @media (max-width: 920px) {
+      .hero,
+      .summary-strip,
+      .stats,
+      .grid {
+        grid-template-columns: 1fr;
+      }
+
+      .span-4,
+      .span-6,
+      .span-8,
+      .span-12 {
+        grid-column: span 1;
+      }
+
+      table.sheet-table {
+        min-width: 100%;
+      }
+
+      .summary-card-header,
+      .section-head,
+      .filter-box {
+        align-items: stretch;
+      }
+
+      .filter-box {
+        justify-content: stretch;
+        flex-basis: 100%;
+      }
+
+      .filter-box input {
+        width: 100%;
+      }
+
+      .collapse-toggle {
+        align-self: flex-start;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <section class="hero">
+      <div class="card">
+        <h1>Workflow Analyzer</h1>
+        <p>Upload a JAGGAER workflow definition XML file and get a fast analysis a CSM can use in customer conversations.</p>
+        <p>The tool stays local in the browser. It looks for workflow type, structure, routing style, repeated patterns, likely maintenance risks, and optimization opportunities.</p>
+      </div>
+      <div class="card">
+        <h3>Upload</h3>
+        <div class="upload-box">
+          <input id="fileInput" type="file" accept=".xml,text/xml" multiple>
+          <div class="actions">
+            <button id="analyzeButton">Analyze File</button>
+            <button id="loadSampleButton" class="secondary">Load Sample XML</button>
+            <button id="downloadButton" class="ghost">Download Report</button>
+          </div>
+          <div id="fileName" class="file-line">No files selected</div>
+        </div>
+      </div>
+    </section>
+
+    <section id="emptyState" class="card">
+      <h2>What this looks for</h2>
+      <ul class="list">
+        <li>Workflow metadata: type, subtype, version, and description</li>
+        <li>Steps, activities, relationships, and activity types</li>
+        <li>Static, dynamic, and ADW patterns</li>
+        <li>Rule groups, folder references, and repeated approval variants</li>
+        <li>CSM-ready recommendations and questions to ask the customer</li>
+      </ul>
+    </section>
+
+    <div id="results" class="hidden">
+      <section class="card">
+        <div class="report-toolbar">
+          <div class="report-title">
+            <h2 id="reportHeading">Workbook Summary</h2>
+            <p id="reportSubheading">Practical spreadsheet-style sections with per-section filters for quick review.</p>
+          </div>
+          <div class="toolbar-actions">
+            <button id="downloadButtonTop" class="ghost">Download Report</button>
+          </div>
+        </div>
+        <div id="tabStrip" class="tab-strip hidden"></div>
+        <div id="stats" class="stats"></div>
+      </section>
+
+      <section id="summaryStrip" class="summary-strip">
+        <article class="summary-card">
+          <div class="summary-card-header">
+            <div class="summary-card-title">
+              <h3>At A Glance</h3>
+              <h2>Workflow Summary</h2>
+            </div>
+          </div>
+          <div class="summary-card-body">
+            <p id="summaryNarrative">Analyze a workflow to see the main operational story here.</p>
+          </div>
+        </article>
+        <article class="summary-card">
+          <div class="summary-card-header">
+            <div class="summary-card-title">
+              <h3>Data Takeaways</h3>
+              <h2>What The XML Suggests</h2>
+            </div>
+          </div>
+          <div class="summary-card-body">
+            <ul id="takeawayList" class="summary-list"></ul>
+          </div>
+        </article>
+        <article class="summary-card">
+          <div class="summary-card-header">
+            <div class="summary-card-title">
+              <h3>CSM Recommendations</h3>
+              <h2>Suggested Next Conversation</h2>
+            </div>
+          </div>
+          <div class="summary-card-body">
+            <ul id="recommendationList" class="summary-list"></ul>
+          </div>
+        </article>
+      </section>
+
+      <section class="grid" style="margin-top: 18px;">
+        <article class="card sheet-section span-6">
+          <div class="section-head">
+            <h2>Metadata</h2>
+            <div class="filter-box">
+              <label for="metadataFilter">Filter</label>
+              <input id="metadataFilter" data-filter-target="metadataTableBody" type="text" placeholder="Search metadata">
+            </div>
+          </div>
+          <div class="sheet-section-body">
+            <div class="sheet-scroll">
+              <table class="sheet-table activity-table">
+                <thead>
+                  <tr><th>Field</th><th>Value</th></tr>
+                </thead>
+                <tbody id="metadataTableBody"></tbody>
+              </table>
+            </div>
+          </div>
+        </article>
+
+        <article class="card sheet-section span-6">
+          <div class="section-head">
+            <h2>Routing Mix</h2>
+            <div class="filter-box">
+              <label for="routingFilter">Filter</label>
+              <input id="routingFilter" data-filter-target="routingTableBody" type="text" placeholder="Search routing">
+            </div>
+          </div>
+          <div class="sheet-section-body">
+            <div class="sheet-scroll">
+              <table class="sheet-table">
+                <thead>
+                  <tr><th>Metric</th><th>Value</th></tr>
+                </thead>
+                <tbody id="routingTableBody"></tbody>
+              </table>
+            </div>
+          </div>
+        </article>
+
+        <article class="card sheet-section span-12">
+          <div class="section-head">
+            <h2>Activity Inventory</h2>
+            <div class="filter-box">
+              <label for="activityFilter">Filter</label>
+              <input id="activityFilter" data-filter-target="activityTableBody" type="text" placeholder="Search activities, rules, folders, steps, attributes">
+            </div>
+          </div>
+          <div class="sheet-section-body">
+            <div class="sheet-scroll">
+              <table class="sheet-table">
+                <thead>
+                  <tr>
+                    <th>Activity</th>
+                    <th>Type</th>
+                    <th>Routing</th>
+                    <th>Folder Rule</th>
+                    <th>Step Ref</th>
+                    <th>Folder Ref</th>
+                    <th>Rule</th>
+                    <th>Attributes</th>
+                  </tr>
+                </thead>
+                <tbody id="activityTableBody"></tbody>
+              </table>
+            </div>
+          </div>
+        </article>
+
+        <article class="card sheet-section span-6">
+          <div class="section-head">
+            <h2>Folders and Robots</h2>
+            <div class="filter-box">
+              <label for="folderFilter">Filter</label>
+              <input id="folderFilter" data-filter-target="folderTableBody" type="text" placeholder="Search folders">
+            </div>
+          </div>
+          <div class="sheet-section-body">
+            <div class="sheet-scroll">
+              <table class="sheet-table">
+                <thead>
+                  <tr><th>Folder / Robot Reference</th><th>Status</th></tr>
+                </thead>
+                <tbody id="folderTableBody"></tbody>
+              </table>
+            </div>
+          </div>
+        </article>
+
+        <article class="card sheet-section span-6">
+          <div class="section-head">
+            <h2>Opportunities</h2>
+            <div class="filter-box">
+              <label for="opportunityFilter">Filter</label>
+              <input id="opportunityFilter" data-filter-target="opportunityTableBody" type="text" placeholder="Search opportunities">
+            </div>
+          </div>
+          <div class="sheet-section-body">
+            <div class="sheet-scroll">
+              <table class="sheet-table">
+                <thead>
+                  <tr><th>#</th><th>Opportunity</th></tr>
+                </thead>
+                <tbody id="opportunityTableBody"></tbody>
+              </table>
+            </div>
+          </div>
+        </article>
+
+        <article class="card sheet-section span-6">
+          <div class="section-head">
+            <h2>Questions For The Customer</h2>
+            <div class="filter-box">
+              <label for="questionFilter">Filter</label>
+              <input id="questionFilter" data-filter-target="questionTableBody" type="text" placeholder="Search questions">
+            </div>
+          </div>
+          <div class="sheet-section-body">
+            <div class="sheet-scroll">
+              <table class="sheet-table">
+                <thead>
+                  <tr><th>#</th><th>Question</th></tr>
+                </thead>
+                <tbody id="questionTableBody"></tbody>
+              </table>
+            </div>
+          </div>
+        </article>
+
+        <article class="card sheet-section span-6">
+          <div class="section-head">
+            <h2>Signals</h2>
+            <div class="filter-box">
+              <label for="signalFilter">Filter</label>
+              <input id="signalFilter" data-filter-target="signalTableBody" type="text" placeholder="Search signals">
+            </div>
+          </div>
+          <div class="sheet-section-body">
+            <div class="sheet-scroll">
+              <table class="sheet-table">
+                <thead>
+                  <tr><th>#</th><th>Signal</th></tr>
+                </thead>
+                <tbody id="signalTableBody"></tbody>
+              </table>
+            </div>
+          </div>
+        </article>
+
+        <article class="card sheet-section span-6">
+          <div class="section-head">
+            <h2>Rule Groups</h2>
+            <div class="filter-box">
+              <label for="ruleGroupFilter">Filter</label>
+              <input id="ruleGroupFilter" data-filter-target="ruleGroupTableBody" type="text" placeholder="Search rule groups">
+            </div>
+          </div>
+          <div class="sheet-section-body">
+            <div class="sheet-scroll">
+              <table class="sheet-table">
+                <thead>
+                  <tr><th>Rule Group</th><th>Status</th></tr>
+                </thead>
+                <tbody id="ruleGroupTableBody"></tbody>
+              </table>
+            </div>
+          </div>
+        </article>
+
+        <article class="card sheet-section span-12">
+          <div class="section-head">
+            <h2>Workflow Checklist</h2>
+            <div class="filter-box">
+              <label for="checklistFilter">Filter</label>
+              <input id="checklistFilter" data-filter-target="checklistTableBody" type="text" placeholder="Search checklist">
+            </div>
+          </div>
+          <div class="sheet-section-body">
+            <div class="sheet-scroll">
+              <table class="sheet-table checklist-table">
+                <thead>
+                  <tr>
+                    <th>Checklist Item</th>
+                    <th>Status</th>
+                    <th>Evidence</th>
+                    <th>CSM Guidance</th>
+                  </tr>
+                </thead>
+                <tbody id="checklistTableBody"></tbody>
+              </table>
+            </div>
+          </div>
+        </article>
+      </section>
+    </div>
+  </div>
+
+  <script>
+    const sampleXml = `<?xml version="1.0" encoding="UTF-8"?>
+<ProcessDefinition>
+  <WorkflowType>formrequest</WorkflowType>
+  <WorkflowSubType>FormRequestApproval</WorkflowSubType>
+  <Usable>true</Usable>
+  <Version>7</Version>
+  <VersionDescription>Sample workflow</VersionDescription>
+  <Step name="Department Approval" />
+  <Step name="Procurement Services" />
+  <Step name="Create NonPO Invoice" />
+  <Activity name="START">
+    <ActivityType>start</ActivityType>
+    <Rule />
+    <FolderSelectionRule>Dummy</FolderSelectionRule>
+  </Activity>
+  <Activity name="Department Approval">
+    <ActivityType>manual</ActivityType>
+    <StepRef name="Department Approval" />
+    <Rule><![CDATA[Document.RequiresRuleGroupEvaluation("Department Approval") == true]]></Rule>
+    <FolderSelectionRule>MultiElementDynamic</FolderSelectionRule>
+    <Attribute name="RuleGroupInternalName">
+      <AttrValue lang="default">Department Approval</AttrValue>
+    </Attribute>
+  </Activity>
+  <Activity name="Procurement Services">
+    <ActivityType>manual</ActivityType>
+    <StepRef name="Procurement Services" />
+    <Rule><![CDATA[Document.Total > 5000]]></Rule>
+    <FolderSelectionRule>ExplicitFolder</FolderSelectionRule>
+    <FolderRef name="Procurement Services" />
+  </Activity>
+  <Activity name="Create NonPO Invoice">
+    <ActivityType>automated</ActivityType>
+    <StepRef name="Create NonPO Invoice" />
+    <Rule><![CDATA[Document.IsCheckRequest == true]]></Rule>
+    <FolderSelectionRule>ExplicitFolder</FolderSelectionRule>
+    <FolderRef name="Create NonPO Invoice" />
+  </Activity>
+  <Activity name="END">
+    <ActivityType>end</ActivityType>
+    <Rule />
+    <FolderSelectionRule>Dummy</FolderSelectionRule>
+  </Activity>
+  <ActivityRelationship previous="START" next="Department Approval" />
+  <ActivityRelationship previous="Department Approval" next="Procurement Services" />
+  <ActivityRelationship previous="Procurement Services" next="Create NonPO Invoice" />
+  <ActivityRelationship previous="Create NonPO Invoice" next="END" />
+</ProcessDefinition>`;
+
+    const fileInput = document.getElementById("fileInput");
+    const analyzeButton = document.getElementById("analyzeButton");
+    const loadSampleButton = document.getElementById("loadSampleButton");
+    const downloadButton = document.getElementById("downloadButton");
+    const downloadButtonTop = document.getElementById("downloadButtonTop");
+    const fileName = document.getElementById("fileName");
+    const emptyState = document.getElementById("emptyState");
+    const results = document.getElementById("results");
+    const reportHeading = document.getElementById("reportHeading");
+    const reportSubheading = document.getElementById("reportSubheading");
+    const tabStrip = document.getElementById("tabStrip");
+    const stats = document.getElementById("stats");
+    const summaryNarrative = document.getElementById("summaryNarrative");
+    const takeawayList = document.getElementById("takeawayList");
+    const recommendationList = document.getElementById("recommendationList");
+    const metadataTableBody = document.getElementById("metadataTableBody");
+    const routingTableBody = document.getElementById("routingTableBody");
+    const activityTableBody = document.getElementById("activityTableBody");
+    const signalTableBody = document.getElementById("signalTableBody");
+    const ruleGroupTableBody = document.getElementById("ruleGroupTableBody");
+    const folderTableBody = document.getElementById("folderTableBody");
+    const opportunityTableBody = document.getElementById("opportunityTableBody");
+    const questionTableBody = document.getElementById("questionTableBody");
+    const checklistTableBody = document.getElementById("checklistTableBody");
+
+    let currentReport = "";
+    let currentSourceName = "workflow-analysis";
+    let currentAnalyses = [];
+    let activeAnalysisIndex = 0;
+
+    fileInput.addEventListener("change", () => {
+      const files = [...fileInput.files];
+      if (!files.length) {
+        fileName.textContent = "No files selected";
+        return;
+      }
+      fileName.textContent = files.length === 1
+        ? files[0].name
+        : `${files.length} files selected: ${files.map((file) => file.name).join(", ")}`;
+    });
+
+    analyzeButton.addEventListener("click", async () => {
+      const files = [...fileInput.files];
+      if (!files.length) {
+        alert("Choose one or more workflow XML files first.");
+        return;
+      }
+      const importedFiles = await Promise.all(files.map(async (file) => ({
+        name: file.name,
+        text: await file.text()
+      })));
+      runAnalysis(importedFiles);
+    });
+
+    loadSampleButton.addEventListener("click", () => {
+      fileName.textContent = "sample-workflow.xml";
+      runAnalysis([{ name: "sample-workflow.xml", text: sampleXml }]);
+    });
+
+    downloadButton.addEventListener("click", () => {
+      downloadReport();
+    });
+
+    downloadButtonTop.addEventListener("click", () => {
+      downloadReport();
+    });
+
+    document.querySelectorAll("[data-filter-target]").forEach((input) => {
+      input.addEventListener("input", () => {
+        applyFilter(input);
+      });
+    });
+
+    initializeCollapsibleSections();
+
+    function runAnalysis(importedFiles) {
+      const analyses = [];
+
+      for (const importedFile of importedFiles) {
+        const analysis = analyzeWorkflowFile(importedFile.text, importedFile.name);
+        if (!analysis) {
+          return;
+        }
+        analyses.push(analysis);
+      }
+      currentAnalyses = analyses;
+      activeAnalysisIndex = 0;
+      renderTabs();
+      renderAnalysisView(activeAnalysisIndex);
+
+      emptyState.classList.add("hidden");
+      results.classList.remove("hidden");
+    }
+
+    function analyzeWorkflowFile(xmlText, sourceName) {
+      const parser = new DOMParser();
+      const xml = parser.parseFromString(xmlText, "text/xml");
+      const parseError = xml.querySelector("parsererror");
+      if (parseError) {
+        alert(`This file could not be parsed as XML: ${sourceName}`);
+        return null;
+      }
+
+      const steps = [...xml.querySelectorAll("Step")];
+      const activities = [...xml.querySelectorAll("Activity")];
+      const relationships = [...xml.querySelectorAll("ActivityRelationship")];
+
+      const metadata = {
+        sourceName,
+        workflowType: getText(xml, "WorkflowType"),
+        workflowSubType: getText(xml, "WorkflowSubType") || "",
+        version: getText(xml, "Version") || "",
+        versionDescription: getText(xml, "VersionDescription") || "",
+        usable: getText(xml, "Usable") || ""
+      };
+
+      const rawActivityDetails = activities.map((activity) => {
+        const name = activity.getAttribute("name") || "Unnamed";
+        const type = getText(activity, "ActivityType") || "unknown";
+        const rule = getText(activity, "Rule");
+        const folderSelectionRule = getText(activity, "FolderSelectionRule") || "Unknown";
+        const folderRef = activity.querySelector("FolderRef")?.getAttribute("name") || "";
+        const stepRef = activity.querySelector("StepRef")?.getAttribute("name") || "";
+        const attributes = [...activity.querySelectorAll("Attribute")].map((attribute) => ({
+          name: attribute.getAttribute("name") || "",
+          value: attribute.querySelector("AttrValue")?.textContent?.trim() || ""
+        }));
+
+        return {
+          sourceName,
+          name,
+          type,
+          rule,
+          folderSelectionRule,
+          folderRef,
+          stepRef,
+          attributes,
+          routingPattern: detectRoutingPattern(folderSelectionRule, rule)
+        };
+      });
+
+      const activityDetails = rawActivityDetails.filter((activity) => !isDummyUtilityActivity(activity));
+
+      const typeCounts = countBy(activityDetails, (item) => item.type);
+      const folderSelectionCounts = countBy(activityDetails, (item) => item.folderSelectionRule);
+      const routingPatternCounts = countBy(activityDetails, (item) => item.routingPattern);
+      const stepNames = steps.map((step) => step.getAttribute("name") || "Unnamed");
+      const ruleGroups = collectRuleGroups(activityDetails);
+      const folderRefs = unique(activityDetails.map((item) => item.folderRef).filter(Boolean)).sort();
+
+      const repeatedPrefixPatterns = findRepeatedPrefixes(stepNames);
+      const manualActivities = activityDetails.filter((item) => item.type === "manual");
+      const automatedActivities = activityDetails.filter((item) => item.type === "automated");
+      const explicitFolderManuals = manualActivities.filter((item) => item.folderSelectionRule === "ExplicitFolder");
+      const dynamicActivities = activityDetails.filter((item) => item.routingPattern === "Dynamic");
+      const adwActivities = activityDetails.filter((item) => item.routingPattern === "ADW");
+
+      const signals = buildSignals({
+        stepNames,
+        repeatedPrefixPatterns,
+        activityDetails,
+        typeCounts,
+        ruleGroups
+      });
+
+      const opportunities = buildOpportunities({
+        metadata,
+        steps,
+        manualActivities,
+        automatedActivities,
+        explicitFolderManuals,
+        dynamicActivities,
+        adwActivities,
+        repeatedPrefixPatterns,
+        relationships,
+        folderRefs
+      });
+
+      const questions = buildQuestions({
+        metadata,
+        repeatedPrefixPatterns,
+        explicitFolderManuals,
+        dynamicActivities,
+        adwActivities
+      });
+
+      const checklist = buildDownstreamChecklist({
+        analyses: [{ metadata }],
+        steps: steps.map((step) => ({
+          sourceName,
+          name: step.getAttribute("name") || "Unnamed"
+        })),
+        relationships: relationships.map((relationship) => ({
+          sourceName,
+          previous: relationship.getAttribute("previous") || "",
+          next: relationship.getAttribute("next") || ""
+        })),
+        activityDetails,
+        ruleGroups,
+        folderRefs,
+        workflowTypes: metadata.workflowType ? [metadata.workflowType] : [],
+        workflowSubTypes: metadata.workflowSubType ? [metadata.workflowSubType] : [],
+        versions: metadata.version ? [metadata.version] : [],
+        usableValues: metadata.usable ? [metadata.usable] : [],
+        versionDescriptions: metadata.versionDescription ? [metadata.versionDescription] : [],
+        routingPatternCounts
+      });
+
+      const report = buildReport({
+        metadata,
+        analyses: [{ metadata }],
+        steps,
+        activityDetails,
+        relationships,
+        typeCounts,
+        routingPatternCounts,
+        ruleGroups,
+        folderRefs,
+        workflowTypes: metadata.workflowType ? [metadata.workflowType] : [],
+        workflowSubTypes: metadata.workflowSubType ? [metadata.workflowSubType] : [],
+        versions: metadata.version ? [metadata.version] : [],
+        usableValues: metadata.usable ? [metadata.usable] : [],
+        versionDescriptions: metadata.versionDescription ? [metadata.versionDescription] : [],
+        signals,
+        opportunities,
+        questions,
+        checklist
+      });
+
+      return {
+        metadata,
+        steps,
+        activities: activityDetails,
+        excludedActivities: rawActivityDetails.filter((activity) => isDummyUtilityActivity(activity)),
+        activityDetails,
+        relationships,
+        typeCounts,
+        folderSelectionCounts,
+        routingPatternCounts,
+        ruleGroups,
+        folderRefs,
+        signals,
+        opportunities,
+        questions,
+        checklist,
+        report
+      };
+    }
+
+    function getText(root, selector) {
+      return root.querySelector(selector)?.textContent?.trim() || "";
+    }
+
+    function countBy(items, accessor) {
+      return items.reduce((acc, item) => {
+        const key = accessor(item) || "Unknown";
+        acc[key] = (acc[key] || 0) + 1;
+        return acc;
+      }, {});
+    }
+
+    function unique(items) {
+      return [...new Set(items)];
+    }
+
+    function detectRoutingPattern(folderSelectionRule, rule) {
+      const normalizedRule = rule || "";
+      if (folderSelectionRule === "MultiElementDynamic" || normalizedRule.includes("RequiresRuleGroupEvaluation")) {
+        return "ADW";
+      }
+
+      if (["Department", "CustomFieldValue", "FormType", "ContractType", "Commodity"].includes(folderSelectionRule)) {
+        return "Dynamic";
+      }
+
+      if (folderSelectionRule === "ExplicitFolder") {
+        return "Static";
+      }
+
+      return "Other";
+    }
+
+    function isDummyUtilityActivity(activity) {
+      return activity.folderSelectionRule === "Dummy";
+    }
+
+    function collectRuleGroups(activityDetails) {
+      const names = [];
+
+      activityDetails.forEach((activity) => {
+        activity.attributes.forEach((attribute) => {
+          if (attribute.name === "RuleGroupInternalName" && attribute.value) {
+            names.push(attribute.value);
+          }
+        });
+
+        const matches = activity.rule.matchAll(/RequiresRuleGroupEvaluation\("([^"]+)"\)/g);
+        for (const match of matches) {
+          names.push(match[1]);
+        }
+      });
+
+      return unique(names).sort((a, b) => a.localeCompare(b));
+    }
+
+    function findRepeatedPrefixes(stepNames) {
+      const buckets = {};
+
+      stepNames.forEach((name) => {
+        const match = name.match(/^([A-Za-z0-9]{2,8})-/);
+        if (match) {
+          const prefix = match[1];
+          buckets[prefix] = (buckets[prefix] || 0) + 1;
+        }
+      });
+
+      return Object.entries(buckets)
+        .filter(([, count]) => count >= 3)
+        .sort((a, b) => b[1] - a[1]);
+    }
+
+    function buildSignals(context) {
+      const signals = [];
+
+      signals.push(`Activity types found: ${Object.entries(context.typeCounts).map(([key, value]) => `${key} (${value})`).join(", ")}`);
+
+      if (context.repeatedPrefixPatterns.length) {
+        signals.push(`Repeated step families detected: ${context.repeatedPrefixPatterns.map(([prefix, count]) => `${prefix} (${count})`).join(", ")}.`);
+      } else {
+        signals.push("No strong repeated step-family pattern detected.");
+      }
+
+      if (context.ruleGroups.length) {
+        signals.push(`ADW-style rule groups are present, which suggests customer-manageable complex routing in at least part of the workflow.`);
+      } else {
+        signals.push("No rule groups were detected in this file.");
+      }
+
+      if (context.stepNames.some((name) => /department/i.test(name))) {
+        signals.push("Department-based routing appears in the workflow naming, so dynamic workflow for departments may already be in use or expected.");
+      }
+
+      if (context.activityDetails.some((item) => /invoice/i.test(item.name))) {
+        signals.push("Invoice-oriented logic appears in activity names, so AP workload reduction opportunities are worth checking.");
+      }
+
+      return signals;
+    }
+
+    function buildOpportunities(context) {
+      const opportunities = [];
+
+      if (context.manualActivities.length > context.automatedActivities.length * 2) {
+        opportunities.push("This workflow is heavily manual. Review whether lower-risk approvals can move to automation, especially for matched or low-value transactions.");
+      }
+
+      if (context.explicitFolderManuals.length >= 4) {
+        opportunities.push("There are many manual activities using explicit folders. If this business logic changes often, consider moving some of it to dynamic workflow or ADW for easier maintenance.");
+      }
+
+      if (context.repeatedPrefixPatterns.length) {
+        opportunities.push("The workflow has many repeated step variants by business unit or code prefix. Ask whether some of this could be consolidated through dynamic values or ADW rather than duplicating similar steps.");
+      }
+
+      if (context.metadata.workflowType === "invoice") {
+        opportunities.push("For invoice workflows, review matched invoice auto-approval, low-dollar auto-approval thresholds, invoice owner assignment, and prevent-approve-if-unmatched controls.");
+      }
+
+      if (context.metadata.workflowType === "requisition" || context.metadata.workflowType === "formrequest") {
+        opportunities.push("For request-style workflows, review email approvals, mobile approvals, ad-hoc approvals, revert-to-previous-step behavior, and whether complex approvals belong in ADW.");
+      }
+
+      if (context.dynamicActivities.length && !context.adwActivities.length) {
+        opportunities.push("Dynamic routing exists, but no ADW was detected. If the customer now wants multi-condition or frequently changing rules, ADW may be the next maintainable step.");
+      }
+
+      if (context.adwActivities.length && !context.folderRefs.length) {
+        opportunities.push("This file leans on ADW rather than explicit folders. Make sure the customer has strong rule-group governance and clear approver ownership.");
+      }
+
+      if (!opportunities.length) {
+        opportunities.push("No obvious structural optimization jumped out from the XML alone. The next step is to compare this structure against business pain points like cycle time, AP workload, and approval delays.");
+      }
+
+      return opportunities;
+    }
+
+    function buildQuestions(context) {
+      const questions = [
+        "Which parts of this workflow create the most delay or manual effort today?",
+        "Which approvals change often enough that the current design feels hard to maintain?"
+      ];
+
+      if (context.metadata.workflowType === "invoice") {
+        questions.push("Are AP staff still manually reviewing low-value or already-matched invoices?");
+      }
+
+      if (context.repeatedPrefixPatterns.length) {
+        questions.push("Are the repeated unit-specific steps truly different, or are they mostly the same policy applied to different departments or business units?");
+      }
+
+      if (context.explicitFolderManuals.length >= 4) {
+        questions.push("Do CSMs or admins need to change approvers and rules often, or is this mostly fixed workflow?");
+      }
+
+      if (context.dynamicActivities.length || context.adwActivities.length) {
+        questions.push("Who owns the ongoing management of rule groups, dynamic values, and approver assignments?");
+      }
+
+      return unique(questions);
+    }
+
+    function buildDownstreamChecklist(context) {
+      const workflowKind = detectWorkflowKind(context);
+      const manualActivities = context.activityDetails.filter((item) => item.type === "manual");
+      const automatedActivities = context.activityDetails.filter((item) => item.type === "automated");
+      const activitiesWithRules = context.activityDetails.filter((item) => item.rule);
+      const activitiesWithStepRefs = context.activityDetails.filter((item) => item.stepRef);
+      const explicitFolderActivities = context.activityDetails.filter((item) => item.folderSelectionRule === "ExplicitFolder");
+      const departmentIndicators = context.activityDetails.filter((item) => /department/i.test(item.name) || /department/i.test(item.rule));
+      const invoiceIndicators = context.activityDetails.filter((item) => /invoice/i.test(item.name) || /invoice/i.test(item.rule));
+      const checklist = [
+        buildStructuralChecklistRow("Workflow type identified", context.workflowTypes.length, joinOrFallback(context.workflowTypes, "Not available in the imported data"), "Confirm the workflow category before discussing downstream behaviors or best-practice alternatives."),
+        buildStructuralChecklistRow("Workflow subtype identified", context.workflowSubTypes.length, joinOrFallback(context.workflowSubTypes, "Not available in the imported data"), "Use subtype detail to validate whether the downstream route matches the intended business use case."),
+        buildStructuralChecklistRow("Version captured", context.versions.length, joinOrFallback(context.versions, "Not available in the imported data"), "Version helps the CSM confirm whether the customer is reviewing the latest maintained workflow definition."),
+        buildStructuralChecklistRow("Usable flag captured", context.usableValues.length, joinOrFallback(context.usableValues, "Not available in the imported data"), "If usability is not exposed here, verify in product whether this workflow is still active."),
+        buildStructuralChecklistRow("Version description captured", context.versionDescriptions.length, joinOrFallback(context.versionDescriptions, "Not available in the imported data"), "Descriptions can help the CSM understand whether the customer documented the purpose of the current design."),
+        buildStructuralChecklistRow("Steps defined", context.steps.length, `${context.steps.length} steps detected`, "Use this to estimate downstream complexity and handoff volume."),
+        buildStructuralChecklistRow("Relationships defined", context.relationships.length, `${context.relationships.length} relationships detected`, "Low or missing relationship counts may mean the data export is incomplete or overly simplified."),
+        buildStructuralChecklistRow("Manual approval activities found", manualActivities.length, summarizeNames(manualActivities), "Manual-heavy flows are a good place to check approval delays and workload reduction opportunities."),
+        buildStructuralChecklistRow("Automated activities found", automatedActivities.length, summarizeNames(automatedActivities), "Automation markers help the CSM see where downstream work is already system-driven."),
+        buildStructuralChecklistRow("Activities with rules found", activitiesWithRules.length, summarizeNames(activitiesWithRules), "If rules are missing from imported data, confirm whether the customer relies on external logic not visible in this XML."),
+        buildStructuralChecklistRow("Activities tied to steps", activitiesWithStepRefs.length, summarizeNames(activitiesWithStepRefs), "Missing step references can make downstream ownership harder to explain or troubleshoot."),
+        buildStructuralChecklistRow("Explicit folder routing found", explicitFolderActivities.length, summarizeNames(explicitFolderActivities), "Explicit folders often indicate static maintenance overhead when approvers or owners change."),
+        buildStructuralChecklistRow("Dynamic routing found", context.routingPatternCounts.Dynamic || 0, `Dynamic activities: ${context.routingPatternCounts.Dynamic || 0}`, "If dynamic routing is missing, ask whether business variance is being handled through duplicated static steps instead."),
+        buildStructuralChecklistRow("ADW routing found", context.routingPatternCounts.ADW || 0, `ADW activities: ${context.routingPatternCounts.ADW || 0}`, "ADW presence tells the CSM to ask who owns downstream rule-group maintenance."),
+        buildStructuralChecklistRow("Rule groups found", context.ruleGroups.length, joinOrFallback(context.ruleGroups, "Not available in the imported data"), "Missing rule groups may be fine for simpler flows, but if the customer expects dynamic logic this gap matters."),
+        buildStructuralChecklistRow("Folder or robot references found", context.folderRefs.length, joinOrFallback(context.folderRefs, "Not available in the imported data"), "If folder references are absent, verify whether downstream routing depends on ADW or external configuration."),
+        buildStructuralChecklistRow("Department-based indicators found", departmentIndicators.length, summarizeNames(departmentIndicators), "Department signals help the CSM ask whether downstream ownership varies by business unit."),
+        buildStructuralChecklistRow("Invoice indicators found", invoiceIndicators.length, summarizeNames(invoiceIndicators), "Invoice signals help focus the downstream conversation on AP workload, auto-approval, and exception handling.")
+      ];
+
+      const requisitionFeatures = [
+        ["Requisition PPT: Auto-Return Robot", [/auto.?return/, /return wd/, /auto return/], "Confirm whether requisition lines can be auto-returned without manual intervention."],
+        ["Requisition PPT: Convert to Check Out Validation Rules", [/convert.*check.?out validation/, /check.?out validation/], "This slide item is feature-specific, so confirm whether validation logic has been moved from workflow into checkout rules."],
+        ["Requisition PPT: Trigger Integrations", [/trigger.*integration/, /\bpr validation\b/, /\bintegration\b/], "Verify whether requisition approval completion triggers downstream integrations."],
+        ["Requisition PPT: PR Validation", [/\bpr validation\b/, /\bvalidation\b/], "Check whether validation is enforced before requisitions move downstream."],
+        ["Requisition PPT: Email Approvals", [/email approval/, /\bemail\b/], "Ask whether requisition approvers can act from email and whether adoption is being tracked."],
+        ["Requisition PPT: Mobile Approvals", [/mobile approval/, /\bmobile\b/], "Ask whether requisition approvers are using mobile approvals or only the UI."],
+        ["Requisition PPT: A.I Assisted Approvals", [/a\.?i assisted approval/, /ai assisted approval/, /assisted approval/], "This capability is not usually explicit in workflow XML, so verify in feature enablement settings if not detected."],
+        ["Requisition PPT: Check Out Validation Rules", [/check.?out validation/], "If not detected, confirm whether validation lives outside the workflow export."],
+        ["Requisition PPT: Revert To Previous Workflow Step", [/revert to previous workflow step/, /\brevert\b/], "If missing, ask whether requisition approvers must reject and restart instead of reverting."],
+        ["Requisition PPT: Contains Old Form Version", [/old form version/, /legacy form/, /old version/], "Old form version checks usually need form metadata outside workflow XML if not explicitly named here."],
+        ["Requisition PPT: Ad-Hoc Approvals", [/ad.?hoc approval/, /ad hoc/], "Confirm whether users can add or perform ad-hoc approvals on requisitions."]
+      ];
+
+      const poFeatures = [
+        ["PO PPT: PO Distribution", [/\bpo distribution\b/, /\bcxml\b/, /\bfax\b/, /\bemail\b/], "Distribution channel metrics are not usually stored in workflow XML, so validate in transaction analytics if not detected."],
+        ["PO PPT: Declining Balance Robot (Cost Matching)", [/declining balance/, /cost matching/], "Verify whether the PO flow supports cost-matching or declining-balance robot behavior."],
+        ["PO PPT: Trigger PO Export Integrations", [/trigger po export integration/, /po export/, /export integration/], "Confirm whether approved POs are pushed to downstream systems automatically."],
+        ["PO PPT: Auto-Invoice", [/auto.?invoice/], "If not detected, check whether invoice creation is driven by a separate integration or platform feature."],
+        ["PO PPT: Revert To Previous Workflow Step", [/revert to previous workflow step/, /\brevert\b/], "Ask whether PO approvers can revert instead of fully restarting the route."]
+      ];
+
+      const invoiceFeatures = [
+        ["Invoice PPT: Auto-Close PO", [/auto.?close po/, /close po/], "Confirm whether invoices trigger PO closure automatically when the business process allows it."],
+        ["Invoice PPT: Auto-Approve If Matched", [/auto.?approve if matched/, /if matched/, /\bmatched\b/], "If not detected, validate whether matched invoice auto-approval is handled in invoice settings outside workflow XML."],
+        ["Invoice PPT: Over Invoiced-Unit Price", [/over invoiced/, /unit price/], "This exception logic may live in matching configuration rather than workflow XML."],
+        ["Invoice PPT: Cost Receipt Invoice Review", [/cost receipt invoice review/, /receipt invoice review/], "Check whether cost-receipt exceptions have their own downstream review step."],
+        ["Invoice PPT: Invoice Owner Review", [/invoice owner review/, /invoice owner/], "If not detected, confirm whether invoice owner review is assigned outside the exported workflow logic."],
+        ["Invoice PPT: Matching Exceptions", [/matching exception/, /matching exceptions/], "Matching exception handling is often configured outside workflow XML, so missing evidence is expected."],
+        ["Invoice PPT: AP Review", [/\bap review\b/, /\baccounts payable review\b/], "Confirm whether AP review is explicit in the route or handled operationally outside the model."],
+        ["Invoice PPT: Revert To Previous Workflow Step", [/revert to previous workflow step/, /\brevert\b/], "Ask whether invoice approvers can revert instead of rejecting and re-submitting."],
+        ["Invoice PPT: Invoice Owner Assignment", [/invoice owner assignment/, /invoice owner/], "If not detected, confirm whether assignment is driven by document ownership logic outside workflow XML."],
+        ["Invoice PPT: Mobile Approvals", [/mobile approval/, /\bmobile\b/], "Ask whether invoice approvals can be completed on mobile and whether the customer uses it."],
+        ["Invoice PPT: Ad-Hoc Approvals", [/ad.?hoc approval/, /ad hoc/], "Confirm whether invoice approvers can insert ad-hoc approvers during routing."],
+        ["Invoice PPT: Email Approvals", [/email approval/, /\bemail\b/], "If missing, validate whether email approvals are enabled at the platform level rather than in workflow XML."],
+        ["Invoice PPT: Prevent Approve If Unmatched", [/prevent approve if unmatched/, /\bunmatched\b/], "This guardrail often lives in invoice matching configuration, so missing evidence is not surprising."],
+        ["Invoice PPT: A.I Assisted Approvals", [/a\.?i assisted approval/, /ai assisted approval/, /assisted approval/], "If not detected, confirm whether AI-assisted approvals are enabled separately from the workflow definition."]
+      ];
+
+      checklist.push(buildChecklistRow(
+        "Workflow-specific checklist profile",
+        workflowKind === "unknown" ? "Not available in the imported data" : "Detected",
+        workflowKind === "unknown"
+          ? "The workflow type did not map cleanly to requisition, purchase order, or invoice."
+          : `Using the ${describeWorkflowKind(workflowKind)} checklist from the PPT.`,
+        "The tool should only search for approvals and controls that are relevant to the current workflow type."
+      ));
+
+      const workflowSpecificRows = workflowKind === "requisition"
+        ? requisitionFeatures
+        : workflowKind === "po"
+          ? poFeatures
+          : workflowKind === "invoice"
+            ? invoiceFeatures
+            : [];
+
+      if (workflowSpecificRows.length) {
+        checklist.push(...buildFeatureChecklistRows(workflowSpecificRows, context));
+      } else {
+        checklist.push(buildChecklistRow(
+          "Workflow-specific feature checks",
+          "Not available in the imported data",
+          "No workflow-specific PPT checklist was selected because the workflow type could not be classified confidently.",
+          "If classification is wrong, refine the workflow type detection or review the XML metadata naming."
+        ));
+      }
+
+      checklist.push(
+        buildChecklistRow(
+          "PPT Gap: Last 12 Months usage metrics",
+          "Not available in the imported data",
+          "Transaction counts, supplier counts, user counts, and revert counts from the PPT are not exposed by workflow XML alone.",
+          "Keep this row visible so the CSM knows those usage metrics still need analytics or reporting data."
+        ),
+        buildChecklistRow(
+          "PPT Gap: Implemented vs Opportunities slide categorization",
+          "Not available in the imported data",
+          "The XML can suggest likely features, but it does not tell us how the customer organized items into the PPT's Implemented versus Opportunities columns.",
+          "Use the detected feature rows as inputs, then let the CSM decide which should remain implemented versus opportunity talking points."
+        ),
+        buildChecklistRow(
+          "PPT Gap: Permission counts and adoption counts",
+          "Not available in the imported data",
+          "Items like email approval users, mobile users, or ad-hoc permission counts are not included in the workflow definition import.",
+          "Validate these with user analytics, permissions reports, or customer admin screenshots."
+        )
+      );
+
+      return checklist;
+    }
+
+    function buildChecklistRow(item, status, evidence, guidance) {
+      return {
+        item,
+        status,
+        evidence,
+        guidance
+      };
+    }
+
+    function buildStructuralChecklistRow(item, count, evidence, guidance) {
+      return buildChecklistRow(
+        item,
+        count ? "Detected" : "Not available in the imported data",
+        count ? evidence : "Not available in the imported data",
+        guidance
+      );
+    }
+
+    function buildFeatureChecklistRows(rows, context) {
+      if (!rows.length) {
+        return [];
+      }
+
+      return rows.map(([item, patterns, guidance]) => {
+        const matches = findFeatureMatches(context.activityDetails, patterns);
+        return buildChecklistRow(
+          item,
+          matches.length ? "Detected" : "Not detected in the imported XML",
+          matches.length ? summarizeNames(matches) : "No matching activity, step, rule, folder, or attribute text was found in the imported XML.",
+          guidance
+        );
+      });
+    }
+
+    function detectWorkflowKind(context) {
+      const joined = [
+        ...(context.workflowTypes || []),
+        ...(context.workflowSubTypes || [])
+      ].join(" ").toLowerCase();
+
+      if (/invoice/.test(joined)) {
+        return "invoice";
+      }
+
+      if (/purchase.?order|\bpo\b/.test(joined)) {
+        return "po";
+      }
+
+      if (/requisition|formrequest|request/.test(joined)) {
+        return "requisition";
+      }
+
+      return "unknown";
+    }
+
+    function describeWorkflowKind(workflowKind) {
+      if (workflowKind === "requisition") {
+        return "Requisition";
+      }
+
+      if (workflowKind === "po") {
+        return "Purchase Order";
+      }
+
+      if (workflowKind === "invoice") {
+        return "Invoice";
+      }
+
+      return "Unknown";
+    }
+
+    function findFeatureMatches(activityDetails, patterns) {
+      return activityDetails.filter((activity) => {
+        const haystack = [
+          activity.name,
+          activity.type,
+          activity.rule,
+          activity.folderSelectionRule,
+          activity.folderRef,
+          activity.stepRef,
+          activity.attributes.map((attribute) => `${attribute.name} ${attribute.value}`).join(" ")
+        ].join(" ").toLowerCase();
+
+        return patterns.some((pattern) => pattern.test(haystack));
+      });
+    }
+
+    function buildReport(context) {
+      return [
+        `Workflow Analysis: ${context.metadata.sourceName}`,
+        "",
+        "Metadata",
+        `- Imported files: ${context.analyses.length}`,
+        `- Source file names: ${context.analyses.map((item) => item.metadata.sourceName).join(", ")}`,
+        `- Workflow types: ${joinOrFallback(context.workflowTypes, "Not available in the imported data")}`,
+        `- Workflow subtypes: ${joinOrFallback(context.workflowSubTypes, "Not available in the imported data")}`,
+        `- Versions: ${joinOrFallback(context.versions, "Not available in the imported data")}`,
+        `- Usable flags: ${joinOrFallback(context.usableValues, "Not available in the imported data")}`,
+        `- Descriptions: ${joinOrFallback(context.versionDescriptions, "Not available in the imported data")}`,
+        "",
+        "Structure",
+        `- Steps: ${context.steps.length}`,
+        `- Activities: ${context.activityDetails.length}`,
+        `- Relationships: ${context.relationships.length}`,
+        `- Activity types: ${Object.entries(context.typeCounts).map(([key, value]) => `${key} (${value})`).join(", ")}`,
+        `- Routing mix: ${Object.entries(context.routingPatternCounts).map(([key, value]) => `${key} (${value})`).join(", ")}`,
+        "",
+        "Rule Groups",
+        ...(context.ruleGroups.length ? context.ruleGroups.map((item) => `- ${item}`) : ["- None detected"]),
+        "",
+        "Folders And Robots",
+        ...(context.folderRefs.length ? context.folderRefs.map((item) => `- ${item}`) : ["- None detected"]),
+        "",
+        "Signals",
+        ...context.signals.map((item) => `- ${item}`),
+        "",
+        "Opportunities",
+        ...context.opportunities.map((item) => `- ${item}`),
+        "",
+        "Questions For The Customer",
+        ...context.questions.map((item) => `- ${item}`),
+        "",
+        "Downstream Workflow Checklist",
+        ...context.checklist.map((item) => `- ${item.item}: ${item.status}. Evidence: ${item.evidence}. CSM guidance: ${item.guidance}`)
+      ].join("\n");
+    }
+
+    function renderTabs() {
+      tabStrip.innerHTML = "";
+      if (currentAnalyses.length <= 1) {
+        tabStrip.classList.add("hidden");
+        return;
+      }
+
+      currentAnalyses.forEach((analysis, index) => {
+        const button = document.createElement("button");
+        button.type = "button";
+        button.className = `tab-button${index === activeAnalysisIndex ? " active" : ""}`;
+        button.textContent = analysis.metadata.sourceName;
+        button.addEventListener("click", () => {
+          activeAnalysisIndex = index;
+          renderTabs();
+          renderAnalysisView(index);
+        });
+        tabStrip.appendChild(button);
+      });
+      tabStrip.classList.remove("hidden");
+    }
+
+    function renderAnalysisView(index) {
+      const analysis = currentAnalyses[index];
+      if (!analysis) {
+        return;
+      }
+
+      currentSourceName = analysis.metadata.sourceName.replace(/\.[^.]+$/, "") || "workflow-analysis";
+      currentReport = analysis.report;
+      reportHeading.textContent = analysis.metadata.sourceName;
+      reportSubheading.textContent = currentAnalyses.length > 1
+        ? `File ${index + 1} of ${currentAnalyses.length}. Review each tab separately for a cleaner per-workflow analysis.`
+        : "Practical spreadsheet-style sections with per-section filters for quick review.";
+
+      renderStats([
+        ["Steps", analysis.steps.length],
+        ["Activities", analysis.activities.length],
+        ["Rule Groups", analysis.ruleGroups.length],
+        ["Relationships", analysis.relationships.length]
+      ]);
+      renderSummary(analysis);
+
+      renderKeyValueTable(metadataTableBody, [
+        ["Source file", analysis.metadata.sourceName],
+        ["Workflow type", analysis.metadata.workflowType || "Not available in the imported data"],
+        ["Workflow subtype", analysis.metadata.workflowSubType || "Not available in the imported data"],
+        ["Version", analysis.metadata.version || "Not available in the imported data"],
+        ["Usable", analysis.metadata.usable || "Not available in the imported data"],
+        ["Version description", analysis.metadata.versionDescription || "Not available in the imported data"]
+      ]);
+
+      renderKeyValueTable(routingTableBody, [
+        ["Static activities", analysis.routingPatternCounts.Static || 0],
+        ["Dynamic activities", analysis.routingPatternCounts.Dynamic || 0],
+        ["ADW activities", analysis.routingPatternCounts.ADW || 0],
+        ...(analysis.routingPatternCounts.Other
+          ? [["Other or utility activities", analysis.routingPatternCounts.Other]]
+          : []),
+        ...Object.entries(analysis.folderSelectionCounts).map(([key, value]) => [key, value])
+      ]);
+
+      renderActivityTable(activityTableBody, analysis.activityDetails, false);
+      renderIndexedTable(signalTableBody, analysis.signals, "Signal");
+      renderSingleValueTable(ruleGroupTableBody, analysis.ruleGroups, "Rule Group", "Detected");
+      renderSingleValueTable(folderTableBody, analysis.folderRefs, "Folder / Robot Reference", "Detected");
+      renderIndexedTable(opportunityTableBody, analysis.opportunities, "Opportunity");
+      renderIndexedTable(questionTableBody, analysis.questions, "Question");
+      renderChecklistTable(checklistTableBody, analysis.checklist);
+      resetFilters();
+    }
+
+    function renderSummary(analysis) {
+      const summary = buildExecutiveSummary(analysis);
+      summaryNarrative.textContent = summary.narrative;
+      renderSummaryList(takeawayList, summary.takeaways, "No high-confidence takeaways were generated from the imported XML.");
+      renderSummaryList(recommendationList, summary.recommendations, "No immediate CSM recommendations were generated from the imported XML.");
+    }
+
+    function renderSummaryList(root, items, emptyText) {
+      root.innerHTML = "";
+      const values = items.length ? items : [emptyText];
+      values.forEach((item) => {
+        const entry = document.createElement("li");
+        entry.textContent = item;
+        root.appendChild(entry);
+      });
+    }
+
+    function buildExecutiveSummary(analysis) {
+      const workflowLabel = analysis.metadata.workflowType || "workflow";
+      const manualCount = analysis.activityDetails.filter((item) => item.type === "manual").length;
+      const automatedCount = analysis.activityDetails.filter((item) => item.type === "automated").length;
+      const dynamicCount = analysis.routingPatternCounts.Dynamic || 0;
+      const adwCount = analysis.routingPatternCounts.ADW || 0;
+      const explicitFolders = analysis.activityDetails.filter((item) => item.folderSelectionRule === "ExplicitFolder").length;
+      const repeatedFamilies = analysis.repeatedPrefixPatterns || [];
+
+      const routingSummary = adwCount
+        ? `includes ${adwCount} ADW-driven activities`
+        : dynamicCount
+          ? `uses ${dynamicCount} dynamic activities without ADW`
+          : "leans mostly on static routing";
+
+      const narrative = `This ${workflowLabel} definition contains ${analysis.activityDetails.length} activities across ${analysis.steps.length} steps and ${routingSummary}. Manual work appears in ${manualCount} activities versus ${automatedCount} automated activities, which gives the CSM a fast read on whether the conversation should focus more on maintenance, governance, or workload reduction.`;
+
+      const takeaways = [
+        `Routing mix: ${Object.entries(analysis.routingPatternCounts).map(([key, value]) => `${key} ${value}`).join(", ")}.`,
+        manualCount > automatedCount
+          ? `Manual approvals outnumber automation, so this flow likely still depends on human review for a meaningful share of the process.`
+          : `Automation is at least keeping pace with manual review, which may shift the conversation toward governance and exception handling instead of pure workload reduction.`,
+        explicitFolders
+          ? `${explicitFolders} activities use explicit folder routing, which usually means approver changes may require more direct maintenance.`
+          : "No explicit folder routing was found, which suggests routing is being handled more through dynamic logic or ADW patterns.",
+        repeatedFamilies.length
+          ? `Repeated step families were detected (${repeatedFamilies.map(([prefix, count]) => `${prefix} ${count}`).join(", ")}), which may signal duplicated business-unit variants.`
+          : "No strong repeated step-family pattern was detected, so the route may be relatively consolidated already."
+      ];
+
+      const recommendations = [
+        ...(analysis.opportunities || []).slice(0, 3),
+        ...(analysis.questions || []).slice(0, 2).map((question) => `Ask: ${question}`)
+      ];
+
+      return {
+        narrative,
+        takeaways: unique(takeaways),
+        recommendations: unique(recommendations)
+      };
+    }
+
+    function initializeCollapsibleSections() {
+      document.querySelectorAll(".sheet-section").forEach((section) => {
+        const header = section.querySelector(".section-head");
+        if (!header || header.querySelector(".collapse-toggle")) {
+          return;
+        }
+
+        const title = header.querySelector("h2, h3")?.textContent?.trim() || "Section";
+        header.appendChild(createCollapseToggle(section, title));
+        section.classList.add("is-collapsed");
+      });
+
+      document.querySelectorAll(".summary-card").forEach((card) => {
+        const header = card.querySelector(".summary-card-header");
+        if (!header || header.querySelector(".collapse-toggle")) {
+          return;
+        }
+
+        const title = header.querySelector("h2, h3")?.textContent?.trim() || "Summary";
+        header.appendChild(createCollapseToggle(card, title));
+        card.classList.add("is-collapsed");
+      });
+    }
+
+    function createCollapseToggle(container, title) {
+      const button = document.createElement("button");
+      button.type = "button";
+      button.className = "collapse-toggle";
+      button.setAttribute("aria-expanded", "false");
+      button.setAttribute("aria-label", `Expand ${title}`);
+      button.innerHTML = '<span class="collapse-arrow" aria-hidden="true">▸</span>';
+      button.addEventListener("click", () => {
+        const isCollapsed = container.classList.toggle("is-collapsed");
+        button.setAttribute("aria-expanded", String(!isCollapsed));
+        button.setAttribute("aria-label", `${isCollapsed ? "Expand" : "Collapse"} ${title}`);
+      });
+      return button;
+    }
+
+    function renderStats(entries) {
+      stats.innerHTML = "";
+      entries.forEach(([label, value]) => {
+        const node = document.createElement("div");
+        node.className = "stat";
+        node.innerHTML = `<div class="label">${label}</div><div class="value">${value}</div>`;
+        stats.appendChild(node);
+      });
+    }
+
+    function renderKeyValueTable(root, items) {
+      root.innerHTML = "";
+      items.forEach(([label, value]) => {
+        const row = document.createElement("tr");
+        row.dataset.filterText = `${label} ${value}`.toLowerCase();
+        row.innerHTML = `<td>${escapeHtml(String(label))}</td><td>${escapeHtml(String(value))}</td>`;
+        root.appendChild(row);
+      });
+    }
+
+    function renderIndexedTable(root, items, columnName) {
+      root.innerHTML = "";
+      if (!items.length) {
+        renderEmptyRow(root, 2, `No ${columnName.toLowerCase()} entries.`);
+        return;
+      }
+      items.forEach((item, index) => {
+        const row = document.createElement("tr");
+        row.dataset.filterText = `${index + 1} ${item}`.toLowerCase();
+        row.innerHTML = `<td>${index + 1}</td><td>${escapeHtml(String(item))}</td>`;
+        root.appendChild(row);
+      });
+    }
+
+    function renderSingleValueTable(root, items, columnName, statusText) {
+      root.innerHTML = "";
+      if (!items.length) {
+        renderEmptyRow(root, 2, `No ${columnName.toLowerCase()} detected.`);
+        return;
+      }
+      items.forEach((item) => {
+        const row = document.createElement("tr");
+        row.dataset.filterText = `${item} ${statusText}`.toLowerCase();
+        row.innerHTML = `<td>${escapeHtml(String(item))}</td><td><span class="status-chip">${escapeHtml(statusText)}</span></td>`;
+        root.appendChild(row);
+      });
+    }
+
+    function renderActivityTable(root, activities, includeSourceName) {
+      root.innerHTML = "";
+      if (!activities.length) {
+        renderEmptyRow(root, 8, "No activities found.");
+        return;
+      }
+
+      activities.forEach((activity) => {
+        const row = document.createElement("tr");
+        row.dataset.filterText = [
+          activity.name,
+          activity.type,
+          activity.routingPattern,
+          activity.folderSelectionRule,
+          activity.stepRef,
+          activity.folderRef,
+          activity.rule,
+          activity.attributes.map((attribute) => `${attribute.name} ${attribute.value}`).join(" ")
+        ].join(" ").toLowerCase();
+
+        row.innerHTML = `
+          <td>${escapeHtml(includeSourceName ? `${activity.sourceName}: ${activity.name}` : activity.name)}</td>
+          <td><span class="status-chip">${escapeHtml(activity.type)}</span></td>
+          <td><span class="status-chip">${escapeHtml(activity.routingPattern)}</span></td>
+          <td>${escapeHtml(activity.folderSelectionRule)}</td>
+          <td>${activity.stepRef ? escapeHtml(activity.stepRef) : '<span class="muted-cell">None</span>'}</td>
+          <td>${activity.folderRef ? escapeHtml(activity.folderRef) : '<span class="muted-cell">None</span>'}</td>
+          <td class="mono">${activity.rule ? escapeHtml(activity.rule) : '<span class="muted-cell">No rule</span>'}</td>
+          <td class="mono">${formatActivityAttributes(activity.attributes)}</td>
+        `;
+        root.appendChild(row);
+      });
+    }
+
+    function formatActivityAttributes(attributes) {
+      if (!attributes.length) {
+        return '<span class="muted-cell">No attributes</span>';
+      }
+
+      return attributes
+        .map((attribute) => `${escapeHtml(attribute.name || "Unnamed")}: ${escapeHtml(attribute.value || "")}`)
+        .join("<br>");
+    }
+
+    function renderChecklistTable(root, items) {
+      root.innerHTML = "";
+      if (!items.length) {
+        renderEmptyRow(root, 4, "No checklist entries.");
+        return;
+      }
+
+      items.forEach((item) => {
+        const row = document.createElement("tr");
+        row.dataset.filterText = `${item.item} ${item.status} ${item.evidence} ${item.guidance}`.toLowerCase();
+        const statusClass = item.status === "Detected"
+          ? "available"
+          : item.status === "Not detected in the imported XML"
+            ? "missing"
+            : "unavailable";
+        row.innerHTML = `
+          <td>${escapeHtml(item.item)}</td>
+          <td><span class="status-chip ${statusClass}">${escapeHtml(item.status)}</span></td>
+          <td>${escapeHtml(item.evidence)}</td>
+          <td>${escapeHtml(item.guidance)}</td>
+        `;
+        root.appendChild(row);
+      });
+    }
+
+    function renderEmptyRow(root, colSpan, text) {
+      const row = document.createElement("tr");
+      row.className = "empty-row";
+      row.innerHTML = `<td colspan="${colSpan}">${escapeHtml(text)}</td>`;
+      root.appendChild(row);
+    }
+
+    function applyFilter(input) {
+      const targetId = input.dataset.filterTarget;
+      const mode = input.dataset.filterMode || "table";
+      const value = input.value.trim().toLowerCase();
+      const target = document.getElementById(targetId);
+
+      if (!target) {
+        return;
+      }
+
+      [...target.querySelectorAll("tr")].forEach((row) => {
+        if (row.classList.contains("empty-row")) {
+          row.style.display = "";
+          return;
+        }
+        const haystack = row.dataset.filterText || row.textContent.toLowerCase();
+        row.style.display = !value || haystack.includes(value) ? "" : "none";
+      });
+    }
+
+    function resetFilters() {
+      document.querySelectorAll("[data-filter-target]").forEach((input) => {
+        input.value = "";
+        applyFilter(input);
+      });
+    }
+
+    function downloadReport() {
+      if (!currentReport) {
+        alert("Analyze a file first.");
+        return;
+      }
+      const blob = new Blob([currentReport], { type: "text/plain;charset=utf-8" });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = `${currentSourceName}-report.txt`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+    }
+
+    function joinOrFallback(items, fallback) {
+      return items.length ? items.join(", ") : fallback;
+    }
+
+    function summarizeNames(items) {
+      if (!items.length) {
+        return "Not available in the imported data";
+      }
+
+      const names = unique(items.map((item) => `${item.sourceName}: ${item.name}`));
+      return names.slice(0, 5).join(", ") + (names.length > 5 ? `, +${names.length - 5} more` : "");
+    }
+
+    function escapeHtml(text) {
+      return text
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#39;");
+    }
+
+  </script>
+</body>
+</html>

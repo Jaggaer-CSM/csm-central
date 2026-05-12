@@ -1,0 +1,1070 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Release Assistant</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #f4f6f8;
+      --ink: #17212b;
+      --muted: #5e6975;
+      --card: #ffffff;
+      --line: #d8dde3;
+      --primary: #0d4b7d;
+      --primary-soft: #e6f0f8;
+      --accent: #d3521f;
+      --ok: #0e7c4f;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: Manrope, "Segoe UI", sans-serif;
+      color: var(--ink);
+      background:
+        radial-gradient(900px 450px at 0% -10%, #f5e9d8, transparent),
+        radial-gradient(900px 450px at 100% -10%, #deecf8, transparent),
+        var(--bg);
+    }
+    .shell {
+      min-height: 100vh;
+      display: grid;
+      grid-template-columns: 280px 1fr;
+    }
+    .side {
+      border-right: 1px solid var(--line);
+      background: #f9fbfd;
+      padding: 18px 14px;
+    }
+    .brand { display: flex; align-items: center; gap: 10px; margin-bottom: 18px; }
+    .logo { width: 36px; height: 36px; border-radius: 10px; background: var(--primary); color: #fff; display: grid; place-items: center; font-weight: 800; }
+    .brand h1 { margin: 0; font-size: 1.05rem; }
+    .brand p { margin: 2px 0 0; color: var(--muted); font-size: .8rem; }
+    .new { width: 100%; border: none; border-radius: 14px; padding: 11px; font-weight: 700; background: #d8eafe; color: #0d3f67; cursor: pointer; margin-bottom: 14px; }
+    .nav { display: grid; gap: 7px; }
+    .nav button {
+      text-align: left;
+      border: 1px solid transparent;
+      background: transparent;
+      border-radius: 0 16px 16px 0;
+      padding: 10px 12px;
+      cursor: pointer;
+      color: var(--ink);
+      font-weight: 600;
+    }
+    .nav button.active { background: #eaf3ff; color: #0d4b7d; border-color: #c9def4; }
+
+    .main { padding: 18px; }
+    .top {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 12px;
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 10px;
+      align-items: center;
+      margin-bottom: 14px;
+    }
+    .search {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: #edf3f9;
+      border: 1px solid #d3dfeb;
+      border-radius: 999px;
+      padding: 9px 12px;
+      color: #4e5f72;
+    }
+    .search input { border: none; background: transparent; width: 100%; outline: none; font: inherit; }
+    .badge { background: #ecf9f2; color: #0c6942; border: 1px solid #cde8da; border-radius: 999px; padding: 6px 10px; font-size: .82rem; font-weight: 700; }
+
+    .panel { display: none; }
+    .panel.active { display: block; }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 14px;
+      margin-bottom: 12px;
+    }
+    .card h2 { margin: 0 0 4px; font-size: 1.18rem; }
+    .sub { margin: 0 0 12px; color: var(--muted); font-size: .92rem; }
+
+    .row { display: grid; grid-template-columns: 1fr auto; gap: 8px; }
+    .search-tools { display: grid; grid-template-columns: 1fr 220px auto; gap: 8px; margin-top: 8px; }
+    input[type="text"], input[type="search"], textarea, select {
+      width: 100%;
+      padding: 10px 12px;
+      border-radius: 10px;
+      border: 1px solid var(--line);
+      font: inherit;
+      background: #fff;
+    }
+    .btn {
+      border: 1px solid var(--primary);
+      background: var(--primary);
+      color: #fff;
+      border-radius: 10px;
+      padding: 10px 13px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .btn.alt { background: #fff; color: var(--ink); border-color: var(--line); }
+
+    .results { border: 1px solid var(--line); border-radius: 12px; overflow: hidden; }
+    .res {
+      padding: 12px;
+      border-bottom: 1px solid #edf1f5;
+      background: #fff;
+    }
+    .res:last-child { border-bottom: none; }
+    .res h3 { margin: 0; font-size: 1rem; }
+    .res a { color: #155aa2; text-decoration: none; }
+    .res a:hover { text-decoration: underline; }
+    .loc { font-size: .82rem; color: var(--ok); margin-top: 2px; }
+    .res p { margin: 7px 0; color: #2f3d4b; }
+    .files { margin: 0; padding-left: 18px; font-size: .9rem; }
+
+    .split { display: grid; grid-template-columns: 1.2fr .8fr; gap: 12px; }
+    .list {
+      max-height: 320px;
+      overflow: auto;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 8px;
+      background: #fff;
+    }
+    .item {
+      display: flex;
+      gap: 9px;
+      padding: 8px;
+      border-radius: 8px;
+      align-items: flex-start;
+      justify-content: flex-start;
+    }
+    .item > div {
+      text-align: left;
+    }
+    .item input[type="checkbox"] {
+      width: 16px;
+      height: 16px;
+      margin-top: 2px;
+      flex: 0 0 auto;
+      accent-color: #2e71c4;
+      cursor: pointer;
+    }
+    .item:hover { background: #f5f9fe; }
+    .meta { font-size: .83rem; color: var(--muted); }
+    .stack { display: grid; gap: 9px; }
+    .kpi {
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 10px;
+      background: #fcfdff;
+    }
+    .kpi strong { display: block; font-size: .8rem; color: var(--muted); margin-bottom: 5px; }
+    .status { margin-top: 8px; font-size: .86rem; color: var(--muted); }
+    .thinking { margin-top: 8px; font-size: .86rem; color: #466b93; }
+    .answer {
+      margin: 10px 0 10px;
+      padding: 14px;
+      border: 1px solid #bdd6ef;
+      border-radius: 10px;
+      background: #eaf4ff;
+      font-size: .98rem;
+      line-height: 1.5;
+    }
+    .answer h3 { margin: 0 0 6px; font-size: 1rem; color: #0b3f6a; }
+    .answer ul { margin: 8px 0 0 18px; padding: 0; }
+    .answer li { margin: 4px 0; }
+    .answer a { color: #0f4c81; text-decoration: none; }
+    .answer a:hover { text-decoration: underline; }
+    .feature-table { display: grid; gap: 6px; margin-top: 8px; }
+    .feature-table .line { font-size: .96rem; color: #132130; line-height: 1.45; }
+    .feature-table .line strong { color: #0f3f68; }
+    .filter-row { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; margin-bottom: 10px; }
+    .planner-search-row { display: grid; grid-template-columns: 1fr auto; gap: 8px; }
+    .filters { display: grid; gap: 4px; }
+    .list-actions { display: flex; gap: 8px; margin: 8px 0 10px; }
+    .list .item input[type="checkbox"] { margin-top: 4px; }
+
+    @media (max-width: 980px) {
+      .shell { grid-template-columns: 1fr; }
+      .side { border-right: none; border-bottom: 1px solid var(--line); }
+      .split { grid-template-columns: 1fr; }
+      .search-tools { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <aside class="side">
+      <div class="brand">
+        <div class="logo">J</div>
+        <div>
+          <h1>Release Assistant</h1>
+          <p>26.1 official release-note assistant with deterministic Product->Core mapping</p>
+        </div>
+      </div>
+      <div class="nav">
+        <button class="nav-btn active" data-target="search">Search Releases</button>
+        <button class="nav-btn" data-target="planner">Create Materials</button>
+        <button class="nav-btn" data-target="slides">Feature Slide Studio</button>
+        <button class="nav-btn" data-target="video">Feature Video Studio</button>
+        <button class="nav-btn" data-target="readiness">Release Readiness</button>
+      </div>
+    </aside>
+
+    <main class="main">
+      <div class="top">
+        <div class="search">
+          <span>⌕</span>
+          <input value="Search all releases, modules, and knowledge assets..." readonly>
+        </div>
+        <span class="badge">Scope: 24.1, 25.3, 26.1 release notes | Deterministic cores: JA/JI/JD/ASO/J1/J1P</span>
+      </div>
+
+      <section id="search" class="panel active">
+        <article class="card">
+          <h2>Search Releases</h2>
+          <p class="sub">Search official 26.1 release notes with strict product-core mapping and citation-backed results.</p>
+          <form id="search-form">
+            <div class="search-tools">
+              <input id="search-q" type="search" placeholder="Example: contracts esignature features">
+              <select id="search-core-filter">
+                <option value="ALL">All Core</option>
+                <option value="JA">JA</option>
+                <option value="JI">JI</option>
+                <option value="JD">JD</option>
+                <option value="ASO">ASO</option>
+                <option value="J1">J1</option>
+                <option value="J1P">J1P</option>
+              </select>
+              <button id="search-btn" class="btn" type="submit">Ask</button>
+            </div>
+          </form>
+          <div id="search-thinking" class="thinking" style="display:none;">Thinking and scanning indexed materials...</div>
+          <div id="search-answer" class="answer" style="display:none;"></div>
+        </article>
+        <article class="card">
+          <h2>Results</h2>
+          <div id="search-results" class="results"></div>
+        </article>
+      </section>
+
+      <section id="planner" class="panel">
+        <article class="card">
+          <h2>Create Materials</h2>
+          <p class="sub">Build customer-facing or internal assets from selected release features.</p>
+          <div class="filter-row">
+            <label class="filters">What should the CSM build?
+              <select id="build-type">
+                <option value="testing_csv_export">Testing CSV export</option>
+                <option value="ppt">PowerPoint (PPT)</option>
+                <option value="training_tool">Training tool</option>
+              </select>
+            </label>
+          </div>
+          <div class="filter-row">
+            <label class="filters">Release
+              <select id="release-filter" multiple size="4"></select>
+            </label>
+            <label class="filters">Product
+              <select id="product-filter" multiple size="4"></select>
+            </label>
+            <label class="filters">Search
+              <div class="planner-search-row">
+                <input id="planner-search" type="text" placeholder="Filter features/modules...">
+                <button id="planner-search-btn" class="btn alt" type="button">Search</button>
+              </div>
+            </label>
+          </div>
+          <div class="split">
+            <div>
+              <div class="list-actions">
+                <button id="select-all-features" class="btn alt" type="button">Select All</button>
+                <button id="clear-features" class="btn alt" type="button">Clear</button>
+              </div>
+              <div id="planner-list" class="list"></div>
+              <div id="planner-status" class="status">Select release/product, click Search, then pick rows and click Create File.</div>
+            </div>
+            <div class="stack">
+              <div id="kpi-total" class="kpi"><strong>Total Features</strong>-</div>
+              <div id="kpi-testing" class="kpi"><strong>Require Testing</strong>-</div>
+              <div id="kpi-enablement" class="kpi"><strong>Enablement Mix</strong>-</div>
+              <button id="generate-plan" class="btn" type="button">Generate Excel Test Plan</button>
+              <button id="create-file" class="btn alt" type="button">Create File</button>
+            </div>
+          </div>
+        </article>
+      </section>
+
+      <section id="slides" class="panel">
+        <article class="card">
+          <h2>Feature Slide Studio</h2>
+          <p class="sub">Select feature(s). The tool creates slides in the 26.1 deck format using semantic summaries from release-note PDFs.</p>
+          <label class="filters">Select feature(s)
+            <select id="slides-feature-select" multiple size="10"></select>
+          </label>
+          <div style="display:flex; gap:8px; margin-top:10px;">
+            <button id="slides-generate" class="btn" type="button">Create Slides</button>
+          </div>
+          <pre id="slides-output" class="status"></pre>
+        </article>
+      </section>
+
+      <section id="video" class="panel">
+        <article class="card">
+          <h2>Feature Video Studio</h2>
+          <p class="sub">Select one or more features and generate a tutorial script/walkthrough from source PDFs.</p>
+          <label>Feature(s)</label>
+          <select id="video-feature-select" multiple size="8"></select>
+          <label style="display:block; margin-top:10px;">Audience/Context</label>
+          <textarea id="video-context" rows="5" placeholder="Example: Explain impact for Procurement Admin and AP approvers."></textarea>
+          <div style="display:flex; gap:8px; margin-top:10px;">
+            <button id="video-generate" class="btn" type="button">Generate Script</button>
+          </div>
+          <pre id="video-output" class="status"></pre>
+        </article>
+      </section>
+
+      <section id="readiness" class="panel">
+        <article class="card">
+          <h2>Release Readiness</h2>
+          <p class="sub">Reference links for feature snapshots and testing guidance documents.</p>
+
+          <div class="kpi">
+            <strong>Release Snapshot PDFs</strong>
+            <ul class="files">
+              <li><a href="https://library.jaggaer.com/wp-content/uploads/JA-26.1-Feature-Snapshot-UIT.pdf" target="_blank">JA 26.1 Feature Snapshot (PDF)</a></li>
+              <li><a href="https://library.jaggaer.com/wp-content/uploads/JI-26.1-Feature-Snapshot-UIT.pdf" target="_blank">JI 26.1 Feature Snapshot (PDF)</a></li>
+              <li><a href="https://library.jaggaer.com/wp-content/uploads/JD-26.1-Feature-Snapshot-UIT.pdf" target="_blank">JD 26.1 Feature Snapshot (PDF)</a></li>
+            </ul>
+          </div>
+
+          <div class="kpi">
+            <strong>Testing Recommendation Documents</strong>
+            <ul class="files">
+              <li><a href="https://library.jaggaer.com/wp-content/uploads/26.1-eProcurement-Release-Notes-External.pdf" target="_blank">26.1 eProcurement Release Notes</a></li>
+              <li><a href="https://library.jaggaer.com/wp-content/uploads/26.1-Sourcing-Release-Notes-External.pdf" target="_blank">26.1 Sourcing Release Notes</a></li>
+              <li><a href="https://library.jaggaer.com/wp-content/uploads/26.1-ContractsPlus-Release-Notes-External.pdf" target="_blank">26.1 Contracts+ Release Notes</a></li>
+              <li><a href="https://library.jaggaer.com/wp-content/uploads/Product-Release-Schedule-2026.pdf" target="_blank">Product Release Schedule 2026</a></li>
+            </ul>
+          </div>
+        </article>
+      </section>
+    </main>
+  </div>
+
+  <script src="data/release_26_1_index.js"></script>
+  <script>
+    const API_BASE = '';
+    const BACKEND_BASE = '';
+
+    const state = {
+      backendEnabled: false,
+      features: [],
+      backendRows: [],
+      offlineRows: [],
+      currentPlannerRows: [],
+      featureSourceMap: new Map(),
+      offlineDemoMode: window.location.protocol === 'file:',
+    };
+
+    const PRODUCT_CORE_MAP = [
+      ['Spend Analytics+', 'JA'], ['Category Management+', 'JA'], ['Value Tracker', 'JA'], ['Savings Management+', 'JA'],
+      ['Sourcing+ and Program Management', 'JA'], ['Supplier Management+', 'JA'],
+      ['Direct Category Management', 'JD'], ['Direct Sourcing', 'JD'], ['Direct Supplier Management', 'JD'],
+      ['Supply Chain Collaboration', 'JD'], ['Direct ASN', 'JD'], ['Quality Management Specialization', 'JD'],
+      ['Sourcing', 'JI'], ['Contracts+', 'JI'], ['Supplier Management (TSM)', 'JI'], ['eProcurement', 'JI'],
+      ['Project Based Procurement', 'JI'], ['Inventory Management', 'JI'], ['Accounts Payable (Receipts and Invoices)', 'JI'],
+      ['eInvoicing Integrations', 'JI'], ['JAGGAER Pay', 'JI'],
+      ['Analytics (J1 Analytics)', 'J1'], ['API (J1 API)', 'J1'], ['Supplier Login and SSO', 'J1'], ['Platform Wide', 'J1'],
+      ['JAGGAER One Supplier Management', 'J1P'], ['Advise', 'J1P'], ['Adopt', 'J1P'],
+      ['Advanced Sourcing Optimizer (ASO)', 'ASO'],
+    ];
+
+    const demoSearchResults = [];
+
+    function termsFromQuery(query) {
+      const raw = String(query || '')
+        .toLowerCase()
+        .replace(/[^a-z0-9+.\s-]/g, ' ')
+        .split(/\s+/)
+        .filter((t) => t.length >= 2);
+
+      const map = {
+        notifications: ['notification', 'email', 'emails', 'otp', 'rejection', 'alert'],
+        notification: ['notifications', 'email', 'emails', 'otp', 'rejection', 'alert'],
+        approvers: ['approver', 'approval', 'workflow'],
+        approvals: ['approver', 'approval', 'workflow'],
+        supplier: ['suppliers', 'vendor'],
+        invoice: ['invoicing', 'ap', 'receipt'],
+      };
+      const out = [...raw];
+      for (const t of raw) {
+        const stem = t.endsWith('s') ? t.slice(0, -1) : t;
+        if (stem && stem !== t) out.push(stem);
+        const ex = map[t] || map[stem];
+        if (ex) out.push(...ex);
+      }
+      return [...new Set(out)];
+    }
+
+    function normalize(v) {
+      return String(v || '').toLowerCase().replace(/[^a-z0-9]+/g, ' ').replace(/\s+/g, ' ').trim();
+    }
+
+    function coreDisplay(product) {
+      const n = normalize(product);
+      for (const [p, core] of PRODUCT_CORE_MAP) {
+        if (normalize(p) === n) return `${p} (${core} Core)`;
+      }
+      return product;
+    }
+
+    function coreCodeFromProduct(product) {
+      const n = normalize(product);
+      for (const [p, core] of PRODUCT_CORE_MAP) {
+        if (normalize(p) === n) return core;
+      }
+      return '';
+    }
+
+    function productFromTitle(title) {
+      const n = normalize(title);
+      let best = null;
+      for (const [p] of PRODUCT_CORE_MAP) {
+        const pn = normalize(p);
+        if (n.includes(pn)) {
+          if (!best || pn.length > normalize(best).length) best = p;
+        }
+      }
+      if (best) return coreDisplay(best);
+      // fallback from filename
+      const t = String(title || '').replace(/26\.1[-_ ]*/i, '').replace(/-?release[-_ ]?notes.*$/i, '').replace(/\.pdf$/i, '').replace(/[-_]+/g, ' ').trim();
+      return t || 'Product Update';
+    }
+
+    function extractFeatureName(content, fallbackProduct) {
+      const t = readableText(content || '');
+      const m = t.match(/([A-Za-z0-9+&()\/,\- ]{4,100})\s+Customer Impact/i);
+      if (m && m[1]) {
+        const raw = m[1]
+          .trim()
+          .replace(/^(New Features|Enhanced Features)\s*/i, '')
+          .replace(/^(l|i)\s+/i, '')
+          .replace(/^(in|and|the)\s+/i, '');
+        const parts = raw.split(/\s+/);
+        const candidate = parts.slice(Math.max(0, parts.length - 10)).join(' ').trim();
+        if (candidate.length >= 4) return candidate;
+      }
+      return `${fallbackProduct} update`;
+    }
+
+    function parseEnablement(content) {
+      const low = String(content || '').toLowerCase().replace(/\s+/g, '');
+      if (low.includes('onbydefault')) return 'ON by default';
+      if (low.includes('offbydefault')) return 'OFF by default';
+      if (low.includes('featureactivation') || low.includes('requires') || low.includes('configuration')) return 'Configuration required';
+      return 'Not explicitly stated';
+    }
+
+    function buildValueAnalysis(content, terms, featureName) {
+      const summary = snippetAround(content, terms).replace(/\.\.\./g, '').trim();
+      const clean = readableText(summary).replace(/\s+/g, ' ').trim();
+      if (!clean) return `Documented 26.1 update for ${featureName}.`;
+      return clean.length > 220 ? `${clean.slice(0, 217).trim()}...` : clean;
+    }
+
+    function buildWhatThisMeans(valueText) {
+      const base = readableText(valueText || '');
+      if (!base) return ['Review this feature in your test environment.', 'Confirm expected behavior with business owners.'];
+      return [
+        `Users should review how this affects day-to-day process steps.`,
+        `CSMs should validate impact and include this in customer enablement/testing guidance.`,
+      ];
+    }
+
+    function extractWhatChanged(content, terms) {
+      const clean = readableText(content || '');
+      const sentences = clean.split(/(?<=[.!?])\s+/).filter(Boolean);
+      const picks = [];
+      const lowTerms = (terms || []).map((t) => t.toLowerCase());
+      for (const s of sentences) {
+        const sl = s.toLowerCase();
+        if (lowTerms.some((t) => sl.includes(t)) || sl.includes('supplier') || sl.includes('invoice') || sl.includes('purchase order') || sl.includes('email')) {
+          picks.push(s);
+        }
+        if (picks.length >= 2) break;
+      }
+      if (!picks.length && sentences.length) picks.push(sentences[0]);
+      return picks.map((x) => x.length > 190 ? `${x.slice(0, 187).trim()}...` : x);
+    }
+
+    function extractNotChanged(content) {
+      const low = readableText(content || '').toLowerCase();
+      const out = [];
+      if (low.includes('does not impact') || low.includes('not impact')) out.push('No major workflow behavior changes are explicitly documented for this item.');
+      if (low.includes('no change')) out.push('This area is documented as unchanged in this release section.');
+      return out;
+    }
+
+    function readableText(text) {
+      let t = String(text || '');
+      t = t.replace(/([a-z])([A-Z])/g, '$1 $2');
+      t = t.replace(/([0-9])([A-Za-z])/g, '$1 $2');
+      t = t.replace(/([A-Za-z])([0-9])/g, '$1 $2');
+      t = t.replace(/[|•]/g, ' ');
+      t = t.replace(/\bl\s+/g, ' ');
+      t = t.replace(/\s+/g, ' ').trim();
+      return t;
+    }
+
+    function snippetAround(text, queryTerms) {
+      const src = readableText(String(text || ''));
+      const low = src.toLowerCase();
+      let pos = -1;
+      for (const t of queryTerms) {
+        const p = low.indexOf(t.toLowerCase());
+        if (p >= 0) { pos = p; break; }
+      }
+      if (pos < 0) return src.slice(0, 260) + (src.length > 260 ? '...' : '');
+      const start = Math.max(0, pos - 90);
+      const end = Math.min(src.length, pos + 220);
+      let out = src.slice(start, end).trim();
+      if (start > 0) out = '...' + out;
+      if (end < src.length) out += '...';
+      return out;
+    }
+
+    function scoreChunk(text, terms, rawQuery) {
+      const low = String(text || '').toLowerCase();
+      let score = 0;
+      for (const t of terms) {
+        let idx = low.indexOf(t);
+        while (idx >= 0) {
+          score += 1;
+          idx = low.indexOf(t, idx + t.length);
+        }
+      }
+      const q = String(rawQuery || '').toLowerCase().trim();
+      if (q && low.includes(q)) score += 5;
+      return score;
+    }
+
+    function searchStatic261(query, topK = 8, coreFilter = 'ALL') {
+      const idx = window.RELEASE_26_1_INDEX;
+      if (!idx || !idx.documents) return [];
+      const terms = termsFromQuery(query);
+      if (!terms.length) return [];
+
+      const ranked = [];
+      for (const doc of idx.documents) {
+        let best = null;
+        let sum = 0;
+        for (const ch of (doc.chunks || [])) {
+          const s = scoreChunk(ch.content, terms, query);
+          if (s <= 0) continue;
+          sum += s;
+          if (!best || s > best.score) best = { score: s, chunk: ch };
+        }
+        if (!best) continue;
+        ranked.push({
+          doc,
+          score: sum + best.score,
+          best: best.chunk,
+        });
+      }
+      ranked.sort((a, b) => b.score - a.score);
+      const top = ranked.slice(0, topK);
+      return top.map((r, i) => {
+        const product = productFromTitle(r.doc.title || r.doc.url);
+        const core = coreCodeFromProduct(product.replace(/\s*\([^)]+\)\s*$/, ''));
+        if (coreFilter !== 'ALL' && core !== coreFilter) return null;
+        const featureName = extractFeatureName(r.best.content, product);
+        const related = top
+          .filter((x, j) => j !== i)
+          .slice(0, 3)
+          .map((x) => ({ title: x.doc.title, url: x.doc.url }));
+        return {
+          title: r.doc.title,
+          url: r.doc.url,
+          release: r.doc.release || '26.1',
+          product,
+          core,
+          feature_name: featureName,
+          enabled: parseEnablement(r.best.content),
+          value_analysis: buildValueAnalysis(r.best.content, terms, featureName),
+          answer: snippetAround(r.best.content, terms),
+          description: snippetAround(r.best.content, terms),
+          location: { page: r.best.page || null },
+          files: related,
+        };
+      }).filter(Boolean);
+    }
+
+    const esc = (s) => String(s || '').replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;');
+
+    async function api(path, method = 'GET', body, base = API_BASE) {
+      if (window.location.protocol === 'file:') {
+        throw new Error('Open this page from the app server, not as a local file. Use http://127.0.0.1:8000/mockup');
+      }
+      const res = await fetch(`${base}${path}`, {
+        method,
+        headers: { 'Content-Type': 'application/json' },
+        body: body ? JSON.stringify(body) : undefined,
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(data.error || `Request failed: ${res.status}`);
+      return data;
+    }
+
+    function selectedValues(id) {
+      return [...document.getElementById(id).selectedOptions].map((o) => o.value);
+    }
+
+    function setSelectOptions(id, values) {
+      const el = document.getElementById(id);
+      el.innerHTML = '';
+      (values || []).forEach((v) => {
+        const opt = document.createElement('option');
+        opt.value = v;
+        opt.textContent = v;
+        el.appendChild(opt);
+      });
+    }
+
+    function buildPlannerRows(rows) {
+      const root = document.getElementById('planner-list');
+      const query = document.getElementById('planner-search').value.trim().toLowerCase();
+      root.innerHTML = '';
+      let shown = 0;
+      rows.forEach((row) => {
+        const label = row.feature_name || row.name || row.title || 'Feature';
+        const meta = `${row.release || ''} ${row.product || ''} ${row.enablement_type || ''}`.trim();
+        const hay = `${label} ${meta}`.toLowerCase();
+        if (query && !hay.includes(query)) return;
+        const id = row.id || row.url || `${label}-${meta}`;
+        const src = row.source_url || row.url || row.id;
+        const item = document.createElement('label');
+        item.className = 'item';
+        item.innerHTML = `<input type="checkbox" value="${esc(id)}" data-source="${esc(src)}"><div><strong>${esc(label)}</strong><div class="meta">${esc(meta)}</div></div>`;
+        root.appendChild(item);
+        shown += 1;
+      });
+      document.getElementById('planner-status').textContent = `${shown} feature rows shown`;
+      state.currentPlannerRows = rows;
+    }
+
+    function selectedFeatureSources() {
+      return [...document.querySelectorAll('#planner-list input[type="checkbox"]:checked')]
+        .map((x) => x.dataset.source)
+        .filter(Boolean);
+    }
+
+    function renderSearchCards(resultsBox, items) {
+      if (!items || !items.length) {
+        resultsBox.innerHTML = '<div class="res"><p>unknown</p></div>';
+        return;
+      }
+      resultsBox.innerHTML = items.map((item, i) => {
+        const loc = item.location && item.location.page ? `Page ${item.location.page}` : 'Page unknown';
+        const product = item.product || productFromTitle(item.title || item.url);
+        const featureName = item.feature_name || `${product} update`;
+        const valueAnalysis = item.value_analysis || readableText(item.answer || item.description || 'No snippet');
+        const enabled = item.enabled || 'Not explicitly stated';
+        const means = buildWhatThisMeans(valueAnalysis);
+        const changed = extractWhatChanged(item.answer || item.description || '', termsFromQuery(document.getElementById('search-q').value || ''));
+        const notChanged = extractNotChanged(item.answer || item.description || '');
+        const rel = (item.release || '26.1');
+        return `<div class="res" id="res-${i + 1}">
+          <h3>${i + 1}. ${esc(product)} – ${esc(featureName)} (${esc(rel)} Enhancements)</h3>
+          <div class="feature-table">
+            <div class="line"><strong>Feature Name:</strong> ${esc(featureName)}</div>
+            <div class="line"><strong>What Changed:</strong>
+              <ul class="files">
+                ${changed.map((c) => `<li>${esc(c)}</li>`).join('')}
+              </ul>
+            </div>
+            <div class="line"><strong>Value of feature:</strong> ${esc(valueAnalysis)}</div>
+            <div class="line"><strong>What This Means:</strong>
+              <ul class="files">
+                <li>${esc(means[0])}</li>
+                <li>${esc(means[1])}</li>
+              </ul>
+            </div>
+            <div class="line"><strong>How is it enabled:</strong> ${esc(enabled)}</div>
+            ${notChanged.length ? `<div class="line"><strong>What Did Not Change:</strong><ul class="files">${notChanged.map((n) => `<li>${esc(n)}</li>`).join('')}</ul></div>` : ''}
+            <div class="line"><strong>Links:</strong> <a href="${item.url}" target="_blank">${esc(item.title || item.url)}</a></div>
+          </div>
+          <div class="loc">Page: ${esc(loc)}</div>
+        </div>`;
+      }).join('');
+    }
+
+    function guessTopic(query) {
+      const q = String(query || '').toLowerCase();
+      if (q.includes('notification')) return 'Notifications';
+      if (q.includes('esignature') || q.includes('e-signature')) return 'eSignature';
+      if (q.includes('approver')) return 'Approvals';
+      if (q.includes('supplier')) return 'Supplier Features';
+      return 'Feature Updates';
+    }
+
+    function buildChatStyleAnswerHtml(query, items) {
+      if (!items || !items.length) {
+        return `<h3>Answer</h3><div>I’m unable to find this information in the 26.1 release notes.<br>You may want to check the Product Release Library for previous versions.</div>`;
+      }
+      const top = items.slice(0, 5);
+      const primary = top[0];
+      const topic = guessTopic(query);
+      const primaryProduct = primary.product || productFromTitle(primary.title || primary.url);
+      const release = primary.release || '26.1';
+      const list = top.map((it, idx) => {
+        const featureName = it.feature_name || `${productFromTitle(it.title || it.url)} update`;
+        const changed = extractWhatChanged(it.answer || it.description || '', termsFromQuery(query));
+        const enabled = it.enabled || 'Not explicitly stated';
+        return `
+          <li style="margin-bottom:8px;">
+            <strong>${idx + 1}. ${esc(featureName)}</strong><br>
+            <span><strong>What Changed:</strong> ${esc(changed[0] || 'Documented update available.')}</span><br>
+            <span><strong>Activation:</strong> ${esc(enabled)}</span>
+            <div><a href="#res-${idx + 1}">View feature details</a></div>
+          </li>
+        `;
+      }).join('');
+      const summary = top.slice(0, 3).map((it) => {
+        const f = it.feature_name || productFromTitle(it.title || it.url);
+        return `<li>${esc(f)}</li>`;
+      }).join('');
+      const src = top.map((it) => {
+        const page = (it.location && it.location.page) ? it.location.page : 'Page not specified';
+        return `<li>${esc(it.title || it.url)} - ${esc(String(page))}</li>`;
+      }).join('');
+      return `
+        <h3>Answer</h3>
+        <div><strong>${esc(primaryProduct)} – ${esc(topic)} (${esc(release)})</strong></div>
+        <div>I found <strong>${items.length}</strong> relevant documented updates for "<strong>${esc(query)}</strong>".</div>
+        <ul>${list}</ul>
+        <div><strong>Summary of related updates:</strong></div>
+        <ul>${summary}</ul>
+        <div><strong>Source:</strong></div>
+        <ul>${src}</ul>
+      `;
+    }
+
+    async function runSearch(q, targetResultsId = 'search-results', targetAnswerId = 'search-answer') {
+      const resultsBox = document.getElementById(targetResultsId);
+      const answerBox = document.getElementById(targetAnswerId);
+      const thinking = document.getElementById('search-thinking');
+      const btn = document.getElementById('search-btn');
+
+      resultsBox.innerHTML = '';
+      answerBox.style.display = 'none';
+      if (thinking) thinking.style.display = '';
+      if (btn) btn.disabled = true;
+
+      const coreFilter = document.getElementById('search-core-filter')?.value || 'ALL';
+
+      if (state.offlineDemoMode) {
+        const local = searchStatic261(q, 8, coreFilter);
+        answerBox.style.display = '';
+        answerBox.innerHTML = buildChatStyleAnswerHtml(q, local);
+        renderSearchCards(resultsBox, local);
+        if (thinking) thinking.style.display = 'none';
+        if (btn) btn.disabled = false;
+        return;
+      }
+
+      try {
+        const data = await api('/api/chat', 'POST', { question: q, show_sources: true, top_k: 8 });
+        const ans = String(data.answer || '').trim();
+        let liveItems = data.results || [];
+        if (coreFilter !== 'ALL') {
+          liveItems = liveItems.filter((it) => {
+            const p = productFromTitle(it.title || it.url).replace(/\s*\([^)]+\)\s*$/, '');
+            return coreCodeFromProduct(p) === coreFilter;
+          });
+        }
+        answerBox.style.display = '';
+        answerBox.innerHTML = buildChatStyleAnswerHtml(q, liveItems);
+        renderSearchCards(resultsBox, liveItems);
+      } catch (err) {
+        const local = searchStatic261(q, 8, coreFilter);
+        answerBox.style.display = '';
+        answerBox.innerHTML = buildChatStyleAnswerHtml(q, local);
+        renderSearchCards(resultsBox, local);
+      } finally {
+        if (thinking) thinking.style.display = 'none';
+        if (btn) btn.disabled = false;
+      }
+    }
+
+    async function loadPlannerData() {
+      try {
+        const filters = await api('/api/backend/filters', 'GET', undefined, BACKEND_BASE);
+        state.backendEnabled = true;
+        setSelectOptions('release-filter', filters.releases || []);
+        setSelectOptions('product-filter', filters.products || []);
+        const data = await api('/api/backend/features?limit=3000', 'GET', undefined, BACKEND_BASE);
+        state.backendRows = data.rows || [];
+        buildPlannerRows(state.backendRows);
+
+        const metrics = await api('/api/backend/metrics', 'GET', undefined, BACKEND_BASE);
+        document.getElementById('kpi-total').innerHTML = `<strong>Total Features</strong>${metrics.total_features || 0}`;
+        document.getElementById('kpi-testing').innerHTML = `<strong>Require Testing</strong>${metrics.requires_testing || 0}`;
+        const top = (metrics.by_enablement || []).slice(0, 3).map((x) => `${x.name}: ${x.count}`).join(' | ');
+        document.getElementById('kpi-enablement').innerHTML = `<strong>Enablement Mix</strong>${esc(top || '-')}`;
+      } catch (err) {
+        state.backendEnabled = false;
+        document.getElementById('planner-status').textContent = 'Using local 26.1 static index for planner demo.';
+        const idx = window.RELEASE_26_1_INDEX || { documents: [] };
+        const offlineRows = (idx.documents || []).map((d, i) => {
+          const product = productFromTitle(d.title || d.url);
+          const core = coreCodeFromProduct(product.replace(/\s*\([^)]+\)\s*$/, ''));
+          return {
+            id: `offline-${i}`,
+            name: `${product} feature set`,
+            feature_name: `${product} feature set`,
+            release: '26.1',
+            product,
+            core,
+            enablement_type: 'see source',
+            source_url: d.url,
+            url: d.url,
+          };
+        });
+        state.offlineRows = offlineRows;
+        setSelectOptions('release-filter', ['26.1']);
+        const products = [...new Set(offlineRows.map((r) => r.product))].sort();
+        setSelectOptions('product-filter', products);
+        buildPlannerRows(offlineRows);
+        document.getElementById('kpi-total').innerHTML = `<strong>Total Features</strong>${offlineRows.length}`;
+        document.getElementById('kpi-testing').innerHTML = '<strong>Require Testing</strong>Use backend API';
+        document.getElementById('kpi-enablement').innerHTML = '<strong>Enablement Mix</strong>Use backend API';
+      }
+    }
+
+    function applyPlannerFiltersLocal() {
+      const releases = new Set(selectedValues('release-filter'));
+      const products = new Set(selectedValues('product-filter'));
+      const base = state.backendEnabled ? state.backendRows : state.offlineRows;
+      const rows = (base || []).filter((r) => {
+        const releaseOk = releases.size === 0 || releases.has(String(r.release || ''));
+        const productOk = products.size === 0 || products.has(String(r.product || ''));
+        return releaseOk && productOk;
+      });
+      buildPlannerRows(rows);
+      syncVideoFeatureSelect();
+      syncSlidesFeatureSelect();
+    }
+
+    async function refreshBackendByFilters() {
+      if (!state.backendEnabled) {
+        applyPlannerFiltersLocal();
+        return;
+      }
+      const releases = selectedValues('release-filter').join(',');
+      const products = selectedValues('product-filter').join(',');
+      const q = new URLSearchParams();
+      if (releases) q.set('releases', releases);
+      if (products) q.set('products', products);
+      q.set('limit', '3000');
+      const data = await api(`/api/backend/features?${q.toString()}`, 'GET', undefined, BACKEND_BASE);
+      state.backendRows = data.rows || [];
+      buildPlannerRows(state.backendRows);
+      const m = await api(`/api/backend/metrics?${q.toString()}`, 'GET', undefined, BACKEND_BASE);
+      document.getElementById('kpi-total').innerHTML = `<strong>Total Features</strong>${m.total_features || 0}`;
+      document.getElementById('kpi-testing').innerHTML = `<strong>Require Testing</strong>${m.requires_testing || 0}`;
+      const top = (m.by_enablement || []).slice(0, 3).map((x) => `${x.name}: ${x.count}`).join(' | ');
+      document.getElementById('kpi-enablement').innerHTML = `<strong>Enablement Mix</strong>${esc(top || '-')}`;
+      state.currentPlannerRows = state.backendRows;
+    }
+
+    function syncVideoFeatureSelect() {
+      const sel = document.getElementById('video-feature-select');
+      sel.innerHTML = '';
+      const rows = (state.currentPlannerRows && state.currentPlannerRows.length)
+        ? state.currentPlannerRows
+        : (state.backendEnabled ? state.backendRows : state.offlineRows);
+      const seen = new Set();
+      rows.forEach((r) => {
+        const name = r.feature_name || r.name || 'Feature';
+        const src = r.source_url || r.url;
+        if (!src) return;
+        const key = `${name}|${src}`;
+        if (seen.has(key)) return;
+        seen.add(key);
+        const opt = document.createElement('option');
+        opt.value = src;
+        opt.textContent = state.backendEnabled ? `${name} (${r.release || 'unknown'} / ${r.product || 'unknown'})` : name;
+        sel.appendChild(opt);
+      });
+    }
+
+    function syncSlidesFeatureSelect() {
+      const sel = document.getElementById('slides-feature-select');
+      if (!sel) return;
+      sel.innerHTML = '';
+      const rows = (state.currentPlannerRows && state.currentPlannerRows.length)
+        ? state.currentPlannerRows
+        : (state.backendEnabled ? state.backendRows : state.offlineRows);
+      const seen = new Set();
+      rows.forEach((r) => {
+        const name = r.feature_name || r.name || 'Feature';
+        const src = r.source_url || r.url;
+        if (!src) return;
+        const key = `${name}|${src}`;
+        if (seen.has(key)) return;
+        seen.add(key);
+        const opt = document.createElement('option');
+        opt.value = src;
+        opt.textContent = state.backendEnabled
+          ? `${name} (${r.release || '26.1'} / ${r.product || 'Unknown'})`
+          : `${name} (${r.product || 'Unknown'})`;
+        sel.appendChild(opt);
+      });
+    }
+
+    const tabs = document.querySelectorAll('.nav-btn');
+    const panels = document.querySelectorAll('.panel');
+    tabs.forEach(btn => {
+      btn.addEventListener('click', () => {
+        tabs.forEach(b => b.classList.remove('active'));
+        panels.forEach(p => p.classList.remove('active'));
+        btn.classList.add('active');
+        document.getElementById(btn.dataset.target).classList.add('active');
+      });
+    });
+
+    document.getElementById('search-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const q = document.getElementById('search-q').value.trim();
+      if (!q) return;
+      await runSearch(q);
+    });
+
+    document.getElementById('planner-search').addEventListener('input', applyPlannerFiltersLocal);
+    document.getElementById('planner-search-btn').addEventListener('click', applyPlannerFiltersLocal);
+
+    document.getElementById('release-filter').addEventListener('change', async () => {
+      await refreshBackendByFilters();
+      syncVideoFeatureSelect();
+      syncSlidesFeatureSelect();
+    });
+    document.getElementById('product-filter').addEventListener('change', async () => {
+      await refreshBackendByFilters();
+      syncVideoFeatureSelect();
+      syncSlidesFeatureSelect();
+    });
+
+    document.getElementById('select-all-features').addEventListener('click', () => {
+      document.querySelectorAll('#planner-list input[type="checkbox"]').forEach((x) => (x.checked = true));
+    });
+    document.getElementById('clear-features').addEventListener('click', () => {
+      document.querySelectorAll('#planner-list input[type="checkbox"]').forEach((x) => (x.checked = false));
+    });
+
+    document.getElementById('generate-plan').addEventListener('click', async () => {
+      if (state.backendEnabled) {
+        const q = new URLSearchParams();
+        const releases = selectedValues('release-filter').join(',');
+        const products = selectedValues('product-filter').join(',');
+        if (releases) q.set('releases', releases);
+        if (products) q.set('products', products);
+        window.open(`${BACKEND_BASE}/api/backend/export.xlsx?${q.toString()}`, '_blank');
+        return;
+      }
+      const selected = selectedFeatureSources();
+      if (!selected.length) {
+        document.getElementById('planner-status').textContent = 'Select at least one item first.';
+        return;
+      }
+      try {
+        const data = await api('/api/create-document', 'POST', { pdf_ids: selected, title: 'Test and Training Plan' });
+        window.open(data.file_url, '_blank');
+      } catch (err) {
+        document.getElementById('planner-status').textContent = err.message;
+      }
+    });
+
+    document.getElementById('create-file').addEventListener('click', async () => {
+      const buildType = document.getElementById('build-type').value;
+      const selected = selectedFeatureSources();
+      const labelByType = {
+        testing_csv_export: 'Testing CSV export',
+        ppt: 'PowerPoint Deck',
+        training_tool: 'Training Tool',
+      };
+      if (!selected.length) {
+        document.getElementById('planner-status').textContent = 'Select at least one feature/module first.';
+        return;
+      }
+
+      if (state.offlineDemoMode) {
+        document.getElementById('planner-status').textContent =
+          `Demo mode: ${labelByType[buildType]} file created from ${selected.length} selected items.`;
+        return;
+      }
+
+      try {
+        const title = `${labelByType[buildType]} - Release Materials`;
+        const data = await api('/api/create-document', 'POST', { pdf_ids: selected, title });
+        document.getElementById('planner-status').innerHTML =
+          `${labelByType[buildType]} ready: <a href="${data.file_url}" target="_blank">Open file</a>`;
+      } catch (err) {
+        document.getElementById('planner-status').textContent = err.message;
+      }
+    });
+
+    document.getElementById('video-generate').addEventListener('click', async () => {
+      const selected = [...document.getElementById('video-feature-select').selectedOptions].map((o) => o.value);
+      const context = document.getElementById('video-context').value.trim();
+      if (!selected.length) {
+        document.getElementById('video-output').textContent = 'Select at least one feature first.';
+        return;
+      }
+      document.getElementById('video-output').textContent = 'Generating tutorial...';
+      try {
+        const data = await api('/api/create-video-tutorial', 'POST', { pdf_ids: selected, impact_context: context });
+        document.getElementById('video-output').innerHTML =
+          `${esc(data.tutorial || '')}\n\nWalkthrough: ${esc(data.html_url || '')}\nScript: ${esc(data.file_url || '')}`;
+      } catch (err) {
+        document.getElementById('video-output').textContent = err.message;
+      }
+    });
+
+    document.getElementById('slides-generate').addEventListener('click', async () => {
+      const selected = [...document.getElementById('slides-feature-select').selectedOptions].map((o) => o.value);
+      const out = document.getElementById('slides-output');
+      if (!selected.length) {
+        out.textContent = 'Select at least one feature first.';
+        return;
+      }
+      if (state.offlineDemoMode) {
+        out.textContent = `Demo mode: slide deck would be generated for ${selected.length} features using 26.1 template style.`;
+        return;
+      }
+      out.textContent = 'Generating slides...';
+      try {
+        const data = await api('/api/create-feature-slides', 'POST', { pdf_ids: selected });
+        out.innerHTML = `Slides ready: <a href="${data.file_url}" target="_blank">Open PPTX</a>\nTemplate used: ${esc(data.template_used || '')}\nSlides created: ${esc(String(data.slides_created || 0))}`;
+      } catch (err) {
+        out.textContent = `Error: ${err.message}`;
+      }
+    });
+
+    (async () => {
+      await loadPlannerData();
+      syncVideoFeatureSelect();
+      syncSlidesFeatureSelect();
+    })();
+  </script>
+</body>
+</html>
