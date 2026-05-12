@@ -107,6 +107,15 @@
       font-size: 1rem;
       line-height: 1.45;
     }
+    .roadmap-btn {
+      display: inline-flex; align-items: center; gap: 7px;
+      margin-top: 14px; padding: 8px 16px;
+      background: transparent; border: 1.5px solid var(--blue);
+      color: var(--blue); border-radius: 999px;
+      font-size: 0.85rem; font-weight: 600; text-decoration: none;
+      transition: background 0.15s, color 0.15s;
+    }
+    .roadmap-btn:hover { background: var(--blue); color: #fff; }
 
     .search-panel {
       display: grid;
@@ -843,6 +852,10 @@
         </div>
         <h1>CSM AI Tools</h1>
         <p class="subtitle">AI-powered tools across the customer lifecycle</p>
+        <a href="index.html" class="roadmap-btn">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="15" height="15" aria-hidden="true"><path d="M3 12h18M3 6h18M3 18h12"/></svg>
+          View Roadmap
+        </a>
       </div>
 
       <div class="search-panel" role="search">
